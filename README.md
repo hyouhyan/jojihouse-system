@@ -4,7 +4,7 @@
 
 ### PostgreSQL
 
-#### メンバー管理(members)
+#### メンバー(members)
 
 `members` テーブルでは、オフィスの利用メンバーの情報を管理します。
 
@@ -16,9 +16,32 @@
 | barcode | カードに印刷するバーコード（EAN-13） | 13桁の数字 |
 | contact | 連絡先情報（Xアカウントなど） |  |
 | remaining_entries | 入場可能回数 | 入場ごとに減少（同日再入場では減らない） |
-| is_student | 学生かどうか |  |
 | registered_at | 登録日 |  |
 | entry_count | 総入場回数 |  |
+
+#### ロール(roles)
+
+| フィールド名 | 説明 | 備考 |
+|-------------|------|------|
+|id|役割のid||
+|name|役割名||
+
+初期データ  
+|name|説明|
+|---|---|
+|member|一般Labメンバー|
+|student|学生|
+|system-admin|システム管理者|
+|house-admin|ハウス管理者(月額出資者)|
+|guest|ゲスト(ラボメン以外, 使うことある？)|
+
+#### ロール用中間テーブル(member_roles)
+
+| フィールド名 | 説明 |
+|-------------|------|
+|member_id|メンバーID|
+|role_id|ロールID|
+|(member_id, role_id)|Primary Key|
 
 ### MongoDB
 
