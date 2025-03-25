@@ -11,7 +11,8 @@ services:
     volumes:
       - ./data/postgresql:/var/lib/postgresql/data
     networks:
-      - myNetwork
+      myNetwork: 
+        ipv4_address: 172.30.0.2
   
   mongoDb:
     image: mongo:latest
@@ -21,8 +22,13 @@ services:
     volumes:
       - ./data/mongodb:/data/db
     networks:
-      - myNetwork
+      myNetwork:
+        ipv4_address: 172.30.0.3
 
 networks:
   myNetwork:
     driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.30.0.0/24
