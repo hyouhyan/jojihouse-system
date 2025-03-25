@@ -21,3 +21,36 @@ conn = psycopg2.connect(
 )
 
 cursor = conn.cursor()
+
+# ハウスへの入室処理
+def userEntry(user_id):
+    cursor.execute("SELECT name FROM users WHERE user_id = %s", (user_id,))
+    user = cursor.fetchone()
+    if user is None:
+        print("ユーザーが存在しません")
+        return False
+    else:
+        print(f"{user[0]}さんが入室しました")
+
+    # 入場可能回数(remaining_entries)を減らす
+    # まず取得
+    cursor.execute("SELECT remaining_entries FROM users WHERE user_id = %s", (user_id,))
+    remaining_entries = cursor.fetchone()[0]
+    # 減らす
+    remaining_entries -= 1
+    # 更新
+    cursor.execute("UPDATE users SET remaining_entries = %s WHERE user_id = %s", (remaining_entries, user_id))
+    conn.commit()
+
+    return True
+
+def userExit(user_id):
+    cursor.execute("SELECT name FROM users WHERE user_id = %s", (user_id,))
+    user = cursor.fetchone()
+    if user is None:
+        print("ユーザーが存在しません")
+        return False
+    else:
+        print(f"{user[0]}さんが退室しました")
+
+    return True
