@@ -17,7 +17,7 @@
 | contact | 連絡先情報（Xアカウントなど） |  |
 | remaining_entries | 入場可能回数 | 入場ごとに減少（同日再入場では減らない） |
 | registered_at | 登録日 |  |
-| entry_count | 総入場回数 |  |
+| total_entries | 総入場回数 |  |
 
 ### ロール(roles)
 

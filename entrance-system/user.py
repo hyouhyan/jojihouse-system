@@ -53,4 +53,13 @@ def userExit(user_id):
     else:
         print(f"{user[0]}さんが退室しました")
 
+    # 総入場回数(total_entries)を増やす
+    cursor.execute("SELECT total_entries FROM users WHERE user_id = %s", (user_id,))
+    total_entries = cursor.fetchone()[0]
+    
+    total_entries += 1
+    
+    cursor.execute("UPDATE users SET total_entries = %s WHERE user_id = %s", (total_entries, user_id))
+    conn.commit()
+
     return True
