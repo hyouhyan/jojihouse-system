@@ -1,10 +1,10 @@
 # JOJIハウス 入退出管理システム
 
-## データベース
+# データベース
 
-### PostgreSQL
+## PostgreSQL
 
-#### メンバー(members)
+### メンバー(members)
 
 `members` テーブルでは、オフィスの利用メンバーの情報を管理します。
 
@@ -19,7 +19,7 @@
 | registered_at | 登録日 |  |
 | entry_count | 総入場回数 |  |
 
-#### ロール(roles)
+### ロール(roles)
 
 | フィールド名 | 説明 | 備考 |
 |-------------|------|------|
@@ -35,7 +35,7 @@
 |house-admin|ハウス管理者(月額出資者)|
 |guest|ゲスト(ラボメン以外, 使うことある？)|
 
-#### ロール用中間テーブル(member_roles)
+### ロール用中間テーブル(member_roles)
 
 | フィールド名 | 説明 |
 |-------------|------|
@@ -43,9 +43,9 @@
 |role_id|ロールID|
 |(member_id, role_id)|Primary Key|
 
-### MongoDB
+## MongoDB
 
-#### 入退室ログ(access_log)
+### 入退室ログ(access_log)
 
 `access_log` コレクションでは、メンバーの入退室の記録を管理します。
 
@@ -56,7 +56,7 @@
 | time | 入退出の時刻 |  |
 | access_type | 入退室の種類 | "entry" or "exit" |
 
-#### 入場可能回数の変更ログ(entry_count_log)
+### 入場可能回数の変更ログ(entry_count_log)
 `entry_count_log` コレクションでは、入場可能回数の変更履歴を管理します。
 
 | フィールド名 | 説明 | 備考 |
