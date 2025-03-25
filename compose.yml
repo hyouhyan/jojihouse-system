@@ -1,0 +1,28 @@
+services:
+  postgreSql:
+    image: postgres:latest
+    container_name: postgreSql
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    networks:
+      - myNetwork
+  
+  mongoDb:
+    image: mongo:latest
+    container_name: mongoDb
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data:/data/db
+    networks:
+      - myNetwork
+
+networks:
+  myNetwork:
+    driver: bridge
