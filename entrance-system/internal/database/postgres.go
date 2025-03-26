@@ -1,4 +1,4 @@
-package main
+package database
 
 import (
 	"database/sql"
@@ -17,7 +17,7 @@ func Env_load() {
 	}
 }
 
-func main() {
+func Connect() {
 	Env_load()
 	// postgreSQLに接続
 	db, err := sql.Open("postgres", "host="+os.Getenv("POSTGRES_HOST")+" port="+os.Getenv("POSTGRES_PORT")+" user="+os.Getenv("POSTGRES_USER")+" password="+os.Getenv("POSTGRES_PASSWORD")+" dbname="+os.Getenv("POSTGRES_DB")+" sslmode=disable")
