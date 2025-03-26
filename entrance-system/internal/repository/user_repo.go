@@ -110,3 +110,12 @@ func (r *UserRepository) IncreaseRemainingEntries(id int) error {
 	}
 	return nil
 }
+
+// 総入場回数を増やす
+func (r *UserRepository) IncreaseTotalEntries(id int) error {
+	_, err := r.db.Exec("UPDATE users SET total_entries = total_entries + 1 WHERE id = $1", id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
