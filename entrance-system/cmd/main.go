@@ -8,7 +8,7 @@ func main() {
 	database.ConnectPostgres()
 	defer database.ClosePostgres()
 
-	// test(database.PostgresDB)
+	test(database.PostgresDB)
 
 	database.ConnectMongo()
 	defer database.CloseMongo()
