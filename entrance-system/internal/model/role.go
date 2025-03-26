@@ -2,7 +2,12 @@ package model
 
 type Role struct {
 	ID   int
-	Role string
+	Name string
+}
+
+type UserRoles struct {
+	UserID int
+	RoleID int
 }
 
 const (
