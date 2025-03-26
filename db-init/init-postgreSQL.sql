@@ -6,5 +6,5 @@ CREATE TABLE users (
     contact VARCHAR(255),
     remaining_entries INT DEFAULT 0 CHECK (remaining_entries >= 0),
     registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    entry_count INT DEFAULT 0 CHECK (entry_count >= 0)
+    total_entries INT DEFAULT 0 CHECK (total_entries >= 0)
 );
