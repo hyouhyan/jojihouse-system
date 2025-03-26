@@ -33,43 +33,14 @@ func (s *UserService) DeleteUser(id int) error {
 	return s.repo.DeleteUser(id)
 }
 
-// 入場したときの処理
-func (s *UserService) EnterUser(barcode string) error {
-	// ユーザー情報を取得(存在するかの確認)
-	user, err := s.repo.GetUserByBarcode(barcode)
-	if err != nil {
-		return err
-	}
-
-	// TODO: ログの生成
-
-	// TODO: ユーザーが入場可能回数を減らす対象かの確認
-	// ハウス管理者とか、同日の再入場とか
-
-	// 残り回数を減らす
-	err = s.repo.DecreaseRemainingEntries(user.ID)
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (s *UserService) DecreaseRemainingEntries(id int) error {
+	return s.repo.DecreaseRemainingEntries(id)
 }
 
-// 退場したときの処理
-func (s *UserService) ExitUser(barcode string) error {
-	// ユーザー情報を取得(存在するかの確認)
-	user, err := s.repo.GetUserByBarcode(barcode)
-	if err != nil {
-		return err
-	}
+func (s *UserService) IncreaseRemainingEntries(id int) error {
+	return s.repo.IncreaseRemainingEntries(id)
+}
 
-	// TODO: ログの生成
-
-	// 入場回数を増やす
-	err = s.repo.IncreaseTotalEntries(user.ID)
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (s *UserService) IncreaseTotalEntries(id int) error {
+	return s.repo.IncreaseTotalEntries(id)
 }
