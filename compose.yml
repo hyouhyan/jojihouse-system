@@ -36,8 +36,13 @@ services:
     container_name: mongoDb
     ports:
       - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: mongo
+      MONGO_INITDB_DATABASE: jojihouse
     volumes:
       - ./data/mongodb:/data/db
+      - ./db-init/mongo:/docker-entrypoint-initdb.d
     networks:
       myNetwork:
         ipv4_address: 172.30.0.11

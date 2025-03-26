@@ -56,8 +56,8 @@
 | time | 入退出の時刻 |  |
 | access_type | 入退室の種類 | "entry" or "exit" |
 
-### 入場可能回数の変更ログ(entry_count_log)
-`entry_count_log` コレクションでは、入場可能回数の変更履歴を管理します。
+### 入場可能回数の変更ログ(remaining_entries_log)
+`remaining_entries_log` コレクションでは、入場可能回数の変更履歴を管理します。
 
 | フィールド名 | 説明 | 備考 |
 |-------------|------|------|
