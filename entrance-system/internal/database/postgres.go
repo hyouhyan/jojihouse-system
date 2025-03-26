@@ -17,9 +17,9 @@ func Env_load() {
 	}
 }
 
-var DB *sql.DB
+var PostgresDB *sql.DB
 
-func Connect() {
+func ConnectPostgres() {
 	Env_load()
 	dst := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
@@ -44,12 +44,12 @@ func Connect() {
 
 	fmt.Println("Successfully connected!")
 
-	DB = db
+	PostgresDB = db
 }
 
-func Close() {
-	if DB != nil {
-		DB.Close()
+func ClosePostgres() {
+	if PostgresDB != nil {
+		PostgresDB.Close()
 		fmt.Println("Successfully closed!")
 	}
 }

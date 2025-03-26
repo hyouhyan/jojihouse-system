@@ -5,8 +5,8 @@ import (
 )
 
 func main() {
-	database.Connect()
-	defer database.Close()
+	database.ConnectPostgres()
+	defer database.ClosePostgres()
 
-	test(database.DB)
+	test(database.PostgresDB)
 }
