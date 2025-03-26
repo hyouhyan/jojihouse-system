@@ -10,7 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var MongoDB *mongo.Client
+var MongoDB *mongo.Database
+var mongoClient *mongo.Client
 
 func ConnectMongo() {
 	Env_load()
@@ -35,12 +36,13 @@ func ConnectMongo() {
 
 	fmt.Println("Successfully connected to mongo!")
 
-	MongoDB = client
+	mongoClient = client
+	MongoDB = client.Database(os.Getenv("MONGO_DB"))
 }
 
 func CloseMongo() {
 	if MongoDB != nil {
-		err := MongoDB.Disconnect(context.Background())
+		err := mongoClient.Disconnect(context.Background())
 		if err != nil {
 			log.Fatalf("Failed to close: %v", err)
 		}
