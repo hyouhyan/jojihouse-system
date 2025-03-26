@@ -8,3 +8,23 @@ CREATE TABLE users (
     registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     total_entries INT DEFAULT 0 CHECK (total_entries >= 0)
 );
+
+CREATE TABLE roles (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+
+-- 初期データの注入
+INSERT INTO roles (name) 
+VALUES 
+    ('member'),
+    ('student'),
+    ('system-admin'),
+    ('house-admin'),
+    ('guest');
+
+CREATE TABLE user_roles (
+    user_id INT REFERENCES users(id),
+    role_id INT REFERENCES roles(id),
+    PRIMARY KEY (user_id, role_id)
+);
