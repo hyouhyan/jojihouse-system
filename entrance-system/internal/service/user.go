@@ -37,8 +37,8 @@ func (s *UserService) DecreaseRemainingEntries(id int) error {
 	return s.repo.DecreaseRemainingEntries(id)
 }
 
-func (s *UserService) IncreaseRemainingEntries(id int) error {
-	return s.repo.IncreaseRemainingEntries(id)
+func (s *UserService) IncreaseRemainingEntries(id int, count int) error {
+	return s.repo.IncreaseRemainingEntries(id, count)
 }
 
 func (s *UserService) IncreaseTotalEntries(id int) error {

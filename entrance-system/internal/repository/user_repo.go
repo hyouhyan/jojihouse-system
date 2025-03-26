@@ -103,8 +103,8 @@ func (r *UserRepository) DecreaseRemainingEntries(id int) error {
 }
 
 // 入場可能回数を増やす
-func (r *UserRepository) IncreaseRemainingEntries(id int) error {
-	_, err := r.db.Exec("UPDATE users SET remaining_entries = remaining_entries + 1 WHERE id = $1", id)
+func (r *UserRepository) IncreaseRemainingEntries(id int, count int) error {
+	_, err := r.db.Exec("UPDATE users SET remaining_entries = remaining_entries + $1 WHERE id = $2", count, id)
 	if err != nil {
 		return err
 	}
