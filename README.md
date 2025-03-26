@@ -4,9 +4,9 @@
 
 ## PostgreSQL
 
-### メンバー(members)
+### ユーザー(users)
 
-`members` テーブルでは、オフィスの利用メンバーの情報を管理します。
+`users` テーブルでは、オフィスの利用メンバーの情報を管理します。
 
 | フィールド名 | 説明 | 備考 |
 |-------------|------|------|
@@ -35,13 +35,13 @@
 |house-admin|ハウス管理者(月額出資者)|
 |guest|ゲスト(ラボメン以外, 使うことある？)|
 
-### ロール用中間テーブル(member_roles)
+### ロール用中間テーブル(user_roles)
 
 | フィールド名 | 説明 |
 |-------------|------|
-|member_id|メンバーID|
+|user_id|メンバーID|
 |role_id|ロールID|
-|(member_id, role_id)|Primary Key|
+|(user_id, role_id)|Primary Key|
 
 ## MongoDB
 
@@ -52,7 +52,7 @@
 | フィールド名 | 説明 | 備考 |
 |-------------|------|------|
 | log_id | 内部処理用 | primary key |
-| member_id | members テーブルと紐づけ |  |
+| user_id | users テーブルと紐づけ |  |
 | time | 入退出の時刻 |  |
 | access_type | 入退室の種類 | "entry" or "exit" |
 
@@ -62,7 +62,7 @@
 | フィールド名 | 説明 | 備考 |
 |-------------|------|------|
 | log_id | 内部処理用 | primary key |
-| member_id | members テーブルと紐づけ |  |
+| user_id | users テーブルと紐づけ |  |
 | previous_entries | 変更前の入場可能回数 |  |
 | new_entries | 変更後の入場可能回数 |  |
 | reason | 追加理由 |  |
