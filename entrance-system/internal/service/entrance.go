@@ -1,14 +1,17 @@
 package service
 
-import "log"
+import (
+	"log"
+)
 
 type EntranceService struct {
 	userService *UserService
 	roleService *RoleService
+	logService  *LogService
 }
 
-func NewEntranceService(userService *UserService, roleService *RoleService) *EntranceService {
-	return &EntranceService{userService: userService, roleService: roleService}
+func NewEntranceService(userService *UserService, roleService *RoleService, logService *LogService) *EntranceService {
+	return &EntranceService{userService: userService, roleService: roleService, logService: logService}
 }
 
 // 入場したときの処理
@@ -19,7 +22,7 @@ func (s *EntranceService) EnterUser(barcode string) error {
 		return err
 	}
 
-	// TODO: ログの生成
+	s.logService.CreateEntryAccessLog(user.ID)
 
 	isDecreaseTarget := true
 	// ハウス管理者か
@@ -52,7 +55,7 @@ func (s *EntranceService) ExitUser(barcode string) error {
 		return err
 	}
 
-	// TODO: ログの生成
+	s.logService.CreateExitAccessLog(user.ID)
 
 	// 入場回数を増やす
 	err = s.userService.IncreaseTotalEntries(user.ID)
