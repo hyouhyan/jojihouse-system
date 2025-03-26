@@ -42,7 +42,7 @@ func ConnectPostgres() {
 		log.Fatalf("Failed to ping: %v", err)
 	}
 
-	fmt.Println("Successfully connected!")
+	fmt.Println("Successfully connected to postgres!")
 
 	PostgresDB = db
 }
@@ -50,6 +50,6 @@ func ConnectPostgres() {
 func ClosePostgres() {
 	if PostgresDB != nil {
 		PostgresDB.Close()
-		fmt.Println("Successfully closed!")
+		fmt.Println("Successfully closed postgres!")
 	}
 }
