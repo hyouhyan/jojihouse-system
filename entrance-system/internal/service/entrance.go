@@ -1,5 +1,7 @@
 package service
 
+import "log"
+
 type EntranceService struct {
 	userService *UserService
 	roleService *RoleService
@@ -19,13 +21,24 @@ func (s *EntranceService) EnterUser(barcode string) error {
 
 	// TODO: ログの生成
 
-	// TODO: ユーザーが入場可能回数を減らす対象かの確認
-	// ハウス管理者とか、同日の再入場とか
-
-	// 残り回数を減らす
-	err = s.userService.DecreaseRemainingEntries(user.ID)
+	isDecreaseTarget := true
+	// ハウス管理者か
+	isHouseAdmin, err := s.roleService.IsHouseAdmin(user.ID)
 	if err != nil {
-		return err
+		log.Fatalf("Failed to check if the user is a house admin: %v", err)
+	}
+	if isHouseAdmin {
+		isDecreaseTarget = false
+	}
+
+	// TODO: 同日の再入場か
+
+	if isDecreaseTarget {
+		// 残り回数を減らす
+		err = s.userService.DecreaseRemainingEntries(user.ID)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
