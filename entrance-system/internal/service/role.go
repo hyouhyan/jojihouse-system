@@ -17,6 +17,10 @@ func (s *RoleService) GetRoleByID(id int) (*model.Role, error) {
 	return s.roleRepo.GetRoleByID(id)
 }
 
+func (s *RoleService) GetRoleByName(name string) (*model.Role, error) {
+	return s.roleRepo.GetRoleByName(name)
+}
+
 func (s *RoleService) GetRolesByUserID(userID int) ([]model.Role, error) {
 	return s.roleRepo.GetRolesByUserID(userID)
 }

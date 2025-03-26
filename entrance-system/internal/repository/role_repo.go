@@ -26,6 +26,18 @@ func (r *RoleRepository) GetRoleByID(id int) (*model.Role, error) {
 	return role, nil
 }
 
+func (r *RoleRepository) GetRoleByName(name string) (*model.Role, error) {
+	role := &model.Role{}
+	err := r.db.QueryRow("SELECT * FROM roles WHERE name = $1", name).Scan(
+		&role.ID,
+		&role.Name,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return role, nil
+}
+
 func (r *RoleRepository) GetRolesByUserID(userID int) ([]model.Role, error) {
 	roles := []model.Role{}
 	rows, err := r.db.Query("SELECT r.id, r.name FROM roles r JOIN user_roles ur ON r.id = ur.role_id WHERE ur.user_id = $1", userID)
@@ -114,4 +126,3 @@ func (r *RoleRepository) RemoveRoleFromUser(userID, roleID int) error {
 	}
 	return nil
 }
-
