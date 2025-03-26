@@ -1,4 +1,4 @@
-# JOJIハウス 入退出管理システム
+# JOJIハウス 入退出管理システム(jojihouse-entrance-system)
 
 # データベース
 
