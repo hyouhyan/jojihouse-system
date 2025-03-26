@@ -1,7 +1,7 @@
 package main
 
 import (
-	"entrance-system/internal/database"
+	"jojihouse-entrance-system/internal/database"
 )
 
 func main() {
