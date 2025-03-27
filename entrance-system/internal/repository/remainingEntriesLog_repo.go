@@ -2,10 +2,14 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"jojihouse-entrance-system/internal/model"
 
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type RemainingEntriesLogRepository struct {
@@ -24,35 +28,45 @@ func (r *RemainingEntriesLogRepository) CreateRemainingEntriesLog(log *model.Rem
 	return nil
 }
 
-func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogs() ([]model.RemainingEntriesLog, error) {
-	var logs []model.RemainingEntriesLog
-	cursor, err := r.db.Collection("remaining_entries_log").Find(context.Background(), nil)
-	if err != nil {
-		return nil, err
-	}
-	defer cursor.Close(context.Background())
-	for cursor.Next(context.Background()) {
-		var log model.RemainingEntriesLog
-		if err := cursor.Decode(&log); err != nil {
-			return nil, err
-		}
-		logs = append(logs, log)
-	}
-	return logs, nil
+func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogs(lastID primitive.ObjectID) ([]model.RemainingEntriesLog, error) {
+	// フィルターなしで全ログを取得
+	return r._findRemainingEntriesLogs(bson.D{}, lastID, 50)
 }
 
-func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogsByUserID(userID int) ([]model.RemainingEntriesLog, error) {
+func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogsByUserID(userID int, lastID primitive.ObjectID) ([]model.RemainingEntriesLog, error) {
+	// `user_id` でフィルター
+	filter := bson.D{{Key: "user_id", Value: userID}}
+	return r._findRemainingEntriesLogs(filter, lastID, 50)
+}
+
+// 共通の検索処理
+func (r *RemainingEntriesLogRepository) _findRemainingEntriesLogs(filter bson.D, lastID primitive.ObjectID, limit int64) ([]model.RemainingEntriesLog, error) {
 	var logs []model.RemainingEntriesLog
-	cursor, err := r.db.Collection("remaining_entries_log").Find(context.Background(), map[string]int{"user_id": userID})
+
+	findOptions := options.Find()
+	findOptions.SetLimit(limit)
+	findOptions.SetSort(bson.D{{Key: "updated_at", Value: 1}}) // `updated_at` で昇順ソート
+
+	// lastID によるページネーション
+	if !lastID.IsZero() {
+		filter = append(filter, bson.E{Key: "_id", Value: bson.D{{Key: "$gt", Value: lastID}}})
+	}
+
+	cursor, err := r.db.Collection("remaining_entries_log").Find(context.Background(), filter, findOptions)
 	if err != nil {
 		return nil, err
 	}
 	defer cursor.Close(context.Background())
+
 	for cursor.Next(context.Background()) {
 		var log model.RemainingEntriesLog
 		if err := cursor.Decode(&log); err != nil {
 			return nil, err
 		}
+
+		// タイムゾーンの変換
+		log.UpdatedAt = log.UpdatedAt.In(time.Local)
+
 		logs = append(logs, log)
 	}
 	return logs, nil
