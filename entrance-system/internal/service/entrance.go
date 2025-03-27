@@ -22,7 +22,10 @@ func (s *EntranceService) EnterUser(barcode string) error {
 		return err
 	}
 
-	s.logService.CreateEntryAccessLog(user.ID)
+	err = s.logService.CreateEntryAccessLog(user.ID)
+	if err != nil {
+		return err
+	}
 
 	isDecreaseTarget := true
 	// ハウス管理者か
@@ -55,7 +58,10 @@ func (s *EntranceService) ExitUser(barcode string) error {
 		return err
 	}
 
-	s.logService.CreateExitAccessLog(user.ID)
+	err = s.logService.CreateExitAccessLog(user.ID)
+	if err != nil {
+		return err
+	}
 
 	// 入場回数を増やす
 	err = s.userService.IncreaseTotalEntries(user.ID)
