@@ -22,6 +22,7 @@ func (s *EntranceService) EnterUser(barcode string) error {
 		return err
 	}
 
+	// 入場ログ作成
 	err = s.accessLogService.CreateEntryAccessLog(user.ID)
 	if err != nil {
 		return err
@@ -58,6 +59,7 @@ func (s *EntranceService) ExitUser(barcode string) error {
 		return err
 	}
 
+	// 退場ログ作成
 	err = s.accessLogService.CreateExitAccessLog(user.ID)
 	if err != nil {
 		return err
