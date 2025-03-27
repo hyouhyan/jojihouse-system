@@ -3,7 +3,6 @@ package service
 import (
 	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/repository"
-	"time"
 )
 
 type UserService struct {
@@ -23,7 +22,6 @@ func (s *UserService) GetUserByBarcode(barcode string) (*model.User, error) {
 }
 
 func (s *UserService) CreateUser(user *model.User) (*model.User, error) {
-	user.Registered_at = time.Now()
 	return s.repo.CreateUser(user)
 }
 

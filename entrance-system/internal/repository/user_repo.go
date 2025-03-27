@@ -52,13 +52,12 @@ func (r *UserRepository) GetUserByBarcode(barcode string) (*model.User, error) {
 
 func (r *UserRepository) CreateUser(user *model.User) (*model.User, error) {
 	err := r.db.QueryRow(
-		"INSERT INTO users (name, description, barcode, contact, remaining_entries, registered_at, total_entries) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id",
+		"INSERT INTO users (name, description, barcode, contact, remaining_entries, total_entries) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
 		user.Name,
 		user.Description,
 		user.Barcode,
 		user.Contact,
 		user.Remaining_entries,
-		user.Registered_at,
 		user.Total_entries,
 	).Scan(&user.ID)
 	if err != nil {
