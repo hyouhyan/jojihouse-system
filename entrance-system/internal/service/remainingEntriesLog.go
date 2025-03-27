@@ -3,6 +3,7 @@ package service
 import (
 	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/repository"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -16,6 +17,8 @@ func NewRemainingEntriesLogService(repo *repository.RemainingEntriesLogRepositor
 }
 
 func (s *RemainingEntriesLogService) CreateRemainingEntriesLog(log *model.RemainingEntriesLog) error {
+	log.ID = primitive.NilObjectID
+	log.UpdatedAt = time.Now()
 	return s.repo.CreateRemainingEntriesLog(log)
 }
 
