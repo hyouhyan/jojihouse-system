@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"jojihouse-entrance-system/internal/model"
 
@@ -37,6 +38,10 @@ func (r *AccessLogRepository) GetAccessLogs() ([]model.AccessLog, error) {
 		if err := cursor.Decode(&log); err != nil {
 			return nil, err
 		}
+
+		// タイムゾーンの変換
+		log.Time = log.Time.In(time.Local)
+
 		logs = append(logs, log)
 	}
 	return logs, nil
@@ -54,6 +59,10 @@ func (r *AccessLogRepository) GetAccessLogsByUserID(userID int) ([]model.AccessL
 		if err := cursor.Decode(&log); err != nil {
 			return nil, err
 		}
+
+		// タイムゾーンの変換
+		log.Time = log.Time.In(time.Local)
+
 		logs = append(logs, log)
 	}
 	return logs, nil
