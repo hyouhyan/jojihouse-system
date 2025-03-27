@@ -5,6 +5,7 @@ import (
 
 	"jojihouse-entrance-system/internal/model"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -26,7 +27,7 @@ func (r *AccessLogRepository) CreateAccessLog(log *model.AccessLog) error {
 
 func (r *AccessLogRepository) GetAccessLogs() ([]model.AccessLog, error) {
 	var logs []model.AccessLog
-	cursor, err := r.db.Collection("access_log").Find(context.Background(), nil)
+	cursor, err := r.db.Collection("access_log").Find(context.Background(), bson.D{})
 	if err != nil {
 		return nil, err
 	}
