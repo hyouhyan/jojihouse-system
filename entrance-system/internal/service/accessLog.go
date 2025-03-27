@@ -4,6 +4,8 @@ import (
 	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/repository"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type AccessLogService struct {
@@ -40,10 +42,10 @@ func (s *AccessLogService) CreateExitAccessLog(userid int) error {
 	return s.CreateAccessLog(log)
 }
 
-func (s *AccessLogService) GetAccessLogs() ([]model.AccessLog, error) {
-	return s.repo.GetAccessLogs()
+func (s *AccessLogService) GetAccessLogs(lastID primitive.ObjectID) ([]model.AccessLog, error) {
+	return s.repo.GetAccessLogs(lastID)
 }
 
-func (s *AccessLogService) GetAccessLogsByUserID(userID int) ([]model.AccessLog, error) {
-	return s.repo.GetAccessLogsByUserID(userID)
+func (s *AccessLogService) GetAccessLogsByUserID(userID int, lastID primitive.ObjectID) ([]model.AccessLog, error) {
+	return s.repo.GetAccessLogsByUserID(userID, lastID)
 }
