@@ -1,17 +1,19 @@
 package service
 
 import (
+	"jojihouse-entrance-system/internal/model"
 	"log"
 )
 
 type EntranceService struct {
-	userService      *UserService
-	roleService      *RoleService
-	accessLogService *AccessLogService
+	userService                *UserService
+	roleService                *RoleService
+	accessLogService           *AccessLogService
+	remainingEntriesLogService *RemainingEntriesLogService
 }
 
-func NewEntranceService(userService *UserService, roleService *RoleService, accessLogService *AccessLogService) *EntranceService {
-	return &EntranceService{userService: userService, roleService: roleService, accessLogService: accessLogService}
+func NewEntranceService(userService *UserService, roleService *RoleService, accessLogService *AccessLogService, remainingEntriesLogService *RemainingEntriesLogService) *EntranceService {
+	return &EntranceService{userService: userService, roleService: roleService, accessLogService: accessLogService, remainingEntriesLogService: remainingEntriesLogService}
 }
 
 // 入場したときの処理
@@ -46,6 +48,26 @@ func (s *EntranceService) EnterUser(barcode string) error {
 		if err != nil {
 			return err
 		}
+		// ログ保存
+		// 変更前残り回数
+		prevRemain := user.Remaining_entries
+		user, err := s.userService.GetUserByID(user.ID)
+		if err != nil {
+			return err
+		}
+		// 変更後残り回数
+		newRemain := user.Remaining_entries
+
+		log := &model.RemainingEntriesLog{
+			UserID:          user.ID,
+			PreviousEntries: prevRemain,
+			NewEntries:      newRemain,
+			Reason:          "ハウス入場のため",
+			UpdatedBy:       "システム",
+		}
+
+		// ログ作成
+		s.remainingEntriesLogService.CreateRemainingEntriesLog(log)
 	}
 
 	return nil
