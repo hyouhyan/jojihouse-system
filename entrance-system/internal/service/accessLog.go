@@ -6,19 +6,19 @@ import (
 	"time"
 )
 
-type LogService struct {
-	repo *repository.LogRepository
+type AccessLogService struct {
+	repo *repository.AccessLogRepository
 }
 
-func NewLogService(repo *repository.LogRepository) *LogService {
-	return &LogService{repo: repo}
+func NewAccessLogService(repo *repository.AccessLogRepository) *AccessLogService {
+	return &AccessLogService{repo: repo}
 }
 
-func (s *LogService) CreateAccessLog(log *model.AccessLog) error {
+func (s *AccessLogService) CreateAccessLog(log *model.AccessLog) error {
 	return s.repo.CreateAccessLog(log)
 }
 
-func (s *LogService) CreateEntryAccessLog(userid int) error {
+func (s *AccessLogService) CreateEntryAccessLog(userid int) error {
 	log :=
 		&model.AccessLog{
 			UserID:     userid,
@@ -29,7 +29,7 @@ func (s *LogService) CreateEntryAccessLog(userid int) error {
 	return s.CreateAccessLog(log)
 }
 
-func (s *LogService) CreateExitAccessLog(userid int) error {
+func (s *AccessLogService) CreateExitAccessLog(userid int) error {
 	log :=
 		&model.AccessLog{
 			UserID:     userid,
@@ -40,22 +40,10 @@ func (s *LogService) CreateExitAccessLog(userid int) error {
 	return s.CreateAccessLog(log)
 }
 
-func (s *LogService) GetAccessLogs() ([]model.AccessLog, error) {
+func (s *AccessLogService) GetAccessLogs() ([]model.AccessLog, error) {
 	return s.repo.GetAccessLogs()
 }
 
-func (s *LogService) GetAccessLogsByUserID(userID int) ([]model.AccessLog, error) {
+func (s *AccessLogService) GetAccessLogsByUserID(userID int) ([]model.AccessLog, error) {
 	return s.repo.GetAccessLogsByUserID(userID)
-}
-
-func (s *LogService) CreateRemainingEntriesLog(log *model.RemainingEntriesLog) error {
-	return s.repo.CreateRemainingEntriesLog(log)
-}
-
-func (s *LogService) GetRemainingEntriesLogs() ([]model.RemainingEntriesLog, error) {
-	return s.repo.GetRemainingEntriesLogs()
-}
-
-func (s *LogService) GetRemainingEntriesLogsByUserID(userID int) ([]model.RemainingEntriesLog, error) {
-	return s.repo.GetRemainingEntriesLogsByUserID(userID)
 }

@@ -5,13 +5,13 @@ import (
 )
 
 type EntranceService struct {
-	userService *UserService
-	roleService *RoleService
-	logService  *LogService
+	userService      *UserService
+	roleService      *RoleService
+	accessLogService *AccessLogService
 }
 
-func NewEntranceService(userService *UserService, roleService *RoleService, logService *LogService) *EntranceService {
-	return &EntranceService{userService: userService, roleService: roleService, logService: logService}
+func NewEntranceService(userService *UserService, roleService *RoleService, accessLogService *AccessLogService) *EntranceService {
+	return &EntranceService{userService: userService, roleService: roleService, accessLogService: accessLogService}
 }
 
 // 入場したときの処理
@@ -22,7 +22,7 @@ func (s *EntranceService) EnterUser(barcode string) error {
 		return err
 	}
 
-	err = s.logService.CreateEntryAccessLog(user.ID)
+	err = s.accessLogService.CreateEntryAccessLog(user.ID)
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func (s *EntranceService) ExitUser(barcode string) error {
 		return err
 	}
 
-	err = s.logService.CreateExitAccessLog(user.ID)
+	err = s.accessLogService.CreateExitAccessLog(user.ID)
 	if err != nil {
 		return err
 	}
