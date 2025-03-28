@@ -2,38 +2,39 @@ package service
 
 import (
 	"jojihouse-entrance-system/internal/model"
+	"jojihouse-entrance-system/internal/repository"
 	"log"
 	"time"
 )
 
 type EntranceService struct {
-	userService                *UserService
-	roleService                *RoleService
-	accessLogService           *AccessLogService
-	remainingEntriesLogService *RemainingEntriesLogService
+	userRepository                *repository.UserRepository
+	roleRepository                *repository.RoleRepository
+	accessLogRepository           *repository.AccessLogRepository
+	remainingEntriesLogRepository *repository.RemainingEntriesLogRepository
 }
 
-func NewEntranceService(userService *UserService, roleService *RoleService, accessLogService *AccessLogService, remainingEntriesLogService *RemainingEntriesLogService) *EntranceService {
-	return &EntranceService{userService: userService, roleService: roleService, accessLogService: accessLogService, remainingEntriesLogService: remainingEntriesLogService}
+func NewEntranceService(userRepository *repository.UserRepository, roleRepository *repository.RoleRepository, accessLogRepository *repository.AccessLogRepository, remainingEntriesLogRepository *repository.RemainingEntriesLogRepository) *EntranceService {
+	return &EntranceService{userRepository: userRepository, roleRepository: roleRepository, accessLogRepository: accessLogRepository, remainingEntriesLogRepository: remainingEntriesLogRepository}
 }
 
 // 入場したときの処理
 func (s *EntranceService) EnterUser(barcode string) error {
 	// ユーザー情報を取得(存在するかの確認)
-	user, err := s.userService.GetUserByBarcode(barcode)
+	user, err := s.userRepository.GetUserByBarcode(barcode)
 	if err != nil {
 		return err
 	}
 
 	// 入場ログ作成
-	err = s.accessLogService.CreateEntryAccessLog(user.ID)
+	err = s.accessLogRepository.CreateEntryAccessLog(user.ID)
 	if err != nil {
 		return err
 	}
 
 	isDecreaseTarget := true
 	// ハウス管理者か
-	isHouseAdmin, err := s.roleService.IsHouseAdmin(user.ID)
+	isHouseAdmin, err := s.roleRepository.IsHouseAdmin(user.ID)
 	if err != nil {
 		log.Fatalf("Failed to check if the user is a house admin: %v", err)
 	}
@@ -42,7 +43,7 @@ func (s *EntranceService) EnterUser(barcode string) error {
 	}
 
 	// 最後に「入場可能回数を消費した」入場を取得
-	lastRemainingLog, err := s.remainingEntriesLogService.GetLastRemainingEntriesLogByUserID(user.ID)
+	lastRemainingLog, err := s.remainingEntriesLogRepository.GetLastRemainingEntriesLogByUserID(user.ID)
 	if err != nil {
 		return err
 	}
@@ -56,14 +57,14 @@ func (s *EntranceService) EnterUser(barcode string) error {
 
 	if isDecreaseTarget {
 		// 残り回数を減らす
-		err = s.userService.DecreaseRemainingEntries(user.ID)
+		err = s.userRepository.DecreaseRemainingEntries(user.ID)
 		if err != nil {
 			return err
 		}
 		// ログ保存
 		// 変更前残り回数
 		prevRemain := user.Remaining_entries
-		user, err := s.userService.GetUserByID(user.ID)
+		user, err := s.userRepository.GetUserByID(user.ID)
 		if err != nil {
 			return err
 		}
@@ -79,7 +80,7 @@ func (s *EntranceService) EnterUser(barcode string) error {
 		}
 
 		// ログ作成
-		s.remainingEntriesLogService.CreateRemainingEntriesLog(log)
+		s.remainingEntriesLogRepository.CreateRemainingEntriesLog(log)
 	}
 
 	return nil
@@ -88,19 +89,19 @@ func (s *EntranceService) EnterUser(barcode string) error {
 // 退場したときの処理
 func (s *EntranceService) ExitUser(barcode string) error {
 	// ユーザー情報を取得(存在するかの確認)
-	user, err := s.userService.GetUserByBarcode(barcode)
+	user, err := s.userRepository.GetUserByBarcode(barcode)
 	if err != nil {
 		return err
 	}
 
 	// 退場ログ作成
-	err = s.accessLogService.CreateExitAccessLog(user.ID)
+	err = s.accessLogRepository.CreateExitAccessLog(user.ID)
 	if err != nil {
 		return err
 	}
 
 	// 入場回数を増やす
-	err = s.userService.IncreaseTotalEntries(user.ID)
+	err = s.userRepository.IncreaseTotalEntries(user.ID)
 	if err != nil {
 		return err
 	}
