@@ -45,9 +45,6 @@ func (s *EntranceService) EnterUser(barcode string) error {
 	lastRemainingLog, err := s.remainingEntriesLogService.GetLastRemainingEntriesLogByUserID(user.ID)
 	if err != nil {
 		return err
-		// mongo: no documents in resultが返される
-		// 登録されたばかりのユーザーや、ハウス管理者の場合は正常な動作
-		// エラーをreturnしないか、このエラーだけ特例で許すか
 	}
 
 	// ログの日が今日なら同日再入場
