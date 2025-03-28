@@ -68,13 +68,12 @@ func (r *UserRepository) CreateUser(user *model.User) (*model.User, error) {
 
 func (r *UserRepository) UpdateUser(user *model.User) error {
 	_, err := r.db.Exec(
-		"UPDATE users SET name = $1, description = $2, barcode = $3, contact = $4, remaining_entries = $5, registered_at = $6, total_entries = $7 WHERE id = $8",
+		"UPDATE users SET name = $1, description = $2, barcode = $3, contact = $4, remaining_entries = $5, total_entries = $6 WHERE id = $7",
 		user.Name,
 		user.Description,
 		user.Barcode,
 		user.Contact,
 		user.Remaining_entries,
-		user.Registered_at,
 		user.Total_entries,
 		user.ID,
 	)
