@@ -43,13 +43,13 @@ func (s *AdminManagementService) RemoveRoleFromUser(userID, roleID int) error {
 }
 
 func (s *AdminManagementService) GetAccessLogs(lastID primitive.ObjectID) ([]model.AccessLog, error) {
-	return s.accessLogRepository.GetAccessLogs(lastID)
+	return s.accessLogRepository.GetAccessLogs(lastID, 50)
 }
 
 func (s *AdminManagementService) GetRemainingEntriesLogs(lastID primitive.ObjectID) ([]model.RemainingEntriesLog, error) {
-	return s.remainingEntriesLogRepository.GetRemainingEntriesLogs(lastID)
+	return s.remainingEntriesLogRepository.GetRemainingEntriesLogs(lastID, 50)
 }
 
 func (s *AdminManagementService) GetRemainingEntriesLogsOnlyIncrease(lastID primitive.ObjectID) ([]model.RemainingEntriesLog, error) {
-	return s.remainingEntriesLogRepository.GetRemainingEntriesLogsOnlyIncrease(lastID)
+	return s.remainingEntriesLogRepository.GetRemainingEntriesLogsOnlyIncrease(lastID, 50)
 }

@@ -20,11 +20,11 @@ func NewUserPortalService(userRepository *repository.UserRepository, roleReposit
 
 // ログの取得
 func (s *UserPortalService) GetAccessLogsByUserID(userID int, lastID primitive.ObjectID) ([]model.AccessLog, error) {
-	return s.accessLogRepository.GetAccessLogsByUserID(userID, lastID)
+	return s.accessLogRepository.GetAccessLogsByUserID(userID, lastID, 50)
 }
 
 func (s *UserPortalService) GetRemainingEntriesLogsByUserID(userID int, lastID primitive.ObjectID) ([]model.RemainingEntriesLog, error) {
-	return s.remainingEntriesLogRepository.GetRemainingEntriesLogsByUserID(userID, lastID)
+	return s.remainingEntriesLogRepository.GetRemainingEntriesLogsByUserID(userID, lastID, 50)
 }
 
 // ユーザー情報の取得

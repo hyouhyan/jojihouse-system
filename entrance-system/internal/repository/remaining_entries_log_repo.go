@@ -31,12 +31,12 @@ func (r *RemainingEntriesLogRepository) CreateRemainingEntriesLog(log *model.Rem
 	return nil
 }
 
-func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogs(lastID primitive.ObjectID) ([]model.RemainingEntriesLog, error) {
+func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogs(lastID primitive.ObjectID, limit int64) ([]model.RemainingEntriesLog, error) {
 	// フィルターなしで全ログを取得
-	return r._findRemainingEntriesLogs(bson.D{}, lastID, 50)
+	return r._findRemainingEntriesLogs(bson.D{}, lastID, limit)
 }
 
-func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogsOnlyIncrease(lastID primitive.ObjectID) ([]model.RemainingEntriesLog, error) {
+func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogsOnlyIncrease(lastID primitive.ObjectID, limit int64) ([]model.RemainingEntriesLog, error) {
 	// previous_entries より new_entries の方が大きいデータを取得
 	filter := bson.D{
 		{Key: "$expr", Value: bson.D{
@@ -44,13 +44,13 @@ func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogsOnlyIncrease(last
 		}},
 	}
 
-	return r._findRemainingEntriesLogs(filter, lastID, 50)
+	return r._findRemainingEntriesLogs(filter, lastID, limit)
 }
 
-func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogsByUserID(userID int, lastID primitive.ObjectID) ([]model.RemainingEntriesLog, error) {
+func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogsByUserID(userID int, lastID primitive.ObjectID, limit int64) ([]model.RemainingEntriesLog, error) {
 	// `user_id` でフィルター
 	filter := bson.D{{Key: "user_id", Value: userID}}
-	return r._findRemainingEntriesLogs(filter, lastID, 50)
+	return r._findRemainingEntriesLogs(filter, lastID, limit)
 }
 
 func (r *RemainingEntriesLogRepository) GetLastRemainingEntriesLogByUserID(userID int) (model.RemainingEntriesLog, error) {
