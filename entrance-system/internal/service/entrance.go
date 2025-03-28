@@ -3,6 +3,7 @@ package service
 import (
 	"jojihouse-entrance-system/internal/model"
 	"log"
+	"time"
 )
 
 type EntranceService struct {
@@ -40,7 +41,21 @@ func (s *EntranceService) EnterUser(barcode string) error {
 		isDecreaseTarget = false
 	}
 
-	// TODO: 同日の再入場か
+	// 最後に「入場可能回数を消費した」入場を取得
+	lastRemainingLog, err := s.remainingEntriesLogService.GetLastRemainingEntriesLogByUserID(user.ID)
+	if err != nil {
+		return err
+		// mongo: no documents in resultが返される
+		// 登録されたばかりのユーザーや、ハウス管理者の場合は正常な動作
+		// エラーをreturnしないか、このエラーだけ特例で許すか
+	}
+
+	// ログの日が今日なら同日再入場
+	if isSameDate(lastRemainingLog.UpdatedAt, time.Now()) {
+		isDecreaseTarget = false
+	}
+
+	// 取得したログと同日の入場かどうか
 
 	if isDecreaseTarget {
 		// 残り回数を減らす
@@ -94,4 +109,10 @@ func (s *EntranceService) ExitUser(barcode string) error {
 	}
 
 	return nil
+}
+
+func isSameDate(a, b time.Time) bool {
+	aDate := a.Truncate(24 * time.Hour)
+	bDate := b.Truncate(24 * time.Hour)
+	return aDate.Equal(bDate)
 }
