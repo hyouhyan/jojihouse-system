@@ -49,3 +49,7 @@ func (s *AdminManagementService) GetAccessLogs(lastID primitive.ObjectID) ([]mod
 func (s *AdminManagementService) GetRemainingEntriesLogs(lastID primitive.ObjectID) ([]model.RemainingEntriesLog, error) {
 	return s.remainingEntriesLogRepository.GetRemainingEntriesLogs(lastID)
 }
+
+func (s *AdminManagementService) GetRemainingEntriesLogsOnlyIncrease(lastID primitive.ObjectID) ([]model.RemainingEntriesLog, error) {
+	return s.remainingEntriesLogRepository.GetRemainingEntriesLogsOnlyIncrease(lastID)
+}
