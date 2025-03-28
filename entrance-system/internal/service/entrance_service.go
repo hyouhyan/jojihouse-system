@@ -53,8 +53,6 @@ func (s *EntranceService) EnterUser(barcode string) error {
 		isDecreaseTarget = false
 	}
 
-	// 取得したログと同日の入場かどうか
-
 	if isDecreaseTarget {
 		// 残り回数を減らす
 		beforeCount, afterCount, err := s.userRepository.DecreaseRemainingEntries(user.ID, 1)
