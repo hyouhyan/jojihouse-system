@@ -57,24 +57,16 @@ func (s *EntranceService) EnterUser(barcode string) error {
 
 	if isDecreaseTarget {
 		// 残り回数を減らす
-		err = s.userRepository.DecreaseRemainingEntries(user.ID)
+		beforeCount, afterCount, err := s.userRepository.DecreaseRemainingEntries(user.ID, 1)
 		if err != nil {
 			return err
 		}
 		// ログ保存
-		// 変更前残り回数
-		prevRemain := user.Remaining_entries
-		user, err := s.userRepository.GetUserByID(user.ID)
-		if err != nil {
-			return err
-		}
-		// 変更後残り回数
-		newRemain := user.Remaining_entries
 
 		log := &model.RemainingEntriesLog{
 			UserID:          user.ID,
-			PreviousEntries: prevRemain,
-			NewEntries:      newRemain,
+			PreviousEntries: beforeCount,
+			NewEntries:      afterCount,
 			Reason:          "ハウス入場のため",
 			UpdatedBy:       "システム",
 		}

@@ -33,34 +33,17 @@ func (s *AdminManagementService) DeleteUser(userID int) error {
 
 // 入場可能回数の追加
 func (s *AdminManagementService) IncreaseRemainingEntries(userID int, count int, reason string, updatedBy string) error {
-	// 変更前のデータ取得
-	user, err := s.userRepository.GetUserByID(userID)
-	if err != nil {
-		return err
-	}
-
 	// 入場可能回数 追加
-	err = s.userRepository.IncreaseRemainingEntries(userID, count)
+	beforeCount, afterCount, err := s.userRepository.IncreaseRemainingEntries(userID, count)
 	if err != nil {
 		return err
 	}
-
-	// 変更前の回数
-	prevCount := user.Remaining_entries
-
-	// 再度取得
-	user, err = s.userRepository.GetUserByID(userID)
-	if err != nil {
-		return err
-	}
-	// 変更後の回数
-	newCount := user.Remaining_entries
 
 	// ログに保存
 	log := &model.RemainingEntriesLog{
 		UserID:          userID,
-		PreviousEntries: prevCount,
-		NewEntries:      newCount,
+		PreviousEntries: beforeCount,
+		NewEntries:      afterCount,
 		Reason:          reason,
 		UpdatedBy:       updatedBy,
 		UpdatedAt:       time.Now(),

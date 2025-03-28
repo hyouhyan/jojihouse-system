@@ -92,21 +92,42 @@ func (r *UserRepository) DeleteUser(id int) error {
 }
 
 // 入場可能回数を減らす
-func (r *UserRepository) DecreaseRemainingEntries(id int) error {
-	_, err := r.db.Exec("UPDATE users SET remaining_entries = remaining_entries - 1 WHERE id = $1", id)
+func (r *UserRepository) DecreaseRemainingEntries(id int, count int) (int, int, error) {
+	var before int
+	var after int
+
+	// remaining_entries を更新しつつ、更新前後の値を取得
+	err := r.db.QueryRow(`
+		UPDATE users 
+		SET remaining_entries = remaining_entries - $1 
+		WHERE id = $2
+		RETURNING remaining_entries + $1, remaining_entries
+	`, count, id).Scan(&before, &after)
+
 	if err != nil {
-		return err
+		return 0, 0, err
 	}
-	return nil
+	return before, after, nil
 }
 
 // 入場可能回数を増やす
-func (r *UserRepository) IncreaseRemainingEntries(id int, count int) error {
-	_, err := r.db.Exec("UPDATE users SET remaining_entries = remaining_entries + $1 WHERE id = $2", count, id)
+func (r *UserRepository) IncreaseRemainingEntries(id int, count int) (int, int, error) {
+	var before int
+	var after int
+
+	// remaining_entries を更新しつつ、更新前後の値を取得
+	err := r.db.QueryRow(`
+		UPDATE users
+		SET remaining_entries = remaining_entries + $1
+		WHERE id = $2
+		RETURNING remaining_entries - $1, remaining_entries
+	`, count, id).Scan(&before, &after)
+
 	if err != nil {
-		return err
+		return 0, 0, err
 	}
-	return nil
+
+	return before, after, nil
 }
 
 // 総入場回数を増やす
