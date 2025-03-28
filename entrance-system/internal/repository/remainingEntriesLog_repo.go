@@ -45,10 +45,15 @@ func (r *RemainingEntriesLogRepository) GetLastRemainingEntriesLogByUserID(userI
 
 	filter := bson.D{{Key: "user_id", Value: userID}}
 
+	cursor := r.db.Collection("remaining_entries_log").FindOne(context.Background(), filter, findOptions)
+
 	var result model.RemainingEntriesLog
 
-	err := r.db.Collection("remaining_entries_log").FindOne(context.Background(), filter, findOptions).Decode(&result)
+	err := cursor.Decode(&result)
 	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return model.RemainingEntriesLog{}, nil
+		}
 		return model.RemainingEntriesLog{}, err
 	}
 
