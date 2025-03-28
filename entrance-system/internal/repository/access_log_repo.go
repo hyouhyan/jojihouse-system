@@ -28,6 +28,28 @@ func (r *AccessLogRepository) CreateAccessLog(log *model.AccessLog) error {
 	return nil
 }
 
+func (r *AccessLogRepository) CreateEntryAccessLog(userid int) error {
+	log :=
+		&model.AccessLog{
+			UserID:     userid,
+			Time:       time.Now(),
+			AccessType: "entry",
+		}
+
+	return r.CreateAccessLog(log)
+}
+
+func (r *AccessLogRepository) CreateExitAccessLog(userid int) error {
+	log :=
+		&model.AccessLog{
+			UserID:     userid,
+			Time:       time.Now(),
+			AccessType: "exit",
+		}
+
+	return r.CreateAccessLog(log)
+}
+
 func (r *AccessLogRepository) GetAccessLogs(lastID primitive.ObjectID) ([]model.AccessLog, error) {
 	// フィルターなしで全ログを取得
 	return r._findAccessLogs(bson.D{}, lastID, 50)

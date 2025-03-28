@@ -59,6 +59,19 @@ func (r *RoleRepository) GetRolesByUserID(userID int) ([]model.Role, error) {
 	return roles, nil
 }
 
+func (r *RoleRepository) IsMember(userID int) (bool, error) {
+	roles, err := r.GetRolesByUserID(userID)
+	if err != nil {
+		return false, err
+	}
+	for _, role := range roles {
+		if role.Name == model.RoleMember {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 func (r *RoleRepository) IsStudent(userID int) (bool, error) {
 	roles, err := r.GetRolesByUserID(userID)
 	if err != nil {

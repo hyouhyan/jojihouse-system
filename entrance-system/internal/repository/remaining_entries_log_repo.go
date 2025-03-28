@@ -21,6 +21,9 @@ func NewRemainingEntriesLogRepository(db *mongo.Database) *RemainingEntriesLogRe
 }
 
 func (r *RemainingEntriesLogRepository) CreateRemainingEntriesLog(log *model.RemainingEntriesLog) error {
+	log.ID = primitive.NilObjectID
+	log.UpdatedAt = time.Now()
+
 	_, err := r.db.Collection("remaining_entries_log").InsertOne(context.Background(), log)
 	if err != nil {
 		return err
