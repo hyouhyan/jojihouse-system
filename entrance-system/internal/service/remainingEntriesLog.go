@@ -29,3 +29,7 @@ func (s *RemainingEntriesLogService) GetRemainingEntriesLogs(lastID primitive.Ob
 func (s *RemainingEntriesLogService) GetRemainingEntriesLogsByUserID(userID int, lastID primitive.ObjectID) ([]model.RemainingEntriesLog, error) {
 	return s.repo.GetRemainingEntriesLogsByUserID(userID, lastID)
 }
+
+func (s *RemainingEntriesLogService) GetLastRemainingEntriesLogByUserID(userID int) (model.RemainingEntriesLog, error) {
+	return s.repo.GetLastRemainingEntriesLogByUserID(userID)
+}

@@ -39,6 +39,27 @@ func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogsByUserID(userID i
 	return r._findRemainingEntriesLogs(filter, lastID, 50)
 }
 
+func (r *RemainingEntriesLogRepository) GetLastRemainingEntriesLogByUserID(userID int) (model.RemainingEntriesLog, error) {
+	findOptions := options.FindOne()
+	findOptions.SetSort(bson.D{{Key: "updated_at", Value: 1}}) // `updated_at` で昇順ソート
+
+	filter := bson.D{{Key: "user_id", Value: userID}}
+
+	cursor := r.db.Collection("remaining_entries_log").FindOne(context.Background(), filter, findOptions)
+
+	var result model.RemainingEntriesLog
+
+	err := cursor.Decode(&result)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return model.RemainingEntriesLog{}, nil
+		}
+		return model.RemainingEntriesLog{}, err
+	}
+
+	return result, nil
+}
+
 // 共通の検索処理
 func (r *RemainingEntriesLogRepository) _findRemainingEntriesLogs(filter bson.D, lastID primitive.ObjectID, limit int64) ([]model.RemainingEntriesLog, error) {
 	var logs []model.RemainingEntriesLog
