@@ -36,6 +36,17 @@ func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogs(lastID primitive
 	return r._findRemainingEntriesLogs(bson.D{}, lastID, 50)
 }
 
+func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogsOnlyIncrease(lastID primitive.ObjectID) ([]model.RemainingEntriesLog, error) {
+	// previous_entries より new_entries の方が大きいデータを取得
+	filter := bson.D{
+		{Key: "$expr", Value: bson.D{
+			{Key: "$gt", Value: bson.A{"$new_entries", "$previous_entries"}},
+		}},
+	}
+
+	return r._findRemainingEntriesLogs(filter, lastID, 50)
+}
+
 func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogsByUserID(userID int, lastID primitive.ObjectID) ([]model.RemainingEntriesLog, error) {
 	// `user_id` でフィルター
 	filter := bson.D{{Key: "user_id", Value: userID}}
