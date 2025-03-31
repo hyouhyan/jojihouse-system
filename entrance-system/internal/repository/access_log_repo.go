@@ -50,14 +50,37 @@ func (r *AccessLogRepository) CreateExitAccessLog(userid int) error {
 	return r.CreateAccessLog(log)
 }
 
-func (r *AccessLogRepository) GetAccessLogs(lastID primitive.ObjectID, limit int64) ([]model.AccessLog, error) {
-	// フィルターなしで全ログを取得
-	return r._findAccessLogs(bson.D{}, lastID, limit)
-}
+func (r *AccessLogRepository) GetAccessLogsByAnyFilter(lastID primitive.ObjectID, options model.AccessLogFilter) ([]model.AccessLog, error) {
+	filter := bson.D{}
 
-func (r *AccessLogRepository) GetAccessLogsByUserID(userID int, lastID primitive.ObjectID, limit int64) ([]model.AccessLog, error) {
-	// `user_id` でフィルター
-	filter := bson.D{{Key: "user_id", Value: userID}}
+	// UserID のフィルタ
+	if options.UserID > 0 {
+		filter = append(filter, bson.E{Key: "user_id", Value: options.UserID})
+	}
+
+	// 日時フィルタ
+	timeFilter := bson.D{}
+	if !options.DayAfter.IsZero() {
+		timeFilter = append(timeFilter, bson.E{Key: "$gte", Value: options.DayAfter})
+	}
+	if !options.DayBefore.IsZero() {
+		timeFilter = append(timeFilter, bson.E{Key: "$lte", Value: options.DayBefore})
+	}
+	if len(timeFilter) > 0 {
+		filter = append(filter, bson.E{Key: "time", Value: timeFilter})
+	}
+
+	// AccessType のフィルタ
+	if options.AccessType != "" {
+		filter = append(filter, bson.E{Key: "access_type", Value: options.AccessType})
+	}
+
+	// リミットの設定（デフォルト50）
+	limit := int64(50)
+	if options.Limit > 0 {
+		limit = int64(options.Limit)
+	}
+
 	return r._findAccessLogs(filter, lastID, limit)
 }
 
