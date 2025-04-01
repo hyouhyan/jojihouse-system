@@ -4,6 +4,7 @@ import (
 	"errors"
 	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/repository"
+	response "jojihouse-entrance-system/internal/responce"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -39,7 +40,7 @@ func (s *UserPortalService) GetAccessLogsByUserID(userID int, lastID primitive.O
 	return s.GetAccessLogsByAnyFilter(lastID, options)
 }
 
-func (s *UserPortalService) GetLatestAccessLog() (model.AccessLog, error) {
+func (s *UserPortalService) GetLatestAccessLog() (response.AccessLogResponse, error) {
 	options := model.AccessLogFilter{
 		Limit: 1,
 	}
@@ -48,10 +49,26 @@ func (s *UserPortalService) GetLatestAccessLog() (model.AccessLog, error) {
 
 	accessLogs, err := s.accessLogRepository.GetAccessLogsByAnyFilter(lastID, options)
 	if err != nil {
-		return model.AccessLog{}, err
+		return response.AccessLogResponse{}, err
 	}
 
-	return accessLogs[0], nil
+	accessLog := accessLogs[0]
+
+	// UserIDからUserNameを取得
+	user, err := s.userRepository.GetUserByID(accessLog.UserID)
+	if err != nil {
+		return response.AccessLogResponse{}, err
+	}
+
+	responseLog := response.AccessLogResponse{
+		ID:         accessLog.ID.Hex(),
+		UserID:     accessLog.UserID,
+		UserName:   user.Name,
+		Time:       accessLog.Time,
+		AccessType: accessLog.AccessType,
+	}
+
+	return responseLog, nil
 }
 
 func (s *UserPortalService) GetAccessLogsByAnyFilter(lastID primitive.ObjectID, options ...model.AccessLogFilter) ([]model.AccessLog, error) {
