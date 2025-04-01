@@ -8,11 +8,12 @@ import (
 )
 
 type EntranceHandler struct {
-	service *service.EntranceService
+	entranceService   *service.EntranceService
+	userPortalService *service.UserPortalService
 }
 
-func NewEntranceHandler(service *service.EntranceService) *EntranceHandler {
-	return &EntranceHandler{service: service}
+func NewEntranceHandler(entranceService *service.EntranceService, userPortalService *service.UserPortalService) *EntranceHandler {
+	return &EntranceHandler{entranceService: entranceService, userPortalService: userPortalService}
 }
 
 type EntranceRequest struct {
@@ -29,13 +30,13 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 	}
 
 	if req.Type == "entry" {
-		err := h.service.EnterUser(req.Barcode)
+		err := h.entranceService.EnterUser(req.Barcode)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to record entry"})
 			return
 		}
 	} else {
-		err := h.service.ExitUser(req.Barcode)
+		err := h.entranceService.ExitUser(req.Barcode)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to record exit"})
 			return
@@ -43,4 +44,16 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
+}
+
+// 在室ユーザー取得
+func (h *EntranceHandler) GetCurrentUsers(c *gin.Context) {
+	currentUsers, err := h.userPortalService.GetCurrentUsers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get current users"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"current_users": currentUsers})
+
 }

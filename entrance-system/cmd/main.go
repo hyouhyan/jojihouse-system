@@ -19,26 +19,26 @@ func main() {
 
 	// 依存関係の注入
 
-	// ユーザーリポジトリを作成
+	// ユーザーリポジトリ
 	userRepo := repository.NewUserRepository(database.PostgresDB)
-	// ロールリポジトリを作成
+	// ロールリポジトリ
 	roleRepo := repository.NewRoleRepository(database.PostgresDB)
-	// ログリポジトリを作成
+	// ログリポジトリ
 	accessLogRepo := repository.NewLogRepository(database.MongoDB)
 	// 入場可能回数ログリポジトリ
 	remainingEntriesLogRepo := repository.NewRemainingEntriesLogRepository(database.MongoDB)
 	// 在室ユーザーリポジトリ
 	currentUsersRepo := repository.NewCurrentUsersRepository(database.PostgresDB)
 
-	// entranceサービスを作成
+	// entranceサービス
 	entranceService := service.NewEntranceService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo, currentUsersRepo)
-	// adminManagementサービスを作成
+	// adminManagementサービス
 	// adminManagementService := service.NewAdminManagementService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo)
-	// userPortalサービスを作成
-	// userPortalService := service.NewUserPortalService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo, currentUsersRepo)
+	// userPortalサービス
+	userPortalService := service.NewUserPortalService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo, currentUsersRepo)
 
-	// EntranceHandlerを作成
-	entranceHandler := handler.NewEntranceHandler(entranceService)
+	// EntranceHandler
+	entranceHandler := handler.NewEntranceHandler(entranceService, userPortalService)
 
 	// Gin ルーターの設定
 	r := gin.Default()

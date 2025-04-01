@@ -10,5 +10,6 @@ func SetupEntranceRoutes(router *gin.Engine, entranceHandler *handler.EntranceHa
 	entranceGroup := router.Group("/entrance")
 	{
 		entranceGroup.POST("/", entranceHandler.RecordEntrance)
+		entranceGroup.GET("/current", entranceHandler.GetCurrentUsers)
 	}
 }
