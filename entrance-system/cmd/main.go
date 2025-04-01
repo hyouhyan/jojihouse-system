@@ -44,6 +44,8 @@ func main() {
 	r := gin.Default()
 	router.SetupEntranceRoutes(r, entranceHandler)
 
+	// test(database.PostgresDB, database.MongoDB)
+
 	// サーバー起動
-	r.Run(":8080")
+	r.Run("127.0.0.1:8080")
 }
