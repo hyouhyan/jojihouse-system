@@ -7,4 +7,8 @@ import (
 )
 
 func SetupEntranceRoutes(router *gin.Engine, entranceHandler *handler.EntranceHandler) {
+	entranceGroup := router.Group("/entrance")
+	{
+		entranceGroup.POST("/", entranceHandler.RecordEntrance)
+	}
 }
