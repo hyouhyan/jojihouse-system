@@ -6,7 +6,9 @@ import (
 	"jojihouse-entrance-system/internal/database"
 	"jojihouse-entrance-system/internal/repository"
 	"jojihouse-entrance-system/internal/service"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -42,6 +44,17 @@ func main() {
 
 	// Gin ルーターの設定
 	r := gin.Default()
+
+	// CORSの設定
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"}, // すべてのオリジンを許可
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour, // プリフライトリクエストの結果をキャッシュ
+	}))
+
 	router.SetupEntranceRoutes(r, entranceHandler)
 
 	// test(database.PostgresDB, database.MongoDB)
