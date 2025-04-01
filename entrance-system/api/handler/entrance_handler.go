@@ -55,5 +55,15 @@ func (h *EntranceHandler) GetCurrentUsers(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"current_users": currentUsers})
+}
 
+// 最終のアクセスログを一件取得
+func (h *EntranceHandler) GetLatestAccessLog(c *gin.Context) {
+	latestAccesLog, err := h.userPortalService.GetLatestAccessLog()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get latest access log"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"latest_access_log": latestAccesLog})
 }

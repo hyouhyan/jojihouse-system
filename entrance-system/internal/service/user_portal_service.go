@@ -39,6 +39,21 @@ func (s *UserPortalService) GetAccessLogsByUserID(userID int, lastID primitive.O
 	return s.GetAccessLogsByAnyFilter(lastID, options)
 }
 
+func (s *UserPortalService) GetLatestAccessLog() (model.AccessLog, error) {
+	options := model.AccessLogFilter{
+		Limit: 1,
+	}
+
+	lastID := primitive.NilObjectID
+
+	accessLogs, err := s.accessLogRepository.GetAccessLogsByAnyFilter(lastID, options)
+	if err != nil {
+		return model.AccessLog{}, err
+	}
+
+	return accessLogs[0], nil
+}
+
 func (s *UserPortalService) GetAccessLogsByAnyFilter(lastID primitive.ObjectID, options ...model.AccessLogFilter) ([]model.AccessLog, error) {
 	opt := model.AccessLogFilter{}
 

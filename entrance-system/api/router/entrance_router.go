@@ -11,5 +11,6 @@ func SetupEntranceRoutes(router *gin.Engine, entranceHandler *handler.EntranceHa
 	{
 		entranceGroup.POST("/", entranceHandler.RecordEntrance)
 		entranceGroup.GET("/current", entranceHandler.GetCurrentUsers)
+		entranceGroup.GET("/latest_access", entranceHandler.GetLatestAccessLog)
 	}
 }
