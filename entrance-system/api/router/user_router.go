@@ -1,0 +1,10 @@
+package router
+
+import (
+	"jojihouse-entrance-system/api/handler"
+
+	"github.com/gin-gonic/gin"
+)
+
+func SetupUserRoutes(router *gin.Engine, userHandler *handler.UserHandler) {
+}
