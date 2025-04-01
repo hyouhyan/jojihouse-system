@@ -90,7 +90,7 @@ func (r *AccessLogRepository) _findAccessLogs(filter bson.D, lastID primitive.Ob
 
 	findOptions := options.Find()
 	findOptions.SetLimit(limit)
-	findOptions.SetSort(bson.D{{Key: "time", Value: 1}}) // `time` で昇順ソート
+	findOptions.SetSort(bson.D{{Key: "time", Value: -1}}) // `time` で昇順ソート
 
 	// lastID によるページネーション
 	if !lastID.IsZero() {
