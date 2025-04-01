@@ -52,6 +52,9 @@ func (s *UserPortalService) GetLatestAccessLog() (response.AccessLogResponse, er
 		return response.AccessLogResponse{}, err
 	}
 
+	if len(accessLogs) == 0 {
+		return response.AccessLogResponse{}, nil
+	}
 	accessLog := accessLogs[0]
 
 	// UserIDからUserNameを取得
