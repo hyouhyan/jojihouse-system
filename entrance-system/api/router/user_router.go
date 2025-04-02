@@ -7,4 +7,8 @@ import (
 )
 
 func SetupUserRoutes(router *gin.Engine, userHandler *handler.UserHandler) {
+	userGroup := router.Group("/users")
+	{
+		userGroup.POST("/", userHandler.CreateUser)
+	}
 }

@@ -35,12 +35,13 @@ func main() {
 	// entranceサービス
 	entranceService := service.NewEntranceService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo, currentUsersRepo)
 	// adminManagementサービス
-	// adminManagementService := service.NewAdminManagementService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo)
+	adminManagementService := service.NewAdminManagementService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo)
 	// userPortalサービス
 	userPortalService := service.NewUserPortalService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo, currentUsersRepo)
 
 	// EntranceHandler
 	entranceHandler := handler.NewEntranceHandler(entranceService, userPortalService)
+	userHandler := handler.NewUserHandler(userPortalService, adminManagementService)
 
 	// Gin ルーターの設定
 	r := gin.Default()
@@ -56,6 +57,8 @@ func main() {
 	}))
 
 	router.SetupEntranceRoutes(r, entranceHandler)
+	router.SetupUserRoutes(r, userHandler)
+	// router.SetupUserRoutes()
 
 	// test(database.PostgresDB, database.MongoDB)
 
