@@ -4,7 +4,7 @@ import (
 	"errors"
 	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/repository"
-	response "jojihouse-entrance-system/internal/responce"
+	"jojihouse-entrance-system/internal/response"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"

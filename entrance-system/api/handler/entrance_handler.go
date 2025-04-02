@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"jojihouse-entrance-system/internal/response"
 	"jojihouse-entrance-system/internal/service"
 	"net/http"
 
@@ -29,21 +30,24 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 		return
 	}
 
+	var response response.EntranceResponse
+	var err error
+
 	if req.Type == "entry" {
-		err := h.entranceService.EnterUser(req.Barcode)
+		response, err = h.entranceService.EnterUser(req.Barcode)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to record entry"})
 			return
 		}
 	} else {
-		err := h.entranceService.ExitUser(req.Barcode)
+		response, err = h.entranceService.ExitUser(req.Barcode)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to record exit"})
 			return
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Success"})
+	c.JSON(http.StatusOK, gin.H{"status": response})
 }
 
 // 在室ユーザー取得
