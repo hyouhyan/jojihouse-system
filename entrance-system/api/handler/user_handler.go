@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"jojihouse-entrance-system/internal/request"
+	"jojihouse-entrance-system/api/model/request"
 	"jojihouse-entrance-system/internal/service"
 	"net/http"
 

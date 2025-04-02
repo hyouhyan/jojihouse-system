@@ -1,9 +1,9 @@
 package service
 
 import (
+	"jojihouse-entrance-system/api/model/response"
 	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/repository"
-	"jojihouse-entrance-system/internal/response"
 	"log"
 	"time"
 )
