@@ -33,48 +33,14 @@ func NewUserPortalService(userRepository *repository.UserRepository,
 }
 
 // ログの取得
-func (s *UserPortalService) GetAccessLogsByUserID(userID int, lastID primitive.ObjectID) ([]model.AccessLog, error) {
+func (s *UserPortalService) GetAccessLogsByUserID(userID int, lastID primitive.ObjectID) ([]response.AccessLogResponse, error) {
 	options := model.AccessLogFilter{
 		UserID: userID,
 	}
 	return s.GetAccessLogsByAnyFilter(lastID, options)
 }
 
-func (s *UserPortalService) GetLatestAccessLog() (response.AccessLogResponse, error) {
-	options := model.AccessLogFilter{
-		Limit: 1,
-	}
-
-	lastID := primitive.NilObjectID
-
-	accessLogs, err := s.accessLogRepository.GetAccessLogsByAnyFilter(lastID, options)
-	if err != nil {
-		return response.AccessLogResponse{}, err
-	}
-
-	if len(accessLogs) == 0 {
-		return response.AccessLogResponse{}, nil
-	}
-	accessLog := accessLogs[0]
-
-	// UserIDからUserNameを取得
-	user, err := s.userRepository.GetUserByID(accessLog.UserID)
-	if err != nil {
-		return response.AccessLogResponse{}, err
-	}
-
-	responseLog := response.AccessLogResponse{
-		ID:         accessLog.ID.Hex(),
-		UserID:     accessLog.UserID,
-		UserName:   user.Name,
-		Time:       accessLog.Time,
-		AccessType: accessLog.AccessType,
-	}
-
-	return responseLog, nil
-}
-
-func (s *UserPortalService) GetAccessLogsByAnyFilter(lastID primitive.ObjectID, options ...model.AccessLogFilter) ([]model.AccessLog, error) {
+func (s *UserPortalService) GetAccessLogsByAnyFilter(lastID primitive.ObjectID, options ...model.AccessLogFilter) ([]response.AccessLogResponse, error) {
 	opt := model.AccessLogFilter{}
 
 	if len(options) > 0 {
@@ -95,7 +61,42 @@ func (s *UserPortalService) GetAccessLogsByAnyFilter(lastID primitive.ObjectID, 
 		}
 	}
 
-	return s.accessLogRepository.GetAccessLogsByAnyFilter(lastID, opt)
+	logs, err := s.accessLogRepository.GetAccessLogsByAnyFilter(lastID, opt)
+	if err != nil {
+		return nil, err
+	}
+
+	// UserIDの一覧を作成
+	userIDs := make([]int, len(logs))
+	for i, log := range logs {
+		userIDs[i] = log.UserID
+	}
+
+	// PostgreSQL から UserID に対応する UserName を取得
+	users, err := s.userRepository.GetUsersByIDs(userIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	// UserID -> UserName のマッピング
+	userMap := make(map[int]string)
+	for _, user := range users {
+		userMap[user.ID] = user.Name
+	}
+
+	// レスポンスデータを作成
+	var responseLogs []response.AccessLogResponse
+	for _, log := range logs {
+		responseLogs = append(responseLogs, response.AccessLogResponse{
+			ID:         log.ID.Hex(),
+			UserID:     log.UserID,
+			UserName:   userMap[log.UserID], // UserIDからUserNameを取得
+			Time:       log.Time,
+			AccessType: log.AccessType,
+		})
+	}
+
+	return responseLogs, nil
 }
 
 func (s *UserPortalService) GetRemainingEntriesLogsByUserID(userID int, lastID primitive.ObjectID) ([]model.RemainingEntriesLog, error) {

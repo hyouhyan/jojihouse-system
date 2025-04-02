@@ -9,8 +9,8 @@ import (
 func SetupEntranceRoutes(router *gin.Engine, entranceHandler *handler.EntranceHandler) {
 	entranceGroup := router.Group("/entrance")
 	{
-		entranceGroup.POST("/", entranceHandler.RecordEntrance)
+		entranceGroup.POST("", entranceHandler.RecordEntrance)
 		entranceGroup.GET("/current", entranceHandler.GetCurrentUsers)
-		entranceGroup.GET("/latest_access", entranceHandler.GetLatestAccessLog)
+		entranceGroup.GET("/logs", entranceHandler.GetAccessLogs)
 	}
 }

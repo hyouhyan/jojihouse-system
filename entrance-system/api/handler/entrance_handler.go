@@ -1,11 +1,13 @@
 package handler
 
 import (
+	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/response"
 	"jojihouse-entrance-system/internal/service"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type EntranceHandler struct {
@@ -61,13 +63,18 @@ func (h *EntranceHandler) GetCurrentUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"current_users": currentUsers})
 }
 
-// 最終のアクセスログを一件取得
-func (h *EntranceHandler) GetLatestAccessLog(c *gin.Context) {
-	latestAccesLog, err := h.userPortalService.GetLatestAccessLog()
+// アクセスログを取得
+func (h *EntranceHandler) GetAccessLogs(c *gin.Context) {
+	lastID := primitive.NilObjectID
+	options := model.AccessLogFilter{
+		Limit: 10,
+	}
+
+	accesLogs, err := h.userPortalService.GetAccessLogsByAnyFilter(lastID, options)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get latest access log"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"latest_access_log": latestAccesLog})
+	c.JSON(http.StatusOK, gin.H{"access_logs": accesLogs})
 }

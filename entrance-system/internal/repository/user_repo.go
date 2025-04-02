@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 
 	"jojihouse-entrance-system/internal/model"
 )
@@ -137,4 +138,50 @@ func (r *UserRepository) IncreaseTotalEntries(id int) error {
 		return err
 	}
 	return nil
+}
+
+// 複数の UserID から User を取得
+func (r *UserRepository) GetUsersByIDs(userIDs []int) ([]model.User, error) {
+	if len(userIDs) == 0 {
+		return nil, nil
+	}
+
+	query := fmt.Sprintf("SELECT * FROM users WHERE id IN (%s)", intArrayToString(userIDs))
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []model.User
+	for rows.Next() {
+		var user model.User
+		if err := rows.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Description,
+			&user.Barcode,
+			&user.Contact,
+			&user.Registered_at,
+			&user.Registered_at,
+			&user.Total_entries,
+		); err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
+}
+
+// int のスライスをカンマ区切りの文字列に変換
+func intArrayToString(arr []int) string {
+	result := ""
+	for i, val := range arr {
+		if i > 0 {
+			result += ","
+		}
+		result += fmt.Sprintf("%d", val)
+	}
+	return result
 }
