@@ -32,20 +32,20 @@ func (s *AdminManagementService) CreateUser(req *request.CreateUserRequest) (*re
 	}
 
 	// ユーザーを作成
-	resUser, err := s.userRepository.CreateUser(user)
+	user, err := s.userRepository.CreateUser(user)
 	if err != nil {
 		return nil, err
 	}
 
 	res := &response.UserResponse{
-		ID:                resUser.ID,
-		Name:              resUser.Name,
-		Description:       resUser.Description,
-		Barcode:           resUser.Barcode,
-		Contact:           resUser.Contact,
-		Remaining_entries: resUser.Remaining_entries,
-		Registered_at:     resUser.Registered_at,
-		Total_entries:     resUser.Total_entries,
+		ID:                user.ID,
+		Name:              user.Name,
+		Description:       user.Description,
+		Barcode:           user.Barcode,
+		Contact:           user.Contact,
+		Remaining_entries: user.Remaining_entries,
+		Registered_at:     user.Registered_at,
+		Total_entries:     user.Total_entries,
 	}
 
 	return res, nil
