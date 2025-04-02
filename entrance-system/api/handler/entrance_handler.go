@@ -72,7 +72,7 @@ func (h *EntranceHandler) GetAccessLogs(c *gin.Context) {
 
 	accesLogs, err := h.userPortalService.GetAccessLogsByAnyFilter(lastID, options)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get latest access log"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get access log", "info": err})
 		return
 	}
 
