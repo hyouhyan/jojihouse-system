@@ -3,6 +3,8 @@ package service
 import (
 	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/repository"
+	"jojihouse-entrance-system/internal/request"
+	"jojihouse-entrance-system/internal/response"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -19,8 +21,34 @@ func NewAdminManagementService(userRepository *repository.UserRepository, roleRe
 	return &AdminManagementService{userRepository: userRepository, roleRepository: roleRepository, accessLogRepository: accessLogRepository, remainingEntriesLogRepository: remainingEntriesLogRepository}
 }
 
-func (s *AdminManagementService) CreateUser(user *model.User) (*model.User, error) {
-	return s.userRepository.CreateUser(user)
+func (s *AdminManagementService) CreateUser(req *request.CreateUserRequest) (*response.UserResponse, error) {
+	// パース的な、model.userに合わせて再構築
+	user := &model.User{
+		Name:              req.Name,
+		Description:       req.Description,
+		Barcode:           req.Barcode,
+		Contact:           req.Contact,
+		Remaining_entries: req.Remaining_entries,
+	}
+
+	// ユーザーを作成
+	resUser, err := s.userRepository.CreateUser(user)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &response.UserResponse{
+		ID:                resUser.ID,
+		Name:              resUser.Name,
+		Description:       resUser.Description,
+		Barcode:           resUser.Barcode,
+		Contact:           resUser.Contact,
+		Remaining_entries: resUser.Remaining_entries,
+		Registered_at:     resUser.Registered_at,
+		Total_entries:     resUser.Total_entries,
+	}
+
+	return res, nil
 }
 
 func (s *AdminManagementService) UpdateUser(user *model.User) error {
