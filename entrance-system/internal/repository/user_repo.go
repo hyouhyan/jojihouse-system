@@ -162,7 +162,7 @@ func (r *UserRepository) GetUsersByIDs(userIDs []int) ([]model.User, error) {
 			&user.Description,
 			&user.Barcode,
 			&user.Contact,
-			&user.Registered_at,
+			&user.Remaining_entries,
 			&user.Registered_at,
 			&user.Total_entries,
 		); err != nil {
