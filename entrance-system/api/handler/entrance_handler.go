@@ -47,7 +47,7 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"status": response})
+	c.JSON(http.StatusOK, gin.H{"entrance_log": response})
 }
 
 // 在室ユーザー取得
