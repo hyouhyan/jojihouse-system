@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"jojihouse-entrance-system/api/model/response"
 	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/repository"
 	"time"
@@ -32,14 +33,14 @@ func NewUserPortalService(userRepository *repository.UserRepository,
 }
 
 // ログの取得
-func (s *UserPortalService) GetAccessLogsByUserID(userID int, lastID primitive.ObjectID) ([]model.AccessLog, error) {
+func (s *UserPortalService) GetAccessLogsByUserID(userID int, lastID string) ([]response.AccessLogResponse, error) {
 	options := model.AccessLogFilter{
 		UserID: userID,
 	}
 	return s.GetAccessLogsByAnyFilter(lastID, options)
 }
 
-func (s *UserPortalService) GetAccessLogsByAnyFilter(lastID primitive.ObjectID, options ...model.AccessLogFilter) ([]model.AccessLog, error) {
+func (s *UserPortalService) GetAccessLogsByAnyFilter(lastID string, options ...model.AccessLogFilter) ([]response.AccessLogResponse, error) {
 	opt := model.AccessLogFilter{}
 
 	if len(options) > 0 {
@@ -55,30 +56,134 @@ func (s *UserPortalService) GetAccessLogsByAnyFilter(lastID primitive.ObjectID, 
 		}
 
 		// DayBeforeとDayAfterの整合性
-		if !opt.DayBefore.IsZero() && !opt.DayAfter.IsZero() && opt.DayBefore.After(opt.DayAfter) {
-			return nil, errors.New("DayBefore cannot be after DayAfter")
+		if !opt.DayBefore.IsZero() && !opt.DayAfter.IsZero() {
+			if opt.DayBefore.After(opt.DayAfter) {
+				return nil, errors.New("DayBefore cannot be after DayAfter")
+			}
+
+			// DayAfterの時間を00:00:00に設定
+			opt.DayAfter = time.Date(opt.DayAfter.Year(), opt.DayAfter.Month(), opt.DayAfter.Day(), 0, 0, 0, 0, opt.DayAfter.Location())
+
+			// DayBeforeの時間を翌日の00:00:00に設定
+			opt.DayBefore = time.Date(opt.DayBefore.Year(), opt.DayBefore.Month(), opt.DayBefore.Day()+1, 0, 0, 0, 0, opt.DayBefore.Location())
 		}
 	}
 
-	return s.accessLogRepository.GetAccessLogsByAnyFilter(lastID, opt)
+	var objectID primitive.ObjectID
+	var err error
+
+	// lastIDを変換
+	if lastID == "" {
+		objectID = primitive.NilObjectID
+	} else {
+		objectID, err = primitive.ObjectIDFromHex(lastID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	logs, err := s.accessLogRepository.GetAccessLogsByAnyFilter(objectID, opt)
+	if err != nil {
+		return nil, err
+	}
+
+	// UserIDの一覧を作成
+	userIDs := make([]int, len(logs))
+	for i, log := range logs {
+		userIDs[i] = log.UserID
+	}
+
+	// PostgreSQL から UserID に対応する UserName を取得
+	users, err := s.userRepository.GetUsersByIDs(userIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	// UserID -> UserName のマッピング
+	userMap := make(map[int]string)
+	for _, user := range users {
+		userMap[user.ID] = user.Name
+	}
+
+	// レスポンスデータを作成
+	var responseLogs []response.AccessLogResponse
+	for _, log := range logs {
+		responseLogs = append(responseLogs, response.AccessLogResponse{
+			ID:         log.ID.Hex(),
+			UserID:     log.UserID,
+			UserName:   userMap[log.UserID], // UserIDからUserNameを取得
+			Time:       log.Time,
+			AccessType: log.AccessType,
+		})
+	}
+
+	return responseLogs, nil
 }
 
 func (s *UserPortalService) GetRemainingEntriesLogsByUserID(userID int, lastID primitive.ObjectID) ([]model.RemainingEntriesLog, error) {
 	return s.remainingEntriesLogRepository.GetRemainingEntriesLogsByUserID(userID, lastID, 50)
 }
 
+func (s *UserPortalService) GetAllUsers() ([]response.UserResponse, error) {
+	users, err := s.userRepository.GetAllUsers()
+	if err != nil {
+		return nil, err
+	}
+
+	var res []response.UserResponse
+	for _, user := range users {
+		res = append(res, *s.cnvModelUserToResponseUser(&user))
+	}
+
+	return res, err
+}
+
 // ユーザー情報の取得
-func (s *UserPortalService) GetUserByID(userID int) (*model.User, error) {
-	return s.userRepository.GetUserByID(userID)
+func (s *UserPortalService) GetUserByID(userID int) (*response.UserResponse, error) {
+	user, err := s.userRepository.GetUserByID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.cnvModelUserToResponseUser(user), nil
 }
 
 func (s *UserPortalService) GetUserByBarcode(barcode string) (*model.User, error) {
 	return s.userRepository.GetUserByBarcode(barcode)
 }
 
+func (s *UserPortalService) GetAllRoles() ([]response.Role, error) {
+	roles, err := s.roleRepository.GetAllRoles()
+	if err != nil {
+		return nil, err
+	}
+
+	var res []response.Role
+	for _, role := range roles {
+		res = append(res, response.Role{
+			ID:   role.ID,
+			Name: role.Name,
+		})
+	}
+	return res, nil
+}
+
 // ロール関連
-func (s *UserPortalService) GetRolesByUserID(userID int) ([]model.Role, error) {
-	return s.roleRepository.GetRolesByUserID(userID)
+func (s *UserPortalService) GetRolesByUserID(userID int) ([]response.Role, error) {
+	roles, err := s.roleRepository.GetRolesByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	var res []response.Role
+	for _, role := range roles {
+		res = append(res, response.Role{
+			ID:   role.ID,
+			Name: role.Name,
+		})
+	}
+
+	return res, nil
 }
 
 func (s *UserPortalService) GetRoleByID(roleID int) (*model.Role, error) {
@@ -117,4 +222,20 @@ func (s *UserPortalService) GetCurrentUsers() ([]model.CurrentUser, error) {
 // 入室時間を取得
 func (s *UserPortalService) GetEnteredTime(userID int) (time.Time, error) {
 	return s.currentUsersRepository.GetEnteredTime(userID)
+}
+
+// model.userをresponse.userに変換
+func (s *UserPortalService) cnvModelUserToResponseUser(user *model.User) *response.UserResponse {
+	resUser := &response.UserResponse{
+		ID:                user.ID,
+		Name:              user.Name,
+		Description:       user.Description,
+		Barcode:           user.Barcode,
+		Contact:           user.Contact,
+		Remaining_entries: user.Remaining_entries,
+		Registered_at:     user.Registered_at,
+		Total_entries:     user.Total_entries,
+	}
+
+	return resUser
 }

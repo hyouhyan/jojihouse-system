@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
 
 	"jojihouse-entrance-system/internal/model"
 )
@@ -12,6 +13,34 @@ type UserRepository struct {
 
 func NewUserRepository(db *sql.DB) *UserRepository {
 	return &UserRepository{db: db}
+}
+
+func (r *UserRepository) GetAllUsers() ([]model.User, error) {
+	rows, err := r.db.Query("SELECT * FROM users")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []model.User
+	for rows.Next() {
+		var user model.User
+		if err := rows.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Description,
+			&user.Barcode,
+			&user.Contact,
+			&user.Remaining_entries,
+			&user.Registered_at,
+			&user.Total_entries,
+		); err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
 }
 
 func (r *UserRepository) GetUserByID(id int) (*model.User, error) {
@@ -51,18 +80,24 @@ func (r *UserRepository) GetUserByBarcode(barcode string) (*model.User, error) {
 }
 
 func (r *UserRepository) CreateUser(user *model.User) (*model.User, error) {
-	err := r.db.QueryRow(
-		"INSERT INTO users (name, description, barcode, contact, remaining_entries, total_entries) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
+	_, err := r.db.Exec(
+		"INSERT INTO users (name, description, barcode, contact, remaining_entries) VALUES ($1, $2, $3, $4, $5)",
 		user.Name,
 		user.Description,
 		user.Barcode,
 		user.Contact,
 		user.Remaining_entries,
-		user.Total_entries,
-	).Scan(&user.ID)
+	)
 	if err != nil {
 		return nil, err
 	}
+
+	// ユーザー情報を取得
+	user, err = r.GetUserByBarcode(user.Barcode)
+	if err != nil {
+		return nil, err
+	}
+
 	return user, nil
 }
 
@@ -137,4 +172,50 @@ func (r *UserRepository) IncreaseTotalEntries(id int) error {
 		return err
 	}
 	return nil
+}
+
+// 複数の UserID から User を取得
+func (r *UserRepository) GetUsersByIDs(userIDs []int) ([]model.User, error) {
+	if len(userIDs) == 0 {
+		return nil, nil
+	}
+
+	query := fmt.Sprintf("SELECT * FROM users WHERE id IN (%s)", intArrayToString(userIDs))
+	rows, err := r.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []model.User
+	for rows.Next() {
+		var user model.User
+		if err := rows.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Description,
+			&user.Barcode,
+			&user.Contact,
+			&user.Remaining_entries,
+			&user.Registered_at,
+			&user.Total_entries,
+		); err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
+}
+
+// int のスライスをカンマ区切りの文字列に変換
+func intArrayToString(arr []int) string {
+	result := ""
+	for i, val := range arr {
+		if i > 0 {
+			result += ","
+		}
+		result += fmt.Sprintf("%d", val)
+	}
+	return result
 }

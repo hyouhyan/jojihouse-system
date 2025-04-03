@@ -1,0 +1,26 @@
+package handler
+
+import (
+	"jojihouse-entrance-system/internal/service"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+type RoleHandler struct {
+	service *service.UserPortalService
+}
+
+func NewRoleHandler(service *service.UserPortalService) *RoleHandler {
+	return &RoleHandler{service: service}
+}
+
+func (h *RoleHandler) GetAllRoles(c *gin.Context) {
+	res, err := h.service.GetAllRoles()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Could not get roles"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"roles": res})
+}

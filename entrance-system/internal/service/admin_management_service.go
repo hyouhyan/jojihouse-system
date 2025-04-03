@@ -1,6 +1,8 @@
 package service
 
 import (
+	"jojihouse-entrance-system/api/model/request"
+	"jojihouse-entrance-system/api/model/response"
 	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/repository"
 	"time"
@@ -19,15 +21,68 @@ func NewAdminManagementService(userRepository *repository.UserRepository, roleRe
 	return &AdminManagementService{userRepository: userRepository, roleRepository: roleRepository, accessLogRepository: accessLogRepository, remainingEntriesLogRepository: remainingEntriesLogRepository}
 }
 
-func (s *AdminManagementService) CreateUser(user *model.User) (*model.User, error) {
-	return s.userRepository.CreateUser(user)
+func (s *AdminManagementService) CreateUser(req *request.CreateUser) (*response.UserResponse, error) {
+	// パース的な、model.userに合わせて再構築
+	user := &model.User{
+		Name:              req.Name,
+		Description:       req.Description,
+		Barcode:           req.Barcode,
+		Contact:           req.Contact,
+		Remaining_entries: req.Remaining_entries,
+	}
+
+	// ユーザーを作成
+	user, err := s.userRepository.CreateUser(user)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &response.UserResponse{
+		ID:                user.ID,
+		Name:              user.Name,
+		Description:       user.Description,
+		Barcode:           user.Barcode,
+		Contact:           user.Contact,
+		Remaining_entries: user.Remaining_entries,
+		Registered_at:     user.Registered_at,
+		Total_entries:     user.Total_entries,
+	}
+
+	return res, nil
 }
 
-func (s *AdminManagementService) UpdateUser(user *model.User) error {
-	return s.userRepository.UpdateUser(user)
+func (s *AdminManagementService) UpdateUser(userID int, user *request.UpdateUser) error {
+	userModel, err := s.userRepository.GetUserByID(userID)
+	if err != nil {
+		return err
+	}
+
+	if user.Name != nil {
+		userModel.Name = *user.Name
+	}
+	if user.Description != nil {
+		userModel.Description = *user.Description
+	}
+	if user.Barcode != nil {
+		userModel.Barcode = *user.Barcode
+	}
+	if user.Contact != nil {
+		userModel.Contact = *user.Contact
+	}
+	if user.Remaining_entries != nil {
+		userModel.Remaining_entries = *user.Remaining_entries
+	}
+
+	return s.userRepository.UpdateUser(userModel)
 }
 
 func (s *AdminManagementService) DeleteUser(userID int) error {
+	// ユーザーが実在するかの確認
+	_, err := s.userRepository.GetUserByID(userID)
+	if err != nil {
+		return err
+	}
+
 	return s.userRepository.DeleteUser(userID)
 }
 

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"jojihouse-entrance-system/api/model/response"
 	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/repository"
 	"log"
@@ -32,23 +33,23 @@ func NewEntranceService(
 }
 
 // 入場したときの処理
-func (s *EntranceService) EnterUser(barcode string) error {
+func (s *EntranceService) EnterUser(barcode string) (response.EntranceResponse, error) {
 	// ユーザー情報を取得(存在するかの確認)
 	user, err := s.userRepository.GetUserByBarcode(barcode)
 	if err != nil {
-		return err
+		return response.EntranceResponse{}, err
 	}
 
 	// 入場ログ作成
 	err = s.accessLogRepository.CreateEntryAccessLog(user.ID)
 	if err != nil {
-		return err
+		return response.EntranceResponse{}, err
 	}
 
 	// 在室ユーザーに追加
 	err = s.currentUsersRepository.AddUserToCurrentUsers(user.ID)
 	if err != nil {
-		return err
+		return response.EntranceResponse{}, err
 	}
 
 	isDecreaseTarget := true
@@ -64,7 +65,7 @@ func (s *EntranceService) EnterUser(barcode string) error {
 	// 最後に「入場可能回数を消費した」入場を取得
 	lastRemainingLog, err := s.remainingEntriesLogRepository.GetLastRemainingEntriesLogByUserID(user.ID)
 	if err != nil {
-		return err
+		return response.EntranceResponse{}, err
 	}
 
 	// ログの日が今日なら同日再入場
@@ -76,7 +77,7 @@ func (s *EntranceService) EnterUser(barcode string) error {
 		// 残り回数を減らす
 		beforeCount, afterCount, err := s.userRepository.DecreaseRemainingEntries(user.ID, 1)
 		if err != nil {
-			return err
+			return response.EntranceResponse{}, err
 		}
 		// ログ保存
 
@@ -89,39 +90,58 @@ func (s *EntranceService) EnterUser(barcode string) error {
 		}
 
 		// ログ作成
-		s.remainingEntriesLogRepository.CreateRemainingEntriesLog(log)
+		err = s.remainingEntriesLogRepository.CreateRemainingEntriesLog(log)
+		if err != nil {
+			return response.EntranceResponse{}, err
+		}
 	}
 
-	return nil
+	// Response作成
+	response := response.EntranceResponse{
+		UserID:     user.ID,
+		UserName:   user.Name,
+		Time:       time.Now(),
+		AccessType: "entry",
+	}
+
+	return response, nil
 }
 
 // 退場したときの処理
-func (s *EntranceService) ExitUser(barcode string) error {
+func (s *EntranceService) ExitUser(barcode string) (response.EntranceResponse, error) {
 	// ユーザー情報を取得(存在するかの確認)
 	user, err := s.userRepository.GetUserByBarcode(barcode)
 	if err != nil {
-		return err
+		return response.EntranceResponse{}, err
 	}
 
 	// 退場ログ作成
 	err = s.accessLogRepository.CreateExitAccessLog(user.ID)
 	if err != nil {
-		return err
+		return response.EntranceResponse{}, err
 	}
 
 	// 在室ユーザーから削除
 	err = s.currentUsersRepository.DeleteUserToCurrentUsers(user.ID)
 	if err != nil {
-		return err
+		return response.EntranceResponse{}, err
 	}
 
 	// 入場回数を増やす
 	err = s.userRepository.IncreaseTotalEntries(user.ID)
 	if err != nil {
-		return err
+		return response.EntranceResponse{}, err
 	}
 
-	return nil
+	// Response作成
+	response := response.EntranceResponse{
+		UserID:     user.ID,
+		UserName:   user.Name,
+		Time:       time.Now(),
+		AccessType: "exit",
+	}
+
+	return response, nil
 }
 
 func isSameDate(a, b time.Time) bool {

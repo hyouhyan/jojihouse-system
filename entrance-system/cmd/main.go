@@ -1,7 +1,15 @@
 package main
 
 import (
+	"jojihouse-entrance-system/api/handler"
+	"jojihouse-entrance-system/api/router"
 	"jojihouse-entrance-system/internal/database"
+	"jojihouse-entrance-system/internal/repository"
+	"jojihouse-entrance-system/internal/service"
+	"time"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
@@ -11,5 +19,51 @@ func main() {
 	database.ConnectMongo()
 	defer database.CloseMongo()
 
-	test(database.PostgresDB, database.MongoDB)
+	// 依存関係の注入
+
+	// ユーザーリポジトリ
+	userRepo := repository.NewUserRepository(database.PostgresDB)
+	// ロールリポジトリ
+	roleRepo := repository.NewRoleRepository(database.PostgresDB)
+	// ログリポジトリ
+	accessLogRepo := repository.NewLogRepository(database.MongoDB)
+	// 入場可能回数ログリポジトリ
+	remainingEntriesLogRepo := repository.NewRemainingEntriesLogRepository(database.MongoDB)
+	// 在室ユーザーリポジトリ
+	currentUsersRepo := repository.NewCurrentUsersRepository(database.PostgresDB)
+
+	// entranceサービス
+	entranceService := service.NewEntranceService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo, currentUsersRepo)
+	// adminManagementサービス
+	adminManagementService := service.NewAdminManagementService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo)
+	// userPortalサービス
+	userPortalService := service.NewUserPortalService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo, currentUsersRepo)
+
+	// EntranceHandler
+	entranceHandler := handler.NewEntranceHandler(entranceService, userPortalService)
+	userHandler := handler.NewUserHandler(userPortalService, adminManagementService)
+	roleHandler := handler.NewRoleHandler(userPortalService)
+
+	// Gin ルーターの設定
+	r := gin.Default()
+
+	// CORSの設定
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"}, // すべてのオリジンを許可
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour, // プリフライトリクエストの結果をキャッシュ
+	}))
+
+	router.SetupEntranceRoutes(r, entranceHandler)
+	router.SetupUserRoutes(r, userHandler)
+	router.SetupRoleRoutes(r, roleHandler)
+	// router.SetupUserRoutes()
+
+	// test(database.PostgresDB, database.MongoDB)
+
+	// サーバー起動
+	r.Run("127.0.0.1:8080")
 }
