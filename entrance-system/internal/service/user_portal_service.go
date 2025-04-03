@@ -2,9 +2,9 @@ package service
 
 import (
 	"errors"
+	"jojihouse-entrance-system/api/model/response"
 	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/repository"
-	"jojihouse-entrance-system/api/model/response"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -101,6 +101,29 @@ func (s *UserPortalService) GetAccessLogsByAnyFilter(lastID primitive.ObjectID, 
 
 func (s *UserPortalService) GetRemainingEntriesLogsByUserID(userID int, lastID primitive.ObjectID) ([]model.RemainingEntriesLog, error) {
 	return s.remainingEntriesLogRepository.GetRemainingEntriesLogsByUserID(userID, lastID, 50)
+}
+
+func (s *UserPortalService) GetAllUsers() ([]response.UserResponse, error) {
+	users, err := s.userRepository.GetAllUsers()
+	if err != nil {
+		return nil, err
+	}
+
+	var res []response.UserResponse
+	for _, user := range users {
+		res = append(res, response.UserResponse{
+			ID:                user.ID,
+			Name:              user.Name,
+			Description:       user.Description,
+			Barcode:           user.Barcode,
+			Contact:           user.Contact,
+			Remaining_entries: user.Remaining_entries,
+			Registered_at:     user.Registered_at,
+			Total_entries:     user.Total_entries,
+		})
+	}
+
+	return res, err
 }
 
 // ユーザー情報の取得

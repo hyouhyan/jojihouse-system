@@ -9,12 +9,12 @@ import (
 )
 
 type UserHandler struct {
-	userportalService      *service.UserPortalService
+	userPortalService      *service.UserPortalService
 	adminManagementService *service.AdminManagementService
 }
 
-func NewUserHandler(userportalService *service.UserPortalService, adminManagementService *service.AdminManagementService) *UserHandler {
-	return &UserHandler{userportalService: userportalService, adminManagementService: adminManagementService}
+func NewUserHandler(userPortalService *service.UserPortalService, adminManagementService *service.AdminManagementService) *UserHandler {
+	return &UserHandler{userPortalService: userPortalService, adminManagementService: adminManagementService}
 }
 
 // ユーザー作成
@@ -38,3 +38,11 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 // ユーザー情報取得
 
 // 全ユーザーの情報取得
+func (h *UserHandler) GetAllUsers(c *gin.Context) {
+	res, err := h.userPortalService.GetAllUsers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get users"})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"users": res})
+}
