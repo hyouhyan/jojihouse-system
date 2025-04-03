@@ -52,13 +52,25 @@ func (s *AdminManagementService) CreateUser(req *request.CreateUser) (*response.
 }
 
 func (s *AdminManagementService) UpdateUser(userID int, user *request.UpdateUser) error {
-	userModel := &model.User{
-		ID:                userID,
-		Name:              user.Name,
-		Description:       user.Description,
-		Barcode:           user.Barcode,
-		Contact:           user.Contact,
-		Remaining_entries: user.Remaining_entries,
+	userModel, err := s.userRepository.GetUserByID(userID)
+	if err != nil {
+		return err
+	}
+
+	if user.Name != nil {
+		userModel.Name = *user.Name
+	}
+	if user.Description != nil {
+		userModel.Description = *user.Description
+	}
+	if user.Barcode != nil {
+		userModel.Barcode = *user.Barcode
+	}
+	if user.Contact != nil {
+		userModel.Contact = *user.Contact
+	}
+	if user.Remaining_entries != nil {
+		userModel.Remaining_entries = *user.Remaining_entries
 	}
 
 	return s.userRepository.UpdateUser(userModel)
