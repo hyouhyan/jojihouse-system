@@ -7,6 +7,7 @@ import (
 	"jojihouse-entrance-system/internal/service"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -73,8 +74,24 @@ func (h *EntranceHandler) GetAccessLogs(c *gin.Context) {
 		}
 	}
 
+	dateStr := c.Query("date")
+
+	var date time.Time
+	var err error
+
+	// 日付のバリデーション（YYYY-MM-DD の形式）
+	if dateStr != "" {
+		date, err = time.Parse("2006-01-02", dateStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format. Use YYYY-MM-DD"})
+			return
+		}
+	}
+
 	options := model.AccessLogFilter{
-		Limit: limit,
+		Limit:     limit,
+		DayBefore: date,
+		DayAfter:  date,
 	}
 
 	accesLogs, err := h.userPortalService.GetAccessLogsByAnyFilter(lastID, options)

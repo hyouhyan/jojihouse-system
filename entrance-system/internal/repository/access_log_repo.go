@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"jojihouse-entrance-system/internal/model"
@@ -80,6 +81,8 @@ func (r *AccessLogRepository) GetAccessLogsByAnyFilter(lastID primitive.ObjectID
 	if options.Limit > 0 {
 		limit = int64(options.Limit)
 	}
+
+	fmt.Println(filter)
 
 	return r._findAccessLogs(filter, lastID, limit)
 }
