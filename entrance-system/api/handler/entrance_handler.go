@@ -85,3 +85,36 @@ func (h *EntranceHandler) GetAccessLogs(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"access_logs": accesLogs})
 }
+
+// アクセスログをユーザー指定で取得
+func (h *EntranceHandler) GetAccessLogsByUserID(c *gin.Context) {
+	userID, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+	}
+
+	lastID := c.Query("last_id") // クエリパラメータから lastID を取得
+	limitStr := c.Query("limit") // クエリパラメータから limit を取得
+
+	// デフォルトの取得件数を設定（limit が指定されていなければ 10）
+	limit := int64(10)
+	if limitStr != "" {
+		parsedLimit, err := strconv.Atoi(limitStr)
+		if err == nil && parsedLimit > 0 {
+			limit = int64(parsedLimit)
+		}
+	}
+
+	options := model.AccessLogFilter{
+		Limit:  limit,
+		UserID: userID,
+	}
+
+	accesLogs, err := h.userPortalService.GetAccessLogsByAnyFilter(lastID, options)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get access log"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"access_logs": accesLogs})
+}
