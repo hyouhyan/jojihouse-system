@@ -2,7 +2,6 @@ package service
 
 import (
 	"errors"
-	"fmt"
 	"jojihouse-entrance-system/api/model/response"
 	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/repository"
@@ -68,9 +67,6 @@ func (s *UserPortalService) GetAccessLogsByAnyFilter(lastID string, options ...m
 			// DayBeforeの時間を翌日の00:00:00に設定
 			opt.DayBefore = time.Date(opt.DayBefore.Year(), opt.DayBefore.Month(), opt.DayBefore.Day()+1, 0, 0, 0, 0, opt.DayBefore.Location())
 		}
-
-		fmt.Println(opt.DayBefore)
-		fmt.Println(opt.DayAfter)
 	}
 
 	var objectID primitive.ObjectID
@@ -90,8 +86,6 @@ func (s *UserPortalService) GetAccessLogsByAnyFilter(lastID string, options ...m
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Println(logs)
 
 	// UserIDの一覧を作成
 	userIDs := make([]int, len(logs))
