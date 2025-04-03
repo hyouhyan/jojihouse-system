@@ -91,6 +91,7 @@ func (h *EntranceHandler) GetAccessLogsByUserID(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+		return
 	}
 
 	lastID := c.Query("last_id") // クエリパラメータから lastID を取得
