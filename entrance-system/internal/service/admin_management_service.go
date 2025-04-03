@@ -65,6 +65,12 @@ func (s *AdminManagementService) UpdateUser(userID int, user *request.UpdateUser
 }
 
 func (s *AdminManagementService) DeleteUser(userID int) error {
+	// ユーザーが実在するかの確認
+	_, err := s.userRepository.GetUserByID(userID)
+	if err != nil {
+		return err
+	}
+
 	return s.userRepository.DeleteUser(userID)
 }
 
