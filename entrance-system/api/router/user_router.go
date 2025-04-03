@@ -15,5 +15,6 @@ func SetupUserRoutes(router *gin.Engine, userHandler *handler.UserHandler) {
 		userGroup.PUT("/:user_id", userHandler.UpdateUser)
 		userGroup.DELETE("/:user_id", userHandler.DeleteUser)
 		userGroup.GET("/:user_id/roles", userHandler.GetRolesByUserID)
+		userGroup.POST("/:user_id/roles", userHandler.AddRoleToUser)
 	}
 }

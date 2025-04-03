@@ -119,3 +119,27 @@ func (h *UserHandler) GetRolesByUserID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"roles": res})
 }
+
+// ロール追加
+func (h *UserHandler) AddRoleToUser(c *gin.Context) {
+	userID, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	var req request.AddRole
+	// リクエストの解読
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	// ロール追加してエラーハンドリング
+	if err := h.adminManagementService.AddRoleToUser(userID, req.RoleID); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Could not add role"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Success"})
+}
