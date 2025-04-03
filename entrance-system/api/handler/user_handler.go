@@ -82,4 +82,23 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 	}
 
 	h.adminManagementService.UpdateUser(userID, &req)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Success"})
+}
+
+// ユーザーを削除
+func (h *UserHandler) DeleteUser(c *gin.Context) {
+	userID, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	err = h.adminManagementService.DeleteUser(userID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Could not delete user"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
