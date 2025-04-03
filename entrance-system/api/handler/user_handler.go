@@ -143,3 +143,25 @@ func (h *UserHandler) AddRoleToUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
+
+// ロール削除
+func (h *UserHandler) RemoveRoleFromUser(c *gin.Context) {
+	userID, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	roleID, err := strconv.Atoi(c.Param("role_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid role ID"})
+		return
+	}
+
+	if err := h.adminManagementService.RemoveRoleFromUser(userID, roleID); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Could not remove role"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Success"})
+}
