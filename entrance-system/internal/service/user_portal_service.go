@@ -111,24 +111,20 @@ func (s *UserPortalService) GetAllUsers() ([]response.UserResponse, error) {
 
 	var res []response.UserResponse
 	for _, user := range users {
-		res = append(res, response.UserResponse{
-			ID:                user.ID,
-			Name:              user.Name,
-			Description:       user.Description,
-			Barcode:           user.Barcode,
-			Contact:           user.Contact,
-			Remaining_entries: user.Remaining_entries,
-			Registered_at:     user.Registered_at,
-			Total_entries:     user.Total_entries,
-		})
+		res = append(res, *s.cnvModelUserToResponseUser(&user))
 	}
 
 	return res, err
 }
 
 // ユーザー情報の取得
-func (s *UserPortalService) GetUserByID(userID int) (*model.User, error) {
-	return s.userRepository.GetUserByID(userID)
+func (s *UserPortalService) GetUserByID(userID int) (*response.UserResponse, error) {
+	user, err := s.userRepository.GetUserByID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.cnvModelUserToResponseUser(user), nil
 }
 
 func (s *UserPortalService) GetUserByBarcode(barcode string) (*model.User, error) {
@@ -176,4 +172,20 @@ func (s *UserPortalService) GetCurrentUsers() ([]model.CurrentUser, error) {
 // 入室時間を取得
 func (s *UserPortalService) GetEnteredTime(userID int) (time.Time, error) {
 	return s.currentUsersRepository.GetEnteredTime(userID)
+}
+
+// model.userをresponse.userに変換
+func (s *UserPortalService) cnvModelUserToResponseUser(user *model.User) *response.UserResponse {
+	resUser := &response.UserResponse{
+		ID:                user.ID,
+		Name:              user.Name,
+		Description:       user.Description,
+		Barcode:           user.Barcode,
+		Contact:           user.Contact,
+		Remaining_entries: user.Remaining_entries,
+		Registered_at:     user.Registered_at,
+		Total_entries:     user.Total_entries,
+	}
+
+	return resUser
 }

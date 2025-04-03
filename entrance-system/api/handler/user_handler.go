@@ -4,6 +4,7 @@ import (
 	"jojihouse-entrance-system/api/model/request"
 	"jojihouse-entrance-system/internal/service"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -36,6 +37,24 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 }
 
 // ユーザー情報取得
+func (h *UserHandler) GetUserByID(c *gin.Context) {
+	// URLパラメータから user_id を取得
+	userID, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	// サービス層でユーザー情報を取得
+	user, err := h.userPortalService.GetUserByID(userID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	// レスポンスを返す
+	c.JSON(http.StatusOK, user)
+}
 
 // 全ユーザーの情報取得
 func (h *UserHandler) GetAllUsers(c *gin.Context) {
