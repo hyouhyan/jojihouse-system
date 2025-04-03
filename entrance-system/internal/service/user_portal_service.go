@@ -33,14 +33,14 @@ func NewUserPortalService(userRepository *repository.UserRepository,
 }
 
 // ログの取得
-func (s *UserPortalService) GetAccessLogsByUserID(userID int, lastID primitive.ObjectID) ([]response.AccessLogResponse, error) {
+func (s *UserPortalService) GetAccessLogsByUserID(userID int, lastID string) ([]response.AccessLogResponse, error) {
 	options := model.AccessLogFilter{
 		UserID: userID,
 	}
 	return s.GetAccessLogsByAnyFilter(lastID, options)
 }
 
-func (s *UserPortalService) GetAccessLogsByAnyFilter(lastID primitive.ObjectID, options ...model.AccessLogFilter) ([]response.AccessLogResponse, error) {
+func (s *UserPortalService) GetAccessLogsByAnyFilter(lastID string, options ...model.AccessLogFilter) ([]response.AccessLogResponse, error) {
 	opt := model.AccessLogFilter{}
 
 	if len(options) > 0 {
@@ -61,7 +61,20 @@ func (s *UserPortalService) GetAccessLogsByAnyFilter(lastID primitive.ObjectID, 
 		}
 	}
 
-	logs, err := s.accessLogRepository.GetAccessLogsByAnyFilter(lastID, opt)
+	var objectID primitive.ObjectID
+	var err error
+
+	// lastIDを変換
+	if lastID == "" {
+		objectID = primitive.NilObjectID
+	} else {
+		objectID, err = primitive.ObjectIDFromHex(lastID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	logs, err := s.accessLogRepository.GetAccessLogsByAnyFilter(objectID, opt)
 	if err != nil {
 		return nil, err
 	}

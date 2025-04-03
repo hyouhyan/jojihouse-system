@@ -5,9 +5,9 @@ import (
 	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/service"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type EntranceHandler struct {
@@ -65,9 +65,20 @@ func (h *EntranceHandler) GetCurrentUsers(c *gin.Context) {
 
 // アクセスログを取得
 func (h *EntranceHandler) GetAccessLogs(c *gin.Context) {
-	lastID := primitive.NilObjectID
+	lastID := c.Query("last_id") // クエリパラメータから lastID を取得
+	limitStr := c.Query("limit") // クエリパラメータから limit を取得
+
+	// デフォルトの取得件数を設定（limit が指定されていなければ 10）
+	limit := int64(10)
+	if limitStr != "" {
+		parsedLimit, err := strconv.Atoi(limitStr)
+		if err == nil && parsedLimit > 0 {
+			limit = int64(parsedLimit)
+		}
+	}
+
 	options := model.AccessLogFilter{
-		Limit: 10,
+		Limit: limit,
 	}
 
 	accesLogs, err := h.userPortalService.GetAccessLogsByAnyFilter(lastID, options)
