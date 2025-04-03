@@ -14,3 +14,8 @@ type UserResponse struct {
 	Registered_at     time.Time `json:"registered_at"`
 	Total_entries     int       `json:"total_entries"`
 }
+
+type Role struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}

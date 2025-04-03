@@ -145,8 +145,21 @@ func (s *UserPortalService) GetUserByBarcode(barcode string) (*model.User, error
 }
 
 // ロール関連
-func (s *UserPortalService) GetRolesByUserID(userID int) ([]model.Role, error) {
-	return s.roleRepository.GetRolesByUserID(userID)
+func (s *UserPortalService) GetRolesByUserID(userID int) ([]response.Role, error) {
+	roles, err := s.roleRepository.GetRolesByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	var res []response.Role
+	for _, role := range roles {
+		res = append(res, response.Role{
+			ID:   role.ID,
+			Name: role.Name,
+		})
+	}
+
+	return res, nil
 }
 
 func (s *UserPortalService) GetRoleByID(roleID int) (*model.Role, error) {

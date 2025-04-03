@@ -102,3 +102,20 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
+
+// ロール取得
+func (h *UserHandler) GetRolesByUserID(c *gin.Context) {
+	userID, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	res, err := h.userPortalService.GetRolesByUserID(userID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Could not get roles"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"roles": res})
+}
