@@ -51,8 +51,17 @@ func (s *AdminManagementService) CreateUser(req *request.CreateUserRequest) (*re
 	return res, nil
 }
 
-func (s *AdminManagementService) UpdateUser(user *model.User) error {
-	return s.userRepository.UpdateUser(user)
+func (s *AdminManagementService) UpdateUser(userID int, user *request.UpdateUser) error {
+	userModel := &model.User{
+		ID:                userID,
+		Name:              user.Name,
+		Description:       user.Description,
+		Barcode:           user.Barcode,
+		Contact:           user.Contact,
+		Remaining_entries: user.Remaining_entries,
+	}
+
+	return s.userRepository.UpdateUser(userModel)
 }
 
 func (s *AdminManagementService) DeleteUser(userID int) error {

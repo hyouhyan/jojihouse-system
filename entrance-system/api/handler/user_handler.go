@@ -65,3 +65,21 @@ func (h *UserHandler) GetAllUsers(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"users": res})
 }
+
+// ユーザー情報を更新
+func (h *UserHandler) UpdateUser(c *gin.Context) {
+	// URLパラメータから user_id を取得
+	userID, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	var req request.UpdateUser
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	h.adminManagementService.UpdateUser(userID, &req)
+}
