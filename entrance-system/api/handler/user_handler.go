@@ -20,7 +20,7 @@ func NewUserHandler(userPortalService *service.UserPortalService, adminManagemen
 
 // ユーザー作成
 func (h *UserHandler) CreateUser(c *gin.Context) {
-	var req request.CreateUserRequest
+	var req request.CreateUser
 	// リクエストの解読
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})

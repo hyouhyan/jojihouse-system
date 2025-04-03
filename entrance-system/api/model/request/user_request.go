@@ -1,6 +1,6 @@
 package request
 
-type CreateUserRequest struct {
+type CreateUser struct {
 	Name              string `json:"name" binding:"required"`
 	Description       string `json:"description"`
 	Barcode           string `json:"barcode" binding:"required"`

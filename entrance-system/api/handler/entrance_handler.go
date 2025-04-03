@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"jojihouse-entrance-system/api/model/request"
 	"jojihouse-entrance-system/api/model/response"
 	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/service"
@@ -19,14 +20,9 @@ func NewEntranceHandler(entranceService *service.EntranceService, userPortalServ
 	return &EntranceHandler{entranceService: entranceService, userPortalService: userPortalService}
 }
 
-type EntranceRequest struct {
-	Barcode string `json:"barcode" binding:"required"`
-	Type    string `json:"type" binding:"required,oneof=entry exit"`
-}
-
 // 入退室記録
 func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
-	var req EntranceRequest
+	var req request.Entrance
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return

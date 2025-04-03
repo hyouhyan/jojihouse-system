@@ -21,7 +21,7 @@ func NewAdminManagementService(userRepository *repository.UserRepository, roleRe
 	return &AdminManagementService{userRepository: userRepository, roleRepository: roleRepository, accessLogRepository: accessLogRepository, remainingEntriesLogRepository: remainingEntriesLogRepository}
 }
 
-func (s *AdminManagementService) CreateUser(req *request.CreateUserRequest) (*response.UserResponse, error) {
+func (s *AdminManagementService) CreateUser(req *request.CreateUser) (*response.UserResponse, error) {
 	// パース的な、model.userに合わせて再構築
 	user := &model.User{
 		Name:              req.Name,
