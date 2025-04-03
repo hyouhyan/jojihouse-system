@@ -42,6 +42,7 @@ func main() {
 	// EntranceHandler
 	entranceHandler := handler.NewEntranceHandler(entranceService, userPortalService)
 	userHandler := handler.NewUserHandler(userPortalService, adminManagementService)
+	roleHandler := handler.NewRoleHandler(userPortalService)
 
 	// Gin ルーターの設定
 	r := gin.Default()
@@ -58,6 +59,7 @@ func main() {
 
 	router.SetupEntranceRoutes(r, entranceHandler)
 	router.SetupUserRoutes(r, userHandler)
+	router.SetupRoleRoutes(r, roleHandler)
 	// router.SetupUserRoutes()
 
 	// test(database.PostgresDB, database.MongoDB)

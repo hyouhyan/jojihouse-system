@@ -14,6 +14,28 @@ func NewRoleRepository(db *sql.DB) *RoleRepository {
 	return &RoleRepository{db: db}
 }
 
+func (r *RoleRepository) GetAllRoles() ([]model.Role, error) {
+	roles := []model.Role{}
+	rows, err := r.db.Query("SELECT id, name FROM roles")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		role := model.Role{}
+		err := rows.Scan(
+			&role.ID,
+			&role.Name,
+		)
+		if err != nil {
+			return nil, err
+		}
+		roles = append(roles, role)
+	}
+	return roles, nil
+}
+
 func (r *RoleRepository) GetRoleByID(id int) (*model.Role, error) {
 	role := &model.Role{}
 	err := r.db.QueryRow("SELECT * FROM roles WHERE id = $1", id).Scan(
