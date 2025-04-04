@@ -239,3 +239,28 @@ func (s *UserPortalService) cnvModelUserToResponseUser(user *model.User) *respon
 
 	return resUser
 }
+
+// ユーザーが在室しているか確認
+func (s *UserPortalService) IsCurrentUser(userID int) (bool, error) {
+	currentUsers, err := s.currentUsersRepository.GetCurrentUsers()
+	if err != nil {
+		return false, err
+	}
+
+	for _, user := range currentUsers {
+		if user.UserID == userID {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+// ユーザーが在室しているか確認
+func (s *UserPortalService) IsCurrentUserByBarcode(barcode string) (bool, error) {
+	user, err := s.userRepository.GetUserByBarcode(barcode)
+	if err != nil {
+		return false, err
+	}
+
+	return s.IsCurrentUser(user.ID)
+}

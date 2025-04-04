@@ -39,6 +39,21 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 	var response response.EntranceResponse
 	var err error
 
+	// autoの場合
+	if req.Type == "auto" {
+		// ユーザーの在室を確認
+		isCurrent, err := h.userPortalService.IsCurrentUserByBarcode(req.Barcode)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check current user"})
+			return
+		}
+		if isCurrent {
+			req.Type = "exit"
+		} else {
+			req.Type = "entry"
+		}
+	}
+
 	if req.Type == "entry" {
 		response, err = h.entranceService.EnterUser(req.Barcode)
 		if err != nil {

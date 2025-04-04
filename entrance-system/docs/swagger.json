@@ -493,7 +493,8 @@
                     "type": "string",
                     "enum": [
                         "entry",
-                        "exit"
+                        "exit",
+                        "auto"
                     ]
                 }
             }

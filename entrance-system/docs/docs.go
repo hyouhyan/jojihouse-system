@@ -499,7 +499,8 @@ const docTemplate = `{
                     "type": "string",
                     "enum": [
                         "entry",
-                        "exit"
+                        "exit",
+                        "auto"
                     ]
                 }
             }

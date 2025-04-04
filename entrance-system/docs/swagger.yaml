@@ -31,6 +31,7 @@ definitions:
         enum:
         - entry
         - exit
+        - auto
         type: string
     required:
     - barcode
