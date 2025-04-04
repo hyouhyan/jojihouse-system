@@ -76,7 +76,7 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 // @Description 現在ハウス内にいるユーザーの一覧を取得します
 // @Produce json
 // @Success 200 {object} []response.UserResponse
-// @Router /entrance/current-users [get]
+// @Router /entrance/current [get]
 func (h *EntranceHandler) GetCurrentUsers(c *gin.Context) {
 	currentUsers, err := h.userPortalService.GetCurrentUsers()
 	if err != nil {

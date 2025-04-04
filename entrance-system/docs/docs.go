@@ -49,7 +49,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/entrance/current-users": {
+        "/entrance/current": {
             "get": {
                 "description": "現在ハウス内にいるユーザーの一覧を取得します",
                 "produces": [
