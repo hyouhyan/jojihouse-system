@@ -15,6 +15,138 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/entrance": {
+            "post": {
+                "description": "ユーザーの入室または退室を記録します",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "入退室記録",
+                "parameters": [
+                    {
+                        "description": "入退室データ",
+                        "name": "entrance",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.Entrance"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.EntranceResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/entrance/current-users": {
+            "get": {
+                "description": "現在オフィス内にいるユーザーの一覧を取得します",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "在室ユーザー取得",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.UserResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/entrance/logs": {
+            "get": {
+                "description": "すべてのユーザーの入退室ログを取得します",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "アクセスログを取得",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "前回のログID（ページネーション用）",
+                        "name": "last_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "取得するログの件数（デフォルト10）",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "対象日（YYYY-MM-DD形式）",
+                        "name": "date",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.AccessLogResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/entrance/logs/{user_id}": {
+            "get": {
+                "description": "指定したユーザーの入退室ログを取得します",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "アクセスログをユーザー指定で取得",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ユーザーID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "前回のログID（ページネーション用）",
+                        "name": "last_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "取得するログの件数（デフォルト10）",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.AccessLogResponse"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "produces": [
@@ -294,6 +426,25 @@ const docTemplate = `{
                 }
             }
         },
+        "request.Entrance": {
+            "type": "object",
+            "required": [
+                "barcode",
+                "type"
+            ],
+            "properties": {
+                "barcode": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "entry",
+                        "exit"
+                    ]
+                }
+            }
+        },
         "request.UpdateUser": {
             "type": "object",
             "properties": {
@@ -311,6 +462,43 @@ const docTemplate = `{
                 },
                 "remaining_entries": {
                     "type": "integer"
+                }
+            }
+        },
+        "response.AccessLogResponse": {
+            "type": "object",
+            "properties": {
+                "access_type": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.EntranceResponse": {
+            "type": "object",
+            "properties": {
+                "access_type": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
+                },
+                "user_name": {
+                    "type": "string"
                 }
             }
         },

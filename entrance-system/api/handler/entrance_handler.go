@@ -21,7 +21,13 @@ func NewEntranceHandler(entranceService *service.EntranceService, userPortalServ
 	return &EntranceHandler{entranceService: entranceService, userPortalService: userPortalService}
 }
 
-// 入退室記録
+// @Summary 入退室記録
+// @Description ユーザーの入室または退室を記録します
+// @Accept json
+// @Produce json
+// @Param entrance body request.Entrance true "入退室データ"
+// @Success 200 {object} response.EntranceResponse
+// @Router /entrance [post]
 func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 	var req request.Entrance
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -49,7 +55,11 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"entrance_log": response})
 }
 
-// 在室ユーザー取得
+// @Summary 在室ユーザー取得
+// @Description 現在オフィス内にいるユーザーの一覧を取得します
+// @Produce json
+// @Success 200 {object} []response.UserResponse
+// @Router /entrance/current-users [get]
 func (h *EntranceHandler) GetCurrentUsers(c *gin.Context) {
 	currentUsers, err := h.userPortalService.GetCurrentUsers()
 	if err != nil {
@@ -60,7 +70,14 @@ func (h *EntranceHandler) GetCurrentUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"current_users": currentUsers})
 }
 
-// アクセスログを取得
+// @Summary アクセスログを取得
+// @Description すべてのユーザーの入退室ログを取得します
+// @Produce json
+// @Param last_id query string false "前回のログID（ページネーション用）"
+// @Param limit query int false "取得するログの件数（デフォルト10）"
+// @Param date query string false "対象日（YYYY-MM-DD形式）"
+// @Success 200 {object} []response.AccessLogResponse
+// @Router /entrance/logs [get]
 func (h *EntranceHandler) GetAccessLogs(c *gin.Context) {
 	lastID := c.Query("last_id") // クエリパラメータから lastID を取得
 	limitStr := c.Query("limit") // クエリパラメータから limit を取得
@@ -94,16 +111,23 @@ func (h *EntranceHandler) GetAccessLogs(c *gin.Context) {
 		DayAfter:  date,
 	}
 
-	accesLogs, err := h.userPortalService.GetAccessLogsByAnyFilter(lastID, options)
+	accessLogs, err := h.userPortalService.GetAccessLogsByAnyFilter(lastID, options)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get access log"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"access_logs": accesLogs})
+	c.JSON(http.StatusOK, gin.H{"access_logs": accessLogs})
 }
 
-// アクセスログをユーザー指定で取得
+// @Summary アクセスログをユーザー指定で取得
+// @Description 指定したユーザーの入退室ログを取得します
+// @Produce json
+// @Param user_id path int true "ユーザーID"
+// @Param last_id query string false "前回のログID（ページネーション用）"
+// @Param limit query int false "取得するログの件数（デフォルト10）"
+// @Success 200 {object} []response.AccessLogResponse
+// @Router /entrance/logs/{user_id} [get]
 func (h *EntranceHandler) GetAccessLogsByUserID(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
@@ -128,11 +152,11 @@ func (h *EntranceHandler) GetAccessLogsByUserID(c *gin.Context) {
 		UserID: userID,
 	}
 
-	accesLogs, err := h.userPortalService.GetAccessLogsByAnyFilter(lastID, options)
+	accessLogs, err := h.userPortalService.GetAccessLogsByAnyFilter(lastID, options)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get access log"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"access_logs": accesLogs})
+	c.JSON(http.StatusOK, gin.H{"access_logs": accessLogs})
 }
