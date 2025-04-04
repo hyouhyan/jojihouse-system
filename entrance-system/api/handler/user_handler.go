@@ -18,7 +18,6 @@ func NewUserHandler(userPortalService *service.UserPortalService, adminManagemen
 	return &UserHandler{userPortalService: userPortalService, adminManagementService: adminManagementService}
 }
 
-// ユーザー作成
 func (h *UserHandler) CreateUser(c *gin.Context) {
 	var req request.CreateUser
 	// リクエストの解読
@@ -36,7 +35,16 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"user": res})
 }
 
-// ユーザー情報取得
+// GetUserByID ユーザー情報取得
+// @Summary ユーザー情報取得
+// @Description 指定したユーザーの情報を取得します
+// @Tags users
+// @Produce json
+// @Param user_id path int true "ユーザーID"
+// @Success 200 {object} model.User
+// @Failure 400 {object} map[string]string
+// @Failure 404 {object} map[string]string
+// @Router /users/{user_id} [get]
 func (h *UserHandler) GetUserByID(c *gin.Context) {
 	// URLパラメータから user_id を取得
 	userID, err := strconv.Atoi(c.Param("user_id"))
