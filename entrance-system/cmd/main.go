@@ -8,10 +8,19 @@ import (
 	"jojihouse-entrance-system/internal/service"
 	"time"
 
+	_ "jojihouse-entrance-system/docs" // 生成される Swagger ドキュメントを読み込む
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+// @title JojiHouse Entrance System API
+// @version 1.0
+// @description JojiHouse の入退室管理システム API ドキュメント
+// @host 127.0.0.1:8080
+// @BasePath /
 func main() {
 	database.ConnectPostgres()
 	defer database.ClosePostgres()
@@ -63,6 +72,9 @@ func main() {
 	// router.SetupUserRoutes()
 
 	// test(database.PostgresDB, database.MongoDB)
+
+	// Swagger のエンドポイントを追加
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// サーバー起動
 	r.Run("127.0.0.1:8080")
