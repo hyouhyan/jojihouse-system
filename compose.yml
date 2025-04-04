@@ -49,11 +49,11 @@ services:
       myNetwork:
         ipv4_address: 172.30.0.11
   
-  # go-app:
-  #   build: ./entrance-system
-  #   volumes: 
-  #     - ./entrance-system:/go/src
-  #   tty: true
+  go-app:
+    build: ./entrance-system
+    volumes: 
+      - ./entrance-system:/go/src
+    tty: true
 
 networks:
   myNetwork:
