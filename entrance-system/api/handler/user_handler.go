@@ -4,6 +4,7 @@ import (
 	"jojihouse-entrance-system/api/model/request"
 	"jojihouse-entrance-system/api/model/response"
 	"jojihouse-entrance-system/internal/service"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -30,12 +31,14 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 	// リクエストの解読
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		log.Print(err)
 		return
 	}
 
 	res, err := h.adminManagementService.CreateUser(&req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+		log.Print(err)
 		return
 	}
 
@@ -54,6 +57,7 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		log.Print(err)
 		return
 	}
 
@@ -61,6 +65,7 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 	user, err := h.userPortalService.GetUserByID(userID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		log.Print(err)
 		return
 	}
 
@@ -77,6 +82,7 @@ func (h *UserHandler) GetAllUsers(c *gin.Context) {
 	res, err := h.userPortalService.GetAllUsers()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get users"})
+		log.Print(err)
 	}
 
 	c.JSON(http.StatusOK, gin.H{"users": res})
@@ -95,18 +101,21 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		log.Print(err)
 		return
 	}
 
 	var req request.UpdateUser
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		log.Print(err)
 		return
 	}
 
 	err = h.adminManagementService.UpdateUser(userID, &req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+		log.Print(err)
 		return
 	}
 
@@ -124,12 +133,14 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		log.Print(err)
 		return
 	}
 
 	err = h.adminManagementService.DeleteUser(userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not delete user"})
+		log.Print(err)
 		return
 	}
 
@@ -147,12 +158,14 @@ func (h *UserHandler) GetRolesByUserID(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		log.Print(err)
 		return
 	}
 
 	res, err := h.userPortalService.GetRolesByUserID(userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not get roles"})
+		log.Print(err)
 		return
 	}
 
@@ -172,17 +185,20 @@ func (h *UserHandler) AddRoleToUser(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		log.Print(err)
 		return
 	}
 
 	var req request.AddRole
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		log.Print(err)
 		return
 	}
 
 	if err := h.adminManagementService.AddRoleToUser(userID, req.RoleID); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not add role"})
+		log.Print(err)
 		return
 	}
 
@@ -201,17 +217,20 @@ func (h *UserHandler) RemoveRoleFromUser(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		log.Print(err)
 		return
 	}
 
 	roleID, err := strconv.Atoi(c.Param("role_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid role ID"})
+		log.Print(err)
 		return
 	}
 
 	if err := h.adminManagementService.RemoveRoleFromUser(userID, roleID); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not remove role"})
+		log.Print(err)
 		return
 	}
 
@@ -229,6 +248,7 @@ func (h *UserHandler) GetUserLogs(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		log.Print(err)
 		return
 	}
 
@@ -237,6 +257,7 @@ func (h *UserHandler) GetUserLogs(c *gin.Context) {
 	remLogs, err := h.userPortalService.GetRemainingEntriesLogsByUserID(userID, lastID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not get remaining entries logs"})
+		log.Print(err)
 		return
 	}
 

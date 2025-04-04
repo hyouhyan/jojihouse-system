@@ -153,6 +153,43 @@
                 }
             }
         },
+        "/kaisuken": {
+            "post": {
+                "description": "ユーザーが回数券を購入します",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "回数券"
+                ],
+                "summary": "回数券購入",
+                "parameters": [
+                    {
+                        "description": "回数券購入のリクエストデータ",
+                        "name": "kaisuken",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.BuyKaisuken"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/roles": {
             "get": {
                 "description": "存在する全ロールをまとめて取得",
@@ -480,6 +517,29 @@
             ],
             "properties": {
                 "role_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "request.BuyKaisuken": {
+            "type": "object",
+            "required": [
+                "amount",
+                "count",
+                "receiver",
+                "user_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "integer"
+                },
+                "count": {
+                    "type": "integer"
+                },
+                "receiver": {
+                    "type": "string"
+                },
+                "user_id": {
                     "type": "integer"
                 }
             }

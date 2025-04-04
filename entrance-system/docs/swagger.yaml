@@ -7,6 +7,22 @@ definitions:
     required:
     - role_id
     type: object
+  request.BuyKaisuken:
+    properties:
+      amount:
+        type: integer
+      count:
+        type: integer
+      receiver:
+        type: string
+      user_id:
+        type: integer
+    required:
+    - amount
+    - count
+    - receiver
+    - user_id
+    type: object
   request.CreateUser:
     properties:
       barcode:
@@ -225,6 +241,30 @@ paths:
       summary: アクセスログをユーザー指定で取得
       tags:
       - エントランス(入退室)管理
+  /kaisuken:
+    post:
+      consumes:
+      - application/json
+      description: ユーザーが回数券を購入します
+      parameters:
+      - description: 回数券購入のリクエストデータ
+        in: body
+        name: kaisuken
+        required: true
+        schema:
+          $ref: '#/definitions/request.BuyKaisuken'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 回数券購入
+      tags:
+      - 回数券
   /roles:
     get:
       description: 存在する全ロールをまとめて取得

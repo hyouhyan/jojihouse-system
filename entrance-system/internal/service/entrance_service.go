@@ -96,6 +96,12 @@ func (s *EntranceService) EnterUser(barcode string) (response.EntranceResponse, 
 		}
 	}
 
+	// 入場回数を増やす
+	err = s.userRepository.IncreaseTotalEntries(user.ID)
+	if err != nil {
+		return response.EntranceResponse{}, err
+	}
+
 	// Response作成
 	response := response.EntranceResponse{
 		UserID:     user.ID,
@@ -123,12 +129,6 @@ func (s *EntranceService) ExitUser(barcode string) (response.EntranceResponse, e
 
 	// 在室ユーザーから削除
 	err = s.currentUsersRepository.DeleteUserToCurrentUsers(user.ID)
-	if err != nil {
-		return response.EntranceResponse{}, err
-	}
-
-	// 入場回数を増やす
-	err = s.userRepository.IncreaseTotalEntries(user.ID)
 	if err != nil {
 		return response.EntranceResponse{}, err
 	}
