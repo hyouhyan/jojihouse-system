@@ -2,6 +2,7 @@ package handler
 
 import (
 	"jojihouse-entrance-system/api/model/request"
+	"jojihouse-entrance-system/api/model/response"
 	"jojihouse-entrance-system/internal/service"
 	"net/http"
 	"strconv"
@@ -215,4 +216,33 @@ func (h *UserHandler) RemoveRoleFromUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
+}
+
+// @Summary ユーザーのログを取得
+// @Description 指定したユーザーの各ログを取得します
+// @Tags ユーザー管理
+// @Produce json
+// @Param user_id path int true "ユーザーID"
+// @Success 200 {object} response.Logs
+// @Router /users/{user_id}/logs [get]
+func (h *UserHandler) GetUserLogs(c *gin.Context) {
+	userID, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		return
+	}
+
+	lastID := c.Query("last_id") // クエリパラメータから lastID を取得
+
+	remLogs, err := h.userPortalService.GetRemainingEntriesLogsByUserID(userID, lastID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not get remaining entries logs"})
+		return
+	}
+
+	logs := response.Logs{
+		RemainingEntriesLog: remLogs,
+	}
+
+	c.JSON(http.StatusOK, gin.H{"logs": logs})
 }

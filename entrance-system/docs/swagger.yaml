@@ -74,6 +74,30 @@ definitions:
       user_name:
         type: string
     type: object
+  response.Logs:
+    properties:
+      remaining_entries_log:
+        items:
+          $ref: '#/definitions/response.RemainingEntriesLog'
+        type: array
+    type: object
+  response.RemainingEntriesLog:
+    properties:
+      id:
+        type: string
+      new_entries:
+        type: integer
+      previous_entries:
+        type: integer
+      reason:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: string
+      user_id:
+        type: integer
+    type: object
   response.Role:
     properties:
       id:
@@ -314,6 +338,25 @@ paths:
               type: string
             type: object
       summary: ユーザー情報を更新
+      tags:
+      - ユーザー管理
+  /users/{user_id}/logs:
+    get:
+      description: 指定したユーザーの各ログを取得します
+      parameters:
+      - description: ユーザーID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Logs'
+      summary: ユーザーのログを取得
       tags:
       - ユーザー管理
   /users/{user_id}/roles:

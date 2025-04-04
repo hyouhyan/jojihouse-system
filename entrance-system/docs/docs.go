@@ -335,6 +335,35 @@ const docTemplate = `{
                 }
             }
         },
+        "/users/{user_id}/logs": {
+            "get": {
+                "description": "指定したユーザーの各ログを取得します",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ユーザー管理"
+                ],
+                "summary": "ユーザーのログを取得",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ユーザーID",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.Logs"
+                        }
+                    }
+                }
+            }
+        },
         "/users/{user_id}/roles": {
             "get": {
                 "description": "指定したユーザーが持つロールを取得します",
@@ -559,6 +588,43 @@ const docTemplate = `{
                 },
                 "user_name": {
                     "type": "string"
+                }
+            }
+        },
+        "response.Logs": {
+            "type": "object",
+            "properties": {
+                "remaining_entries_log": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/response.RemainingEntriesLog"
+                    }
+                }
+            }
+        },
+        "response.RemainingEntriesLog": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "new_entries": {
+                    "type": "integer"
+                },
+                "previous_entries": {
+                    "type": "integer"
+                },
+                "reason": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },

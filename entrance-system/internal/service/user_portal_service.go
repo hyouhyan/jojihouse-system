@@ -120,8 +120,38 @@ func (s *UserPortalService) GetAccessLogsByAnyFilter(lastID string, options ...m
 	return responseLogs, nil
 }
 
-func (s *UserPortalService) GetRemainingEntriesLogsByUserID(userID int, lastID primitive.ObjectID) ([]model.RemainingEntriesLog, error) {
-	return s.remainingEntriesLogRepository.GetRemainingEntriesLogsByUserID(userID, lastID, 50)
+func (s *UserPortalService) GetRemainingEntriesLogsByUserID(userID int, lastID string) ([]response.RemainingEntriesLog, error) {
+	var objectID primitive.ObjectID
+	var err error
+	// lastIDを変換
+	if lastID == "" {
+		objectID = primitive.NilObjectID
+	} else {
+		objectID, err = primitive.ObjectIDFromHex(lastID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	logs, err := s.remainingEntriesLogRepository.GetRemainingEntriesLogsByUserID(userID, objectID, 50)
+	if err != nil {
+		return nil, err
+	}
+
+	// レスポンスデータの作成
+	var responseLogs []response.RemainingEntriesLog
+	for _, log := range logs {
+		responseLogs = append(responseLogs, response.RemainingEntriesLog{
+			ID:              log.ID.Hex(),
+			UserID:          log.UserID,
+			PreviousEntries: log.PreviousEntries,
+			NewEntries:      log.NewEntries,
+			Reason:          log.Reason,
+			UpdatedBy:       log.UpdatedBy,
+			UpdatedAt:       log.UpdatedAt,
+		})
+	}
+	return responseLogs, nil
 }
 
 func (s *UserPortalService) GetAllUsers() ([]response.UserResponse, error) {
