@@ -15,6 +15,11 @@ func NewRoleHandler(service *service.UserPortalService) *RoleHandler {
 	return &RoleHandler{service: service}
 }
 
+// @Summary 全ロール取得
+// @Description 存在する全ロールをまとめて取得
+// @Produce json
+// @Success 200 {object} []response.Role
+// @Router /roles [get]
 func (h *RoleHandler) GetAllRoles(c *gin.Context) {
 	res, err := h.service.GetAllRoles()
 	if err != nil {

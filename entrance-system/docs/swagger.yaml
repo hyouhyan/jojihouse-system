@@ -192,6 +192,19 @@ paths:
               $ref: '#/definitions/response.AccessLogResponse'
             type: array
       summary: アクセスログをユーザー指定で取得
+  /roles:
+    get:
+      description: 存在する全ロールをまとめて取得
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/response.Role'
+            type: array
+      summary: 全ロール取得
   /users:
     get:
       produces:

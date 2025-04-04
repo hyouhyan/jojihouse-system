@@ -147,6 +147,26 @@ const docTemplate = `{
                 }
             }
         },
+        "/roles": {
+            "get": {
+                "description": "存在する全ロールをまとめて取得",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "全ロール取得",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/response.Role"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/users": {
             "get": {
                 "produces": [
