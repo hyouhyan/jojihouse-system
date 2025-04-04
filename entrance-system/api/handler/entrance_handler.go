@@ -56,7 +56,7 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 }
 
 // @Summary 在室ユーザー取得
-// @Description 現在オフィス内にいるユーザーの一覧を取得します
+// @Description 現在ハウス内にいるユーザーの一覧を取得します
 // @Produce json
 // @Success 200 {object} []response.UserResponse
 // @Router /entrance/current-users [get]

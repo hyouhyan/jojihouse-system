@@ -48,7 +48,7 @@ const docTemplate = `{
         },
         "/entrance/current-users": {
             "get": {
-                "description": "現在オフィス内にいるユーザーの一覧を取得します",
+                "description": "現在ハウス内にいるユーザーの一覧を取得します",
                 "produces": [
                     "application/json"
                 ],
