@@ -2,6 +2,7 @@ package handler
 
 import (
 	"jojihouse-entrance-system/internal/service"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -25,6 +26,7 @@ func (h *RoleHandler) GetAllRoles(c *gin.Context) {
 	res, err := h.service.GetAllRoles()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Could not get roles"})
+		log.Print(err)
 		return
 	}
 

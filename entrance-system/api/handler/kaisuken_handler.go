@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"jojihouse-entrance-system/api/model/request"
 	"jojihouse-entrance-system/internal/service"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -36,6 +37,7 @@ func (h *KaisukenHandler) BuyKaisuken(c *gin.Context) {
 	var req request.BuyKaisuken
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		log.Print(err)
 		return
 	}
 
@@ -43,6 +45,7 @@ func (h *KaisukenHandler) BuyKaisuken(c *gin.Context) {
 	err := h.adminManagementService.IncreaseRemainingEntries(req.UserID, req.Count, description, req.Receiver)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not increase remaining entries"})
+		log.Print(err)
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})

@@ -5,6 +5,7 @@ import (
 	"jojihouse-entrance-system/api/model/response"
 	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/service"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -33,6 +34,7 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 	var req request.Entrance
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		log.Print(err)
 		return
 	}
 
@@ -45,6 +47,7 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 		isCurrent, err := h.userPortalService.IsCurrentUserByBarcode(req.Barcode)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check current user"})
+			log.Print(err)
 			return
 		}
 		if isCurrent {
@@ -58,12 +61,14 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 		response, err = h.entranceService.EnterUser(req.Barcode)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to record entry"})
+			log.Print(err)
 			return
 		}
 	} else {
 		response, err = h.entranceService.ExitUser(req.Barcode)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to record exit"})
+			log.Print(err)
 			return
 		}
 	}
@@ -81,6 +86,7 @@ func (h *EntranceHandler) GetCurrentUsers(c *gin.Context) {
 	currentUsers, err := h.userPortalService.GetCurrentUsers()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get current users"})
+		log.Print(err)
 		return
 	}
 
@@ -119,6 +125,7 @@ func (h *EntranceHandler) GetAccessLogs(c *gin.Context) {
 		date, err = time.Parse("2006-01-02", dateStr)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format. Use YYYY-MM-DD"})
+			log.Print(err)
 			return
 		}
 	}
@@ -132,6 +139,7 @@ func (h *EntranceHandler) GetAccessLogs(c *gin.Context) {
 	accessLogs, err := h.userPortalService.GetAccessLogsByAnyFilter(lastID, options)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get access log"})
+		log.Print(err)
 		return
 	}
 
@@ -151,6 +159,7 @@ func (h *EntranceHandler) GetAccessLogsByUserID(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+		log.Print(err)
 		return
 	}
 
@@ -174,6 +183,7 @@ func (h *EntranceHandler) GetAccessLogsByUserID(c *gin.Context) {
 	accessLogs, err := h.userPortalService.GetAccessLogsByAnyFilter(lastID, options)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get access log"})
+		log.Print(err)
 		return
 	}
 
