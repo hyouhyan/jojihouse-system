@@ -8,6 +8,8 @@ import (
 	"jojihouse-entrance-system/internal/service"
 	"time"
 
+	_ "jojihouse-entrance-system/docs" // 生成される Swagger ドキュメントを読み込む
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -17,7 +19,7 @@ import (
 // @title JojiHouse Entrance System API
 // @version 1.0
 // @description JojiHouse の入退室管理システム API ドキュメント
-// @host localhost:8080
+// @host 127.0.0.1:8080
 // @BasePath /
 func main() {
 	database.ConnectPostgres()

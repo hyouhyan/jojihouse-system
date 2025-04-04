@@ -1,0 +1,231 @@
+basePath: /
+definitions:
+  request.AddRole:
+    properties:
+      role_id:
+        type: integer
+    required:
+    - role_id
+    type: object
+  request.CreateUser:
+    properties:
+      barcode:
+        type: string
+      contact:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      remaining_entries:
+        type: integer
+    required:
+    - barcode
+    - name
+    type: object
+  request.UpdateUser:
+    properties:
+      barcode:
+        type: string
+      contact:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      remaining_entries:
+        type: integer
+    type: object
+  response.Role:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  response.UserResponse:
+    properties:
+      barcode:
+        type: string
+      contact:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      registered_at:
+        type: string
+      remaining_entries:
+        type: integer
+      total_entries:
+        type: integer
+    type: object
+host: 127.0.0.1:8080
+info:
+  contact: {}
+  description: JojiHouse の入退室管理システム API ドキュメント
+  title: JojiHouse Entrance System API
+  version: "1.0"
+paths:
+  /users:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/response.UserResponse'
+            type: array
+      summary: 全ユーザーの情報取得
+  /users/:
+    post:
+      parameters:
+      - description: ユーザー情報
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.UserResponse'
+      summary: ユーザーを新規作成
+  /users/{user_id}:
+    delete:
+      description: 指定したユーザーを削除します
+      parameters:
+      - description: ユーザーID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: ユーザーを削除
+    get:
+      description: 指定したユーザーの情報を取得します
+      parameters:
+      - description: ユーザーID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.UserResponse'
+      summary: ユーザー情報取得
+    patch:
+      consumes:
+      - application/json
+      description: 指定したユーザーの情報を更新します（部分更新）
+      parameters:
+      - description: ユーザーID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - description: 更新するユーザー情報（部分的に送信可能）
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: ユーザー情報を更新
+  /users/{user_id}/roles:
+    get:
+      description: 指定したユーザーが持つロールを取得します
+      parameters:
+      - description: ユーザーID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/response.Role'
+            type: array
+      summary: 指定ユーザーのロールを取得
+    post:
+      consumes:
+      - application/json
+      description: 指定したユーザーにロールを追加します
+      parameters:
+      - description: ユーザーID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - description: 追加するロールのID
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/request.AddRole'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 指定ユーザーにロールを追加
+  /users/{user_id}/roles/{role_id}:
+    delete:
+      description: 指定したユーザーからロールを削除します
+      parameters:
+      - description: ユーザーID
+        in: path
+        name: user_id
+        required: true
+        type: integer
+      - description: ロールID
+        in: path
+        name: role_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: 指定ユーザーのロールを削除
+swagger: "2.0"

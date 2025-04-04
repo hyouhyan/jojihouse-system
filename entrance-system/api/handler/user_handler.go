@@ -18,6 +18,11 @@ func NewUserHandler(userPortalService *service.UserPortalService, adminManagemen
 	return &UserHandler{userPortalService: userPortalService, adminManagementService: adminManagementService}
 }
 
+// @Summary ユーザーを新規作成
+// @Produce json
+// @Param user body request.CreateUser true "ユーザー情報"
+// @Success 200 {object} response.UserResponse
+// @Router /users/ [POST]
 func (h *UserHandler) CreateUser(c *gin.Context) {
 	var req request.CreateUser
 	// リクエストの解読
@@ -35,15 +40,11 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"user": res})
 }
 
-// GetUserByID ユーザー情報取得
 // @Summary ユーザー情報取得
 // @Description 指定したユーザーの情報を取得します
-// @Tags users
 // @Produce json
 // @Param user_id path int true "ユーザーID"
-// @Success 200 {object} model.User
-// @Failure 400 {object} map[string]string
-// @Failure 404 {object} map[string]string
+// @Success 200 {object} response.UserResponse
 // @Router /users/{user_id} [get]
 func (h *UserHandler) GetUserByID(c *gin.Context) {
 	// URLパラメータから user_id を取得
@@ -64,7 +65,10 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-// 全ユーザーの情報取得
+// @Summary 全ユーザーの情報取得
+// @Produce json
+// @Success 200 {object} []response.UserResponse
+// @Router /users [get]
 func (h *UserHandler) GetAllUsers(c *gin.Context) {
 	res, err := h.userPortalService.GetAllUsers()
 	if err != nil {
@@ -74,9 +78,15 @@ func (h *UserHandler) GetAllUsers(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"users": res})
 }
 
-// ユーザー情報を更新
+// @Summary ユーザー情報を更新
+// @Description 指定したユーザーの情報を更新します（部分更新）
+// @Accept json
+// @Produce json
+// @Param user_id path int true "ユーザーID"
+// @Param user body request.UpdateUser true "更新するユーザー情報（部分的に送信可能）"
+// @Success 200 {object} map[string]string
+// @Router /users/{user_id} [patch]
 func (h *UserHandler) UpdateUser(c *gin.Context) {
-	// URLパラメータから user_id を取得
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
@@ -89,12 +99,21 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 		return
 	}
 
-	h.adminManagementService.UpdateUser(userID, &req)
+	err = h.adminManagementService.UpdateUser(userID, &req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
 
-// ユーザーを削除
+// @Summary ユーザーを削除
+// @Description 指定したユーザーを削除します
+// @Produce json
+// @Param user_id path int true "ユーザーID"
+// @Success 200 {object} map[string]string
+// @Router /users/{user_id} [delete]
 func (h *UserHandler) DeleteUser(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
@@ -104,14 +123,19 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 
 	err = h.adminManagementService.DeleteUser(userID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Could not delete user"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not delete user"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
 
-// ロール取得
+// @Summary 指定ユーザーのロールを取得
+// @Description 指定したユーザーが持つロールを取得します
+// @Produce json
+// @Param user_id path int true "ユーザーID"
+// @Success 200 {object} []response.Role
+// @Router /users/{user_id}/roles [get]
 func (h *UserHandler) GetRolesByUserID(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
@@ -121,14 +145,21 @@ func (h *UserHandler) GetRolesByUserID(c *gin.Context) {
 
 	res, err := h.userPortalService.GetRolesByUserID(userID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Could not get roles"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not get roles"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"roles": res})
 }
 
-// ロール追加
+// @Summary 指定ユーザーにロールを追加
+// @Description 指定したユーザーにロールを追加します
+// @Accept json
+// @Produce json
+// @Param user_id path int true "ユーザーID"
+// @Param role body request.AddRole true "追加するロールのID"
+// @Success 200 {object} map[string]string
+// @Router /users/{user_id}/roles [post]
 func (h *UserHandler) AddRoleToUser(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
@@ -137,22 +168,26 @@ func (h *UserHandler) AddRoleToUser(c *gin.Context) {
 	}
 
 	var req request.AddRole
-	// リクエストの解読
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
 
-	// ロール追加してエラーハンドリング
 	if err := h.adminManagementService.AddRoleToUser(userID, req.RoleID); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Could not add role"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not add role"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})
 }
 
-// ロール削除
+// @Summary 指定ユーザーのロールを削除
+// @Description 指定したユーザーからロールを削除します
+// @Produce json
+// @Param user_id path int true "ユーザーID"
+// @Param role_id path int true "ロールID"
+// @Success 200 {object} map[string]string
+// @Router /users/{user_id}/roles/{role_id} [delete]
 func (h *UserHandler) RemoveRoleFromUser(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
@@ -167,7 +202,7 @@ func (h *UserHandler) RemoveRoleFromUser(c *gin.Context) {
 	}
 
 	if err := h.adminManagementService.RemoveRoleFromUser(userID, roleID); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Could not remove role"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not remove role"})
 		return
 	}
 
