@@ -19,6 +19,7 @@ func NewUserHandler(userPortalService *service.UserPortalService, adminManagemen
 }
 
 // @Summary ユーザーを新規作成
+// @Tags ユーザー管理
 // @Produce json
 // @Param user body request.CreateUser true "ユーザー情報"
 // @Success 200 {object} response.UserResponse
@@ -42,6 +43,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 
 // @Summary ユーザー情報取得
 // @Description 指定したユーザーの情報を取得します
+// @Tags ユーザー管理
 // @Produce json
 // @Param user_id path int true "ユーザーID"
 // @Success 200 {object} response.UserResponse
@@ -66,6 +68,7 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 }
 
 // @Summary 全ユーザーの情報取得
+// @Tags ユーザー管理
 // @Produce json
 // @Success 200 {object} []response.UserResponse
 // @Router /users [get]
@@ -81,6 +84,7 @@ func (h *UserHandler) GetAllUsers(c *gin.Context) {
 // @Summary ユーザー情報を更新
 // @Description 指定したユーザーの情報を更新します（部分更新）
 // @Accept json
+// @Tags ユーザー管理
 // @Produce json
 // @Param user_id path int true "ユーザーID"
 // @Param user body request.UpdateUser true "更新するユーザー情報（部分的に送信可能）"
@@ -110,6 +114,7 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 
 // @Summary ユーザーを削除
 // @Description 指定したユーザーを削除します
+// @Tags ユーザー管理
 // @Produce json
 // @Param user_id path int true "ユーザーID"
 // @Success 200 {object} map[string]string
@@ -132,6 +137,7 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 
 // @Summary 指定ユーザーのロールを取得
 // @Description 指定したユーザーが持つロールを取得します
+// @Tags ユーザー管理
 // @Produce json
 // @Param user_id path int true "ユーザーID"
 // @Success 200 {object} []response.Role
@@ -155,6 +161,7 @@ func (h *UserHandler) GetRolesByUserID(c *gin.Context) {
 // @Summary 指定ユーザーにロールを追加
 // @Description 指定したユーザーにロールを追加します
 // @Accept json
+// @Tags ユーザー管理
 // @Produce json
 // @Param user_id path int true "ユーザーID"
 // @Param role body request.AddRole true "追加するロールのID"
@@ -183,6 +190,7 @@ func (h *UserHandler) AddRoleToUser(c *gin.Context) {
 
 // @Summary 指定ユーザーのロールを削除
 // @Description 指定したユーザーからロールを削除します
+// @Tags ユーザー管理
 // @Produce json
 // @Param user_id path int true "ユーザーID"
 // @Param role_id path int true "ロールID"

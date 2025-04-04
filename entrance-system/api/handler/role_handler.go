@@ -16,6 +16,7 @@ func NewRoleHandler(service *service.UserPortalService) *RoleHandler {
 }
 
 // @Summary 全ロール取得
+// @Tags ロール管理
 // @Description 存在する全ロールをまとめて取得
 // @Produce json
 // @Success 200 {object} []response.Role

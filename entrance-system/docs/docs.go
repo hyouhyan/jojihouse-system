@@ -24,6 +24,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "エントランス(入退室)管理"
+                ],
                 "summary": "入退室記録",
                 "parameters": [
                     {
@@ -52,6 +55,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "エントランス(入退室)管理"
+                ],
                 "summary": "在室ユーザー取得",
                 "responses": {
                     "200": {
@@ -71,6 +77,9 @@ const docTemplate = `{
                 "description": "すべてのユーザーの入退室ログを取得します",
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "エントランス(入退室)管理"
                 ],
                 "summary": "アクセスログを取得",
                 "parameters": [
@@ -111,6 +120,9 @@ const docTemplate = `{
                 "description": "指定したユーザーの入退室ログを取得します",
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "エントランス(入退室)管理"
                 ],
                 "summary": "アクセスログをユーザー指定で取得",
                 "parameters": [
@@ -153,6 +165,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "ロール管理"
+                ],
                 "summary": "全ロール取得",
                 "responses": {
                     "200": {
@@ -172,6 +187,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "ユーザー管理"
+                ],
                 "summary": "全ユーザーの情報取得",
                 "responses": {
                     "200": {
@@ -190,6 +208,9 @@ const docTemplate = `{
             "post": {
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "ユーザー管理"
                 ],
                 "summary": "ユーザーを新規作成",
                 "parameters": [
@@ -219,6 +240,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "ユーザー管理"
+                ],
                 "summary": "ユーザー情報取得",
                 "parameters": [
                     {
@@ -242,6 +266,9 @@ const docTemplate = `{
                 "description": "指定したユーザーを削除します",
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "ユーザー管理"
                 ],
                 "summary": "ユーザーを削除",
                 "parameters": [
@@ -272,6 +299,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "ユーザー管理"
                 ],
                 "summary": "ユーザー情報を更新",
                 "parameters": [
@@ -311,6 +341,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "ユーザー管理"
+                ],
                 "summary": "指定ユーザーのロールを取得",
                 "parameters": [
                     {
@@ -340,6 +373,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "ユーザー管理"
                 ],
                 "summary": "指定ユーザーにロールを追加",
                 "parameters": [
@@ -378,6 +414,9 @@ const docTemplate = `{
                 "description": "指定したユーザーからロールを削除します",
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "ユーザー管理"
                 ],
                 "summary": "指定ユーザーのロールを削除",
                 "parameters": [

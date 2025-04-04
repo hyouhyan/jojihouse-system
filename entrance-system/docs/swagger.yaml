@@ -126,6 +126,8 @@ paths:
           schema:
             $ref: '#/definitions/response.EntranceResponse'
       summary: 入退室記録
+      tags:
+      - エントランス(入退室)管理
   /entrance/current-users:
     get:
       description: 現在ハウス内にいるユーザーの一覧を取得します
@@ -139,6 +141,8 @@ paths:
               $ref: '#/definitions/response.UserResponse'
             type: array
       summary: 在室ユーザー取得
+      tags:
+      - エントランス(入退室)管理
   /entrance/logs:
     get:
       description: すべてのユーザーの入退室ログを取得します
@@ -165,6 +169,8 @@ paths:
               $ref: '#/definitions/response.AccessLogResponse'
             type: array
       summary: アクセスログを取得
+      tags:
+      - エントランス(入退室)管理
   /entrance/logs/{user_id}:
     get:
       description: 指定したユーザーの入退室ログを取得します
@@ -192,6 +198,8 @@ paths:
               $ref: '#/definitions/response.AccessLogResponse'
             type: array
       summary: アクセスログをユーザー指定で取得
+      tags:
+      - エントランス(入退室)管理
   /roles:
     get:
       description: 存在する全ロールをまとめて取得
@@ -205,6 +213,8 @@ paths:
               $ref: '#/definitions/response.Role'
             type: array
       summary: 全ロール取得
+      tags:
+      - ロール管理
   /users:
     get:
       produces:
@@ -217,6 +227,8 @@ paths:
               $ref: '#/definitions/response.UserResponse'
             type: array
       summary: 全ユーザーの情報取得
+      tags:
+      - ユーザー管理
   /users/:
     post:
       parameters:
@@ -234,6 +246,8 @@ paths:
           schema:
             $ref: '#/definitions/response.UserResponse'
       summary: ユーザーを新規作成
+      tags:
+      - ユーザー管理
   /users/{user_id}:
     delete:
       description: 指定したユーザーを削除します
@@ -253,6 +267,8 @@ paths:
               type: string
             type: object
       summary: ユーザーを削除
+      tags:
+      - ユーザー管理
     get:
       description: 指定したユーザーの情報を取得します
       parameters:
@@ -269,6 +285,8 @@ paths:
           schema:
             $ref: '#/definitions/response.UserResponse'
       summary: ユーザー情報取得
+      tags:
+      - ユーザー管理
     patch:
       consumes:
       - application/json
@@ -295,6 +313,8 @@ paths:
               type: string
             type: object
       summary: ユーザー情報を更新
+      tags:
+      - ユーザー管理
   /users/{user_id}/roles:
     get:
       description: 指定したユーザーが持つロールを取得します
@@ -314,6 +334,8 @@ paths:
               $ref: '#/definitions/response.Role'
             type: array
       summary: 指定ユーザーのロールを取得
+      tags:
+      - ユーザー管理
     post:
       consumes:
       - application/json
@@ -340,6 +362,8 @@ paths:
               type: string
             type: object
       summary: 指定ユーザーにロールを追加
+      tags:
+      - ユーザー管理
   /users/{user_id}/roles/{role_id}:
     delete:
       description: 指定したユーザーからロールを削除します
@@ -364,4 +388,6 @@ paths:
               type: string
             type: object
       summary: 指定ユーザーのロールを削除
+      tags:
+      - ユーザー管理
 swagger: "2.0"

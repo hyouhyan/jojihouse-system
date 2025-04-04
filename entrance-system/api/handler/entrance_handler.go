@@ -22,6 +22,7 @@ func NewEntranceHandler(entranceService *service.EntranceService, userPortalServ
 }
 
 // @Summary 入退室記録
+// @Tags エントランス(入退室)管理
 // @Description ユーザーの入室または退室を記録します
 // @Accept json
 // @Produce json
@@ -56,6 +57,7 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 }
 
 // @Summary 在室ユーザー取得
+// @Tags エントランス(入退室)管理
 // @Description 現在ハウス内にいるユーザーの一覧を取得します
 // @Produce json
 // @Success 200 {object} []response.UserResponse
@@ -71,6 +73,7 @@ func (h *EntranceHandler) GetCurrentUsers(c *gin.Context) {
 }
 
 // @Summary アクセスログを取得
+// @Tags エントランス(入退室)管理
 // @Description すべてのユーザーの入退室ログを取得します
 // @Produce json
 // @Param last_id query string false "前回のログID（ページネーション用）"
@@ -121,6 +124,7 @@ func (h *EntranceHandler) GetAccessLogs(c *gin.Context) {
 }
 
 // @Summary アクセスログをユーザー指定で取得
+// @Tags エントランス(入退室)管理
 // @Description 指定したユーザーの入退室ログを取得します
 // @Produce json
 // @Param user_id path int true "ユーザーID"
