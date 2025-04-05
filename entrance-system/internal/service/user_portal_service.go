@@ -33,14 +33,14 @@ func NewUserPortalService(userRepository *repository.UserRepository,
 }
 
 // ログの取得
-func (s *UserPortalService) GetAccessLogsByUserID(userID int, lastID string) ([]response.AccessLogResponse, error) {
+func (s *UserPortalService) GetAccessLogsByUserID(userID int, lastID string) ([]response.AccessLog, error) {
 	options := model.AccessLogFilter{
 		UserID: userID,
 	}
 	return s.GetAccessLogsByAnyFilter(lastID, options)
 }
 
-func (s *UserPortalService) GetAccessLogsByAnyFilter(lastID string, options ...model.AccessLogFilter) ([]response.AccessLogResponse, error) {
+func (s *UserPortalService) GetAccessLogsByAnyFilter(lastID string, options ...model.AccessLogFilter) ([]response.AccessLog, error) {
 	opt := model.AccessLogFilter{}
 
 	if len(options) > 0 {
@@ -106,9 +106,9 @@ func (s *UserPortalService) GetAccessLogsByAnyFilter(lastID string, options ...m
 	}
 
 	// レスポンスデータを作成
-	var responseLogs []response.AccessLogResponse
+	var responseLogs []response.AccessLog
 	for _, log := range logs {
-		responseLogs = append(responseLogs, response.AccessLogResponse{
+		responseLogs = append(responseLogs, response.AccessLog{
 			ID:         log.ID.Hex(),
 			UserID:     log.UserID,
 			UserName:   userMap[log.UserID], // UserIDからUserNameを取得
@@ -154,13 +154,13 @@ func (s *UserPortalService) GetRemainingEntriesLogsByUserID(userID int, lastID s
 	return responseLogs, nil
 }
 
-func (s *UserPortalService) GetAllUsers() ([]response.UserResponse, error) {
+func (s *UserPortalService) GetAllUsers() ([]response.User, error) {
 	users, err := s.userRepository.GetAllUsers()
 	if err != nil {
 		return nil, err
 	}
 
-	var res []response.UserResponse
+	var res []response.User
 	for _, user := range users {
 		res = append(res, *s.cnvModelUserToResponseUser(&user))
 	}
@@ -169,7 +169,7 @@ func (s *UserPortalService) GetAllUsers() ([]response.UserResponse, error) {
 }
 
 // ユーザー情報の取得
-func (s *UserPortalService) GetUserByID(userID int) (*response.UserResponse, error) {
+func (s *UserPortalService) GetUserByID(userID int) (*response.User, error) {
 	user, err := s.userRepository.GetUserByID(userID)
 	if err != nil {
 		return nil, err
@@ -255,8 +255,8 @@ func (s *UserPortalService) GetEnteredTime(userID int) (time.Time, error) {
 }
 
 // model.userをresponse.userに変換
-func (s *UserPortalService) cnvModelUserToResponseUser(user *model.User) *response.UserResponse {
-	resUser := &response.UserResponse{
+func (s *UserPortalService) cnvModelUserToResponseUser(user *model.User) *response.User {
+	resUser := &response.User{
 		ID:                user.ID,
 		Name:              user.Name,
 		Description:       user.Description,
