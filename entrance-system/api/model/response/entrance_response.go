@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type EntranceResponse struct {
+type Entrance struct {
 	UserID     int       `json:"user_id"`
 	UserName   string    `json:"user_name"`
 	Time       time.Time `json:"time"`

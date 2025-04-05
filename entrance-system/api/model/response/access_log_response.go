@@ -5,7 +5,7 @@ import (
 )
 
 // フロントエンドに返すためのログデータ
-type AccessLogResponse struct {
+type AccessLog struct {
 	ID         string    `json:"id"`
 	UserID     int       `json:"user_id"`
 	UserName   string    `json:"user_name"`
