@@ -38,7 +38,7 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 		return
 	}
 
-	var response response.EntranceResponse
+	var response response.Entrance
 	var err error
 
 	// autoの場合
