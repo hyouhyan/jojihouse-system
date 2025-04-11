@@ -13,6 +13,7 @@ type User struct {
 	Remaining_entries int       `json:"remaining_entries"`
 	Registered_at     time.Time `json:"registered_at"`
 	Total_entries     int       `json:"total_entries"`
+	Allergy           string    `json:"allergy"`
 }
 
 type Role struct {

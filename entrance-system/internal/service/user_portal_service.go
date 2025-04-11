@@ -265,6 +265,7 @@ func (s *UserPortalService) cnvModelUserToResponseUser(user *model.User) *respon
 		Remaining_entries: user.Remaining_entries,
 		Registered_at:     user.Registered_at,
 		Total_entries:     user.Total_entries,
+		Allergy:           user.Allergy,
 	}
 
 	return resUser
