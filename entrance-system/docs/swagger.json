@@ -37,7 +37,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.EntranceResponse"
+                            "$ref": "#/definitions/response.Entrance"
                         }
                     }
                 }
@@ -59,7 +59,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/response.UserResponse"
+                                "$ref": "#/definitions/response.User"
                             }
                         }
                     }
@@ -102,7 +102,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/response.AccessLogResponse"
+                                "$ref": "#/definitions/response.AccessLog"
                             }
                         }
                     }
@@ -146,7 +146,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/response.AccessLogResponse"
+                                "$ref": "#/definitions/response.AccessLog"
                             }
                         }
                     }
@@ -228,7 +228,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/response.UserResponse"
+                                "$ref": "#/definitions/response.User"
                             }
                         }
                     }
@@ -259,7 +259,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.UserResponse"
+                            "$ref": "#/definitions/response.User"
                         }
                     }
                 }
@@ -288,7 +288,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.UserResponse"
+                            "$ref": "#/definitions/response.User"
                         }
                     }
                 }
@@ -551,6 +551,9 @@
                 "name"
             ],
             "properties": {
+                "allergy": {
+                    "type": "string"
+                },
                 "barcode": {
                     "type": "string"
                 },
@@ -591,6 +594,9 @@
         "request.UpdateUser": {
             "type": "object",
             "properties": {
+                "allergy": {
+                    "type": "string"
+                },
                 "barcode": {
                     "type": "string"
                 },
@@ -608,7 +614,7 @@
                 }
             }
         },
-        "response.AccessLogResponse": {
+        "response.AccessLog": {
             "type": "object",
             "properties": {
                 "access_type": {
@@ -628,7 +634,7 @@
                 }
             }
         },
-        "response.EntranceResponse": {
+        "response.Entrance": {
             "type": "object",
             "properties": {
                 "access_type": {
@@ -693,9 +699,12 @@
                 }
             }
         },
-        "response.UserResponse": {
+        "response.User": {
             "type": "object",
             "properties": {
+                "allergy": {
+                    "type": "string"
+                },
                 "barcode": {
                     "type": "string"
                 },

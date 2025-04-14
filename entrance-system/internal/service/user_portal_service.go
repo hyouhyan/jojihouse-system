@@ -246,6 +246,7 @@ func (s *UserPortalService) IsGuest(userID int) (bool, error) {
 
 // 在室ユーザー一覧を取得
 func (s *UserPortalService) GetCurrentUsers() ([]model.CurrentUser, error) {
+	// TODO: response.Userに変換
 	return s.currentUsersRepository.GetCurrentUsers()
 }
 
