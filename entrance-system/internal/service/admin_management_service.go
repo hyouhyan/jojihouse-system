@@ -73,6 +73,9 @@ func (s *AdminManagementService) UpdateUser(userID int, user *request.UpdateUser
 	if user.Remaining_entries != nil {
 		userModel.Remaining_entries = *user.Remaining_entries
 	}
+	if user.Allergy != nil {
+		userModel.Allergy = *user.Allergy
+	}
 
 	return s.userRepository.UpdateUser(userModel)
 }

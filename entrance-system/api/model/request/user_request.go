@@ -15,5 +15,5 @@ type UpdateUser struct {
 	Barcode           *string `json:"barcode,omitempty"`
 	Contact           *string `json:"contact,omitempty"`
 	Remaining_entries *int    `json:"remaining_entries,omitempty"`
-	Allergy           string  `json:"allergy"`
+	Allergy           *string `json:"allergy"`
 }
