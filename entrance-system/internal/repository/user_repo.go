@@ -34,6 +34,7 @@ func (r *UserRepository) GetAllUsers() ([]model.User, error) {
 			&user.Remaining_entries,
 			&user.Registered_at,
 			&user.Total_entries,
+			&user.Allergy,
 		); err != nil {
 			return nil, err
 		}
@@ -54,6 +55,7 @@ func (r *UserRepository) GetUserByID(id int) (*model.User, error) {
 		&user.Remaining_entries,
 		&user.Registered_at,
 		&user.Total_entries,
+		&user.Allergy,
 	)
 	if err != nil {
 		return nil, err
@@ -72,6 +74,7 @@ func (r *UserRepository) GetUserByBarcode(barcode string) (*model.User, error) {
 		&user.Remaining_entries,
 		&user.Registered_at,
 		&user.Total_entries,
+		&user.Allergy,
 	)
 	if err != nil {
 		return nil, err
@@ -81,12 +84,13 @@ func (r *UserRepository) GetUserByBarcode(barcode string) (*model.User, error) {
 
 func (r *UserRepository) CreateUser(user *model.User) (*model.User, error) {
 	_, err := r.db.Exec(
-		"INSERT INTO users (name, description, barcode, contact, remaining_entries) VALUES ($1, $2, $3, $4, $5)",
+		"INSERT INTO users (name, description, barcode, contact, remaining_entries, allergy) VALUES ($1, $2, $3, $4, $5, $6)",
 		user.Name,
 		user.Description,
 		user.Barcode,
 		user.Contact,
 		user.Remaining_entries,
+		user.Allergy,
 	)
 	if err != nil {
 		return nil, err
@@ -103,13 +107,14 @@ func (r *UserRepository) CreateUser(user *model.User) (*model.User, error) {
 
 func (r *UserRepository) UpdateUser(user *model.User) error {
 	_, err := r.db.Exec(
-		"UPDATE users SET name = $1, description = $2, barcode = $3, contact = $4, remaining_entries = $5, total_entries = $6 WHERE id = $7",
+		"UPDATE users SET name = $1, description = $2, barcode = $3, contact = $4, remaining_entries = $5, total_entries = $6, allergy = $7 WHERE id = $8",
 		user.Name,
 		user.Description,
 		user.Barcode,
 		user.Contact,
 		user.Remaining_entries,
 		user.Total_entries,
+		user.Allergy,
 		user.ID,
 	)
 	if err != nil {
@@ -199,6 +204,7 @@ func (r *UserRepository) GetUsersByIDs(userIDs []int) ([]model.User, error) {
 			&user.Remaining_entries,
 			&user.Registered_at,
 			&user.Total_entries,
+			&user.Allergy,
 		); err != nil {
 			return nil, err
 		}

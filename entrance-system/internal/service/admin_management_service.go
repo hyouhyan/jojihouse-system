@@ -29,6 +29,7 @@ func (s *AdminManagementService) CreateUser(req *request.CreateUser) (*response.
 		Barcode:           req.Barcode,
 		Contact:           req.Contact,
 		Remaining_entries: req.Remaining_entries,
+		Allergy:           req.Allergy,
 	}
 
 	// ユーザーを作成
@@ -71,6 +72,9 @@ func (s *AdminManagementService) UpdateUser(userID int, user *request.UpdateUser
 	}
 	if user.Remaining_entries != nil {
 		userModel.Remaining_entries = *user.Remaining_entries
+	}
+	if user.Allergy != nil {
+		userModel.Allergy = *user.Allergy
 	}
 
 	return s.userRepository.UpdateUser(userModel)

@@ -25,6 +25,8 @@ definitions:
     type: object
   request.CreateUser:
     properties:
+      allergy:
+        type: string
       barcode:
         type: string
       contact:
@@ -55,6 +57,8 @@ definitions:
     type: object
   request.UpdateUser:
     properties:
+      allergy:
+        type: string
       barcode:
         type: string
       contact:
@@ -66,7 +70,7 @@ definitions:
       remaining_entries:
         type: integer
     type: object
-  response.AccessLogResponse:
+  response.AccessLog:
     properties:
       access_type:
         type: string
@@ -79,7 +83,7 @@ definitions:
       user_name:
         type: string
     type: object
-  response.EntranceResponse:
+  response.Entrance:
     properties:
       access_type:
         type: string
@@ -121,8 +125,10 @@ definitions:
       name:
         type: string
     type: object
-  response.UserResponse:
+  response.User:
     properties:
+      allergy:
+        type: string
       barcode:
         type: string
       contact:
@@ -165,7 +171,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.EntranceResponse'
+            $ref: '#/definitions/response.Entrance'
       summary: 入退室記録
       tags:
       - エントランス(入退室)管理
@@ -179,7 +185,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/response.UserResponse'
+              $ref: '#/definitions/response.User'
             type: array
       summary: 在室ユーザー取得
       tags:
@@ -207,7 +213,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/response.AccessLogResponse'
+              $ref: '#/definitions/response.AccessLog'
             type: array
       summary: アクセスログを取得
       tags:
@@ -236,7 +242,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/response.AccessLogResponse'
+              $ref: '#/definitions/response.AccessLog'
             type: array
       summary: アクセスログをユーザー指定で取得
       tags:
@@ -289,7 +295,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/response.UserResponse'
+              $ref: '#/definitions/response.User'
             type: array
       summary: 全ユーザーの情報取得
       tags:
@@ -309,7 +315,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.UserResponse'
+            $ref: '#/definitions/response.User'
       summary: ユーザーを新規作成
       tags:
       - ユーザー管理
@@ -348,7 +354,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/response.UserResponse'
+            $ref: '#/definitions/response.User'
       summary: ユーザー情報取得
       tags:
       - ユーザー管理

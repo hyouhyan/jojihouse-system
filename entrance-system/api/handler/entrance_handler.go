@@ -28,7 +28,7 @@ func NewEntranceHandler(entranceService *service.EntranceService, userPortalServ
 // @Accept json
 // @Produce json
 // @Param entrance body request.Entrance true "入退室データ"
-// @Success 200 {object} response.EntranceResponse
+// @Success 200 {object} response.Entrance
 // @Router /entrance [post]
 func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 	var req request.Entrance
@@ -80,7 +80,7 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 // @Tags エントランス(入退室)管理
 // @Description 現在ハウス内にいるユーザーの一覧を取得します
 // @Produce json
-// @Success 200 {object} []response.UserResponse
+// @Success 200 {object} []response.User
 // @Router /entrance/current [get]
 func (h *EntranceHandler) GetCurrentUsers(c *gin.Context) {
 	currentUsers, err := h.userPortalService.GetCurrentUsers()
@@ -100,7 +100,7 @@ func (h *EntranceHandler) GetCurrentUsers(c *gin.Context) {
 // @Param last_id query string false "前回のログID（ページネーション用）"
 // @Param limit query int false "取得するログの件数（デフォルト10）"
 // @Param date query string false "対象日（YYYY-MM-DD形式）"
-// @Success 200 {object} []response.AccessLogResponse
+// @Success 200 {object} []response.AccessLog
 // @Router /entrance/logs [get]
 func (h *EntranceHandler) GetAccessLogs(c *gin.Context) {
 	lastID := c.Query("last_id") // クエリパラメータから lastID を取得
@@ -153,7 +153,7 @@ func (h *EntranceHandler) GetAccessLogs(c *gin.Context) {
 // @Param user_id path int true "ユーザーID"
 // @Param last_id query string false "前回のログID（ページネーション用）"
 // @Param limit query int false "取得するログの件数（デフォルト10）"
-// @Success 200 {object} []response.AccessLogResponse
+// @Success 200 {object} []response.AccessLog
 // @Router /entrance/logs/{user_id} [get]
 func (h *EntranceHandler) GetAccessLogsByUserID(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
