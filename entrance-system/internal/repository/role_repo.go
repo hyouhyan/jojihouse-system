@@ -1,16 +1,16 @@
 package repository
 
 import (
-	"database/sql"
-
 	"jojihouse-entrance-system/internal/model"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type RoleRepository struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewRoleRepository(db *sql.DB) *RoleRepository {
+func NewRoleRepository(db *sqlx.DB) *RoleRepository {
 	return &RoleRepository{db: db}
 }
 
