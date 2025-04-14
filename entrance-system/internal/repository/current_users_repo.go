@@ -4,13 +4,15 @@ import (
 	"database/sql"
 	"jojihouse-entrance-system/internal/model"
 	"time"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type CurrentUsersRepository struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewCurrentUsersRepository(db *sql.DB) *CurrentUsersRepository {
+func NewCurrentUsersRepository(db *sqlx.DB) *CurrentUsersRepository {
 	return &CurrentUsersRepository{db: db}
 }
 
