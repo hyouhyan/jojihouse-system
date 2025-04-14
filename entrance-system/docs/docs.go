@@ -43,7 +43,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.EntranceResponse"
+                            "$ref": "#/definitions/response.Entrance"
                         }
                     }
                 }
@@ -65,7 +65,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/response.UserResponse"
+                                "$ref": "#/definitions/response.User"
                             }
                         }
                     }
@@ -108,7 +108,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/response.AccessLogResponse"
+                                "$ref": "#/definitions/response.AccessLog"
                             }
                         }
                     }
@@ -152,7 +152,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/response.AccessLogResponse"
+                                "$ref": "#/definitions/response.AccessLog"
                             }
                         }
                     }
@@ -234,7 +234,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/response.UserResponse"
+                                "$ref": "#/definitions/response.User"
                             }
                         }
                     }
@@ -265,7 +265,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.UserResponse"
+                            "$ref": "#/definitions/response.User"
                         }
                     }
                 }
@@ -294,7 +294,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/response.UserResponse"
+                            "$ref": "#/definitions/response.User"
                         }
                     }
                 }
@@ -557,6 +557,9 @@ const docTemplate = `{
                 "name"
             ],
             "properties": {
+                "allergy": {
+                    "type": "string"
+                },
                 "barcode": {
                     "type": "string"
                 },
@@ -597,6 +600,9 @@ const docTemplate = `{
         "request.UpdateUser": {
             "type": "object",
             "properties": {
+                "allergy": {
+                    "type": "string"
+                },
                 "barcode": {
                     "type": "string"
                 },
@@ -614,7 +620,7 @@ const docTemplate = `{
                 }
             }
         },
-        "response.AccessLogResponse": {
+        "response.AccessLog": {
             "type": "object",
             "properties": {
                 "access_type": {
@@ -634,7 +640,7 @@ const docTemplate = `{
                 }
             }
         },
-        "response.EntranceResponse": {
+        "response.Entrance": {
             "type": "object",
             "properties": {
                 "access_type": {
@@ -699,9 +705,12 @@ const docTemplate = `{
                 }
             }
         },
-        "response.UserResponse": {
+        "response.User": {
             "type": "object",
             "properties": {
+                "allergy": {
+                    "type": "string"
+                },
                 "barcode": {
                     "type": "string"
                 },

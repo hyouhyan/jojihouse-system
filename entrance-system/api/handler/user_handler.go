@@ -24,7 +24,7 @@ func NewUserHandler(userPortalService *service.UserPortalService, adminManagemen
 // @Tags ユーザー管理
 // @Produce json
 // @Param user body request.CreateUser true "ユーザー情報"
-// @Success 200 {object} response.UserResponse
+// @Success 200 {object} response.User
 // @Router /users/ [POST]
 func (h *UserHandler) CreateUser(c *gin.Context) {
 	var req request.CreateUser
@@ -50,7 +50,7 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 // @Tags ユーザー管理
 // @Produce json
 // @Param user_id path int true "ユーザーID"
-// @Success 200 {object} response.UserResponse
+// @Success 200 {object} response.User
 // @Router /users/{user_id} [get]
 func (h *UserHandler) GetUserByID(c *gin.Context) {
 	// URLパラメータから user_id を取得
@@ -76,7 +76,7 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 // @Summary 全ユーザーの情報取得
 // @Tags ユーザー管理
 // @Produce json
-// @Success 200 {object} []response.UserResponse
+// @Success 200 {object} []response.User
 // @Router /users [get]
 func (h *UserHandler) GetAllUsers(c *gin.Context) {
 	res, err := h.userPortalService.GetAllUsers()
