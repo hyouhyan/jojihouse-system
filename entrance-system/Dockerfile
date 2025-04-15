@@ -22,4 +22,4 @@ COPY . .
 EXPOSE 8080
 
 # 実行可能ファイルをデフォルトのコマンドとして設定
-CMD ["go" "run" "cmd/main.go"]
+CMD ["go", "run", "cmd/main.go"]
