@@ -49,11 +49,17 @@ services:
       myNetwork:
         ipv4_address: 172.30.0.11
   
-  go-app:
+  jojihouse-system:
     build: ./entrance-system
+    container_name: jojihouse-system
+    ports:
+      - "8080:8080"
     volumes: 
       - ./entrance-system:/go/src
     tty: true
+    networks:
+      myNetwork:
+        ipv4_address: 172.30.0.21
 
 networks:
   myNetwork:
