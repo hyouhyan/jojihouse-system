@@ -13,8 +13,7 @@ services:
       - ./data/postgresql:/var/lib/postgresql/data
       - ./db-init/postgres:/docker-entrypoint-initdb.d
     networks:
-      myNetwork: 
-        ipv4_address: 172.30.0.2
+      - myNetwork
   
   pgweb: 
     image: sosedoff/pgweb
@@ -22,15 +21,14 @@ services:
     ports:
       - "8081:8081"
     environment:
-      DATABASE_URL: postgres://postgres:postgres@172.30.0.2:5432/postgres?sslmode=disable
+      DATABASE_URL: postgres://postgres:postgres@postgreSql:5432/postgres?sslmode=disable
     links:
       - postgreSql
     restart: always
     depends_on:
       - postgreSql
     networks:
-      myNetwork: 
-        ipv4_address: 172.30.0.3
+      - myNetwork
   
   mongoDb:
     image: mongo:latest
@@ -46,8 +44,7 @@ services:
       - ./data/mongodb:/data/db
       - ./db-init/mongo:/docker-entrypoint-initdb.d
     networks:
-      myNetwork:
-        ipv4_address: 172.30.0.11
+      - myNetwork
   
   jojihouse-system:
     build: ./entrance-system
@@ -58,13 +55,10 @@ services:
       - ./entrance-system:/go/src
     tty: true
     networks:
-      myNetwork:
-        ipv4_address: 172.30.0.21
+      - myNetwork
 
 networks:
   myNetwork:
     driver: bridge
     ipam:
       driver: default
-      config:
-        - subnet: 172.30.0.0/24
