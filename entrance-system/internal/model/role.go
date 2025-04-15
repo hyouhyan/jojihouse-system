@@ -1,13 +1,13 @@
 package model
 
 type Role struct {
-	ID   int
-	Name string
+	ID   int    `db:"id"`
+	Name string `db:"name"`
 }
 
 type UserRoles struct {
-	UserID int
-	RoleID int
+	UserID int `db:"user_id"`
+	RoleID int `db:"role_id"`
 }
 
 const (
