@@ -4,13 +4,15 @@ import (
 	"database/sql"
 	"jojihouse-entrance-system/internal/model"
 	"time"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type CurrentUsersRepository struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewCurrentUsersRepository(db *sql.DB) *CurrentUsersRepository {
+func NewCurrentUsersRepository(db *sqlx.DB) *CurrentUsersRepository {
 	return &CurrentUsersRepository{db: db}
 }
 
@@ -42,29 +44,15 @@ func (r *CurrentUsersRepository) GetCurrentUsers() ([]model.CurrentUser, error) 
 	var users []model.CurrentUser
 
 	query := `
-		SELECT u.id, u.name, c.entered_at
+		SELECT u.id AS user_id, u.name, c.entered_at
 		FROM current_users c
 		JOIN users u ON c.user_id = u.id
 	`
 
-	rows, err := r.db.Query(query)
+	err := r.db.Select(&users, query)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var user model.CurrentUser
-		if err := rows.Scan(&user.UserID, &user.Name, &user.EnteredAt); err != nil {
-			return nil, err
-		}
-		users = append(users, user)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-
 	return users, nil
 }
 

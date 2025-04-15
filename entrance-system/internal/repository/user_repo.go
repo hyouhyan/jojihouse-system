@@ -1,62 +1,31 @@
 package repository
 
 import (
-	"database/sql"
-	"fmt"
-
 	"jojihouse-entrance-system/internal/model"
+
+	"github.com/jmoiron/sqlx"
 )
 
 type UserRepository struct {
-	db *sql.DB
+	db *sqlx.DB
 }
 
-func NewUserRepository(db *sql.DB) *UserRepository {
+func NewUserRepository(db *sqlx.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
 func (r *UserRepository) GetAllUsers() ([]model.User, error) {
-	rows, err := r.db.Query("SELECT * FROM users")
+	var users []model.User
+	err := r.db.Select(&users, "SELECT * FROM users")
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
-
-	var users []model.User
-	for rows.Next() {
-		var user model.User
-		if err := rows.Scan(
-			&user.ID,
-			&user.Name,
-			&user.Description,
-			&user.Barcode,
-			&user.Contact,
-			&user.Remaining_entries,
-			&user.Registered_at,
-			&user.Total_entries,
-			&user.Allergy,
-		); err != nil {
-			return nil, err
-		}
-		users = append(users, user)
-	}
-
 	return users, nil
 }
 
 func (r *UserRepository) GetUserByID(id int) (*model.User, error) {
 	user := &model.User{}
-	err := r.db.QueryRow("SELECT * FROM users WHERE id = $1", id).Scan(
-		&user.ID,
-		&user.Name,
-		&user.Description,
-		&user.Barcode,
-		&user.Contact,
-		&user.Remaining_entries,
-		&user.Registered_at,
-		&user.Total_entries,
-		&user.Allergy,
-	)
+	err := r.db.Get(user, "SELECT * FROM users WHERE id = $1", id)
 	if err != nil {
 		return nil, err
 	}
@@ -65,17 +34,7 @@ func (r *UserRepository) GetUserByID(id int) (*model.User, error) {
 
 func (r *UserRepository) GetUserByBarcode(barcode string) (*model.User, error) {
 	user := &model.User{}
-	err := r.db.QueryRow("SELECT * FROM users WHERE barcode = $1", barcode).Scan(
-		&user.ID,
-		&user.Name,
-		&user.Description,
-		&user.Barcode,
-		&user.Contact,
-		&user.Remaining_entries,
-		&user.Registered_at,
-		&user.Total_entries,
-		&user.Allergy,
-	)
+	err := r.db.Get(user, "SELECT * FROM users WHERE barcode = $1", barcode)
 	if err != nil {
 		return nil, err
 	}
@@ -83,15 +42,10 @@ func (r *UserRepository) GetUserByBarcode(barcode string) (*model.User, error) {
 }
 
 func (r *UserRepository) CreateUser(user *model.User) (*model.User, error) {
-	_, err := r.db.Exec(
-		"INSERT INTO users (name, description, barcode, contact, remaining_entries, allergy) VALUES ($1, $2, $3, $4, $5, $6)",
-		user.Name,
-		user.Description,
-		user.Barcode,
-		user.Contact,
-		user.Remaining_entries,
-		user.Allergy,
-	)
+	_, err := r.db.NamedExec(`
+		INSERT INTO users (name, description, barcode, contact, remaining_entries, allergy)
+		VALUES (:name, :description, :barcode, :contact, :remaining_entries, :allergy)
+	`, user)
 	if err != nil {
 		return nil, err
 	}
@@ -106,17 +60,17 @@ func (r *UserRepository) CreateUser(user *model.User) (*model.User, error) {
 }
 
 func (r *UserRepository) UpdateUser(user *model.User) error {
-	_, err := r.db.Exec(
-		"UPDATE users SET name = $1, description = $2, barcode = $3, contact = $4, remaining_entries = $5, total_entries = $6, allergy = $7 WHERE id = $8",
-		user.Name,
-		user.Description,
-		user.Barcode,
-		user.Contact,
-		user.Remaining_entries,
-		user.Total_entries,
-		user.Allergy,
-		user.ID,
-	)
+	_, err := r.db.NamedExec(`
+		UPDATE users SET
+			name = :name,
+			description = :description,
+			barcode = :barcode,
+			contact = :contact,
+			remaining_entries = :remaining_entries,
+			total_entries = :total_entries,
+			allergy = :allergy
+		WHERE id = :id
+	`, user)
 	if err != nil {
 		return err
 	}
@@ -185,43 +139,17 @@ func (r *UserRepository) GetUsersByIDs(userIDs []int) ([]model.User, error) {
 		return nil, nil
 	}
 
-	query := fmt.Sprintf("SELECT * FROM users WHERE id IN (%s)", intArrayToString(userIDs))
-	rows, err := r.db.Query(query)
+	query, args, err := sqlx.In("SELECT * FROM users WHERE id IN (?)", userIDs)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+	query = r.db.Rebind(query)
 
 	var users []model.User
-	for rows.Next() {
-		var user model.User
-		if err := rows.Scan(
-			&user.ID,
-			&user.Name,
-			&user.Description,
-			&user.Barcode,
-			&user.Contact,
-			&user.Remaining_entries,
-			&user.Registered_at,
-			&user.Total_entries,
-			&user.Allergy,
-		); err != nil {
-			return nil, err
-		}
-		users = append(users, user)
+	err = r.db.Select(&users, query, args...)
+	if err != nil {
+		return nil, err
 	}
-
 	return users, nil
-}
 
-// int のスライスをカンマ区切りの文字列に変換
-func intArrayToString(arr []int) string {
-	result := ""
-	for i, val := range arr {
-		if i > 0 {
-			result += ","
-		}
-		result += fmt.Sprintf("%d", val)
-	}
-	return result
 }

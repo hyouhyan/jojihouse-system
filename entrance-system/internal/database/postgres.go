@@ -1,11 +1,11 @@
 package database
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
 	"os"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
@@ -17,7 +17,7 @@ func Env_load() {
 	}
 }
 
-var PostgresDB *sql.DB
+var PostgresDB *sqlx.DB
 
 func ConnectPostgres() {
 	Env_load()
@@ -31,7 +31,7 @@ func ConnectPostgres() {
 	)
 
 	// postgreSQLに接続
-	db, err := sql.Open("postgres", dst)
+	db, err := sqlx.Open("postgres", dst)
 	if err != nil {
 		log.Fatalf("Failed to open a DB connection: %v", err)
 	}
