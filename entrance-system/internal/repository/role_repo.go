@@ -16,32 +16,16 @@ func NewRoleRepository(db *sqlx.DB) *RoleRepository {
 
 func (r *RoleRepository) GetAllRoles() ([]model.Role, error) {
 	roles := []model.Role{}
-	rows, err := r.db.Query("SELECT id, name FROM roles")
+	err := r.db.Select(&roles, "SELECT * FROM roles")
 	if err != nil {
 		return nil, err
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		role := model.Role{}
-		err := rows.Scan(
-			&role.ID,
-			&role.Name,
-		)
-		if err != nil {
-			return nil, err
-		}
-		roles = append(roles, role)
 	}
 	return roles, nil
 }
 
 func (r *RoleRepository) GetRoleByID(id int) (*model.Role, error) {
 	role := &model.Role{}
-	err := r.db.QueryRow("SELECT * FROM roles WHERE id = $1", id).Scan(
-		&role.ID,
-		&role.Name,
-	)
+	err := r.db.Get(role, "SELECT * FROM roles WHERE id = $1", id)
 	if err != nil {
 		return nil, err
 	}
@@ -50,10 +34,7 @@ func (r *RoleRepository) GetRoleByID(id int) (*model.Role, error) {
 
 func (r *RoleRepository) GetRoleByName(name string) (*model.Role, error) {
 	role := &model.Role{}
-	err := r.db.QueryRow("SELECT * FROM roles WHERE name = $1", name).Scan(
-		&role.ID,
-		&role.Name,
-	)
+	err := r.db.Get(role, "SELECT * FROM roles WHERE name = $1", name)
 	if err != nil {
 		return nil, err
 	}
@@ -62,21 +43,9 @@ func (r *RoleRepository) GetRoleByName(name string) (*model.Role, error) {
 
 func (r *RoleRepository) GetRolesByUserID(userID int) ([]model.Role, error) {
 	roles := []model.Role{}
-	rows, err := r.db.Query("SELECT r.id, r.name FROM roles r JOIN user_roles ur ON r.id = ur.role_id WHERE ur.user_id = $1", userID)
+	err := r.db.Select(&roles, "SELECT r.* FROM roles r JOIN user_roles ur ON r.id = ur.role_id WHERE ur.user_id = $1", userID)
 	if err != nil {
 		return nil, err
-	}
-	defer rows.Close()
-	for rows.Next() {
-		role := model.Role{}
-		err := rows.Scan(
-			&role.ID,
-			&role.Name,
-		)
-		if err != nil {
-			return nil, err
-		}
-		roles = append(roles, role)
 	}
 	return roles, nil
 }
