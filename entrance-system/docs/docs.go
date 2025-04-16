@@ -239,9 +239,7 @@ const docTemplate = `{
                         }
                     }
                 }
-            }
-        },
-        "/users/": {
+            },
             "post": {
                 "produces": [
                     "application/json"

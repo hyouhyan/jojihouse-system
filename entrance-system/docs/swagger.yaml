@@ -300,7 +300,6 @@ paths:
       summary: 全ユーザーの情報取得
       tags:
       - ユーザー管理
-  /users/:
     post:
       parameters:
       - description: ユーザー情報

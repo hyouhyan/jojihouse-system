@@ -233,9 +233,7 @@
                         }
                     }
                 }
-            }
-        },
-        "/users/": {
+            },
             "post": {
                 "produces": [
                     "application/json"
