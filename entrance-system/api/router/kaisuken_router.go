@@ -9,6 +9,6 @@ import (
 func SetupKaisukenRoutes(router *gin.Engine, handler *handler.KaisukenHandler) {
 	group := router.Group("/kaisuken")
 	{
-		group.POST("/", handler.BuyKaisuken)
+		group.POST("", handler.BuyKaisuken)
 	}
 }

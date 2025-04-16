@@ -25,7 +25,7 @@ func NewUserHandler(userPortalService *service.UserPortalService, adminManagemen
 // @Produce json
 // @Param user body request.CreateUser true "ユーザー情報"
 // @Success 200 {object} response.User
-// @Router /users/ [POST]
+// @Router /users [POST]
 func (h *UserHandler) CreateUser(c *gin.Context) {
 	var req request.CreateUser
 	// リクエストの解読

@@ -9,6 +9,6 @@ import (
 func SetupRoleRoutes(router *gin.Engine, roleHandler *handler.RoleHandler) {
 	userGroup := router.Group("/roles")
 	{
-		userGroup.GET("/", roleHandler.GetAllRoles)
+		userGroup.GET("", roleHandler.GetAllRoles)
 	}
 }

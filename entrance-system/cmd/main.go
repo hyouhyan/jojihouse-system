@@ -59,7 +59,10 @@ func main() {
 
 	// CORSの設定
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"}, // すべてのオリジンを許可
+		AllowOrigins: []string{
+			"http://127.0.0.1:8080",
+			"http://house.joji:8080",
+		},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
