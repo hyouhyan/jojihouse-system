@@ -3,7 +3,7 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    barcode VARCHAR(64) UNIQUE NOT NULL,
+    barcode VARCHAR(64) UNIQUE,
     contact VARCHAR(255),
     remaining_entries INT DEFAULT 0 CHECK (remaining_entries >= 0),
     registered_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
