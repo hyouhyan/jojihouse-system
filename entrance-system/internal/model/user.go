@@ -12,4 +12,5 @@ type User struct {
 	Registered_at     time.Time `db:"registered_at"`
 	Total_entries     int       `db:"total_entries"`
 	Allergy           string    `db:"allergy"`
+	Number            int       `db:"number"`
 }
