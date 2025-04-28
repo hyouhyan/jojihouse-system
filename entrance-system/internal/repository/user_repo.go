@@ -43,8 +43,8 @@ func (r *UserRepository) GetUserByBarcode(barcode string) (*model.User, error) {
 
 func (r *UserRepository) CreateUser(user *model.User) (*model.User, error) {
 	_, err := r.db.NamedExec(`
-		INSERT INTO users (name, description, barcode, contact, remaining_entries, allergy)
-		VALUES (:name, :description, :barcode, :contact, :remaining_entries, :allergy)
+		INSERT INTO users (name, description, barcode, contact, remaining_entries, allergy, number)
+		VALUES (:name, :description, :barcode, :contact, :remaining_entries, :allergy, :number)
 	`, user)
 	if err != nil {
 		return nil, err
@@ -69,6 +69,7 @@ func (r *UserRepository) UpdateUser(user *model.User) error {
 			remaining_entries = :remaining_entries,
 			total_entries = :total_entries,
 			allergy = :allergy
+			number = :number
 		WHERE id = :id
 	`, user)
 	if err != nil {

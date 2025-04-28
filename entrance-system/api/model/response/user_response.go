@@ -14,6 +14,7 @@ type User struct {
 	Registered_at     time.Time `json:"registered_at"`
 	Total_entries     int       `json:"total_entries"`
 	Allergy           string    `json:"allergy"`
+	Number            int       `json:"number"`
 }
 
 type Role struct {
