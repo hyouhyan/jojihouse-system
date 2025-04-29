@@ -5,7 +5,7 @@ CREATE TABLE users (
     description TEXT,
     barcode VARCHAR(64) UNIQUE NOT NULL,
     contact VARCHAR(255),
-    remaining_entries INT DEFAULT 0 CHECK (remaining_entries >= 0),
+    remaining_entries INT DEFAULT 0,
     registered_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     total_entries INT DEFAULT 0 CHECK (total_entries >= 0),
     allergy VARCHAR(255),
