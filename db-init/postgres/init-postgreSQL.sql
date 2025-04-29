@@ -3,13 +3,13 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    barcode VARCHAR(64) UNIQUE,
+    barcode VARCHAR(64) UNIQUE NOT NULL,
     contact VARCHAR(255),
     remaining_entries INT DEFAULT 0 CHECK (remaining_entries >= 0),
     registered_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     total_entries INT DEFAULT 0 CHECK (total_entries >= 0),
     allergy VARCHAR(255),
-    number INT UNIQUE
+    number INT UNIQUE NOT NULL
 );
 
 -- ロール
