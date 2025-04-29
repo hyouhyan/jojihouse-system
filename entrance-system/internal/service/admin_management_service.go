@@ -62,25 +62,25 @@ func (s *AdminManagementService) UpdateUser(userID int, user *request.UpdateUser
 	}
 
 	if user.Name != nil {
-		userModel.Name = *user.Name
+		userModel.Name = user.Name
 	}
 	if user.Description != nil {
-		userModel.Description = *user.Description
+		userModel.Description = user.Description
 	}
 	if user.Barcode != nil {
-		userModel.Barcode = *user.Barcode
+		userModel.Barcode = user.Barcode
 	}
 	if user.Contact != nil {
-		userModel.Contact = *user.Contact
+		userModel.Contact = user.Contact
 	}
 	if user.Remaining_entries != nil {
-		userModel.Remaining_entries = *user.Remaining_entries
+		userModel.Remaining_entries = user.Remaining_entries
 	}
 	if user.Allergy != nil {
-		userModel.Allergy = *user.Allergy
+		userModel.Allergy = user.Allergy
 	}
 	if user.Number != nil {
-		userModel.Number = *user.Number
+		userModel.Number = user.Number
 	}
 
 	return s.userRepository.UpdateUser(userModel)
