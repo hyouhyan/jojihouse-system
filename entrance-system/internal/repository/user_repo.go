@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"jojihouse-entrance-system/internal/model"
 
 	"github.com/jmoiron/sqlx"
@@ -42,21 +43,42 @@ func (r *UserRepository) GetUserByBarcode(barcode string) (*model.User, error) {
 }
 
 func (r *UserRepository) CreateUser(user *model.User) (*model.User, error) {
-	_, err := r.db.NamedExec(`
+	// _, err := r.db.NamedExec(`
+	// 	INSERT INTO users (name, description, barcode, contact, remaining_entries, allergy, number)
+	// 	VALUES (:name, :description, :barcode, :contact, :remaining_entries, :allergy, :number)
+	// `, user)
+
+	// ユーザーをインサートしつつ、ユーザー情報を取得
+	query := `
 		INSERT INTO users (name, description, barcode, contact, remaining_entries, allergy, number)
 		VALUES (:name, :description, :barcode, :contact, :remaining_entries, :allergy, :number)
-	`, user)
+		RETURNING *
+	`
+
+	stmt, err := r.db.PrepareNamed(query)
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 
-	// ユーザー情報を取得
-	user, err = r.GetUserByBarcode(user.Barcode)
+	// ここがポイント！！ QueryRowxではなく NamedQuery → その結果から取り出す
+	rows, err := stmt.Queryx(user)
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
-	return user, nil
+	var insertedUser model.User
+	if rows.Next() {
+		if err := rows.StructScan(&insertedUser); err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, errors.New("no user inserted")
+	}
+
+	return &insertedUser, nil
+
 }
 
 func (r *UserRepository) UpdateUser(user *model.User) error {
