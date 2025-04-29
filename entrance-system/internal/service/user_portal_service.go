@@ -102,7 +102,7 @@ func (s *UserPortalService) GetAccessLogsByAnyFilter(lastID string, options ...m
 	// UserID -> UserName のマッピング
 	userMap := make(map[int]string)
 	for _, user := range users {
-		userMap[user.ID] = user.Name
+		userMap[*user.ID] = *user.Name
 	}
 
 	// レスポンスデータを作成
@@ -294,5 +294,5 @@ func (s *UserPortalService) IsCurrentUserByBarcode(barcode string) (bool, error)
 		return false, err
 	}
 
-	return s.IsCurrentUser(user.ID)
+	return s.IsCurrentUser(*user.ID)
 }

@@ -1,7 +1,10 @@
 package repository
 
 import (
+	"errors"
+	"fmt"
 	"jojihouse-entrance-system/internal/model"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -42,21 +45,79 @@ func (r *UserRepository) GetUserByBarcode(barcode string) (*model.User, error) {
 }
 
 func (r *UserRepository) CreateUser(user *model.User) (*model.User, error) {
-	_, err := r.db.NamedExec(`
-		INSERT INTO users (name, description, barcode, contact, remaining_entries, allergy)
-		VALUES (:name, :description, :barcode, :contact, :remaining_entries, :allergy)
-	`, user)
+	// sql文の構築
+	columns := []string{}
+	values := []string{}
+	args := map[string]interface{}{}
+
+	if user.Name != nil {
+		columns = append(columns, "name")
+		values = append(values, ":name")
+		args["name"] = *user.Name
+	}
+	if user.Description != nil {
+		columns = append(columns, "description")
+		values = append(values, ":description")
+		args["description"] = *user.Description
+	}
+	if user.Barcode != nil {
+		columns = append(columns, "barcode")
+		values = append(values, ":barcode")
+		args["barcode"] = *user.Barcode
+	}
+	if user.Contact != nil {
+		columns = append(columns, "contact")
+		values = append(values, ":contact")
+		args["contact"] = *user.Contact
+	}
+	if user.Remaining_entries != nil {
+		columns = append(columns, "remaining_entries")
+		values = append(values, ":remaining_entries")
+		args["remaining_entries"] = *user.Remaining_entries
+	}
+	if user.Allergy != nil {
+		columns = append(columns, "allergy")
+		values = append(values, ":allergy")
+		args["allergy"] = *user.Allergy
+	}
+	if user.Number != nil {
+		columns = append(columns, "number")
+		values = append(values, ":number")
+		args["number"] = *user.Number
+	}
+
+	query := fmt.Sprintf(`
+		INSERT INTO users (%s)
+		VALUES (%s)
+		RETURNING *`,
+		strings.Join(columns, ", "),
+		strings.Join(values, ", "),
+	)
+
+	stmt, err := r.db.PrepareNamed(query)
 	if err != nil {
 		return nil, err
 	}
+	defer stmt.Close()
 
-	// ユーザー情報を取得
-	user, err = r.GetUserByBarcode(user.Barcode)
+	// ここがポイント！！ QueryRowxではなく NamedQuery → その結果から取り出す
+	rows, err := stmt.Queryx(args)
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
-	return user, nil
+	var insertedUser model.User
+	if rows.Next() {
+		if err := rows.StructScan(&insertedUser); err != nil {
+			return nil, err
+		}
+	} else {
+		return nil, errors.New("no user inserted")
+	}
+
+	return &insertedUser, nil
+
 }
 
 func (r *UserRepository) UpdateUser(user *model.User) error {
@@ -69,6 +130,7 @@ func (r *UserRepository) UpdateUser(user *model.User) error {
 			remaining_entries = :remaining_entries,
 			total_entries = :total_entries,
 			allergy = :allergy
+			number = :number
 		WHERE id = :id
 	`, user)
 	if err != nil {

@@ -41,20 +41,20 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 	}
 
 	// 入場ログ作成
-	err = s.accessLogRepository.CreateEntryAccessLog(user.ID)
+	err = s.accessLogRepository.CreateEntryAccessLog(*user.ID)
 	if err != nil {
 		return response.Entrance{}, err
 	}
 
 	// 在室ユーザーに追加
-	err = s.currentUsersRepository.AddUserToCurrentUsers(user.ID)
+	err = s.currentUsersRepository.AddUserToCurrentUsers(*user.ID)
 	if err != nil {
 		return response.Entrance{}, err
 	}
 
 	isDecreaseTarget := true
 	// ハウス管理者か
-	isHouseAdmin, err := s.roleRepository.IsHouseAdmin(user.ID)
+	isHouseAdmin, err := s.roleRepository.IsHouseAdmin(*user.ID)
 	if err != nil {
 		log.Fatalf("Failed to check if the user is a house admin: %v", err)
 	}
@@ -63,7 +63,7 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 	}
 
 	// 最後に「入場可能回数を消費した」入場を取得
-	lastRemainingLog, err := s.remainingEntriesLogRepository.GetLastRemainingEntriesLogByUserID(user.ID)
+	lastRemainingLog, err := s.remainingEntriesLogRepository.GetLastRemainingEntriesLogByUserID(*user.ID)
 	if err != nil {
 		return response.Entrance{}, err
 	}
@@ -75,14 +75,14 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 
 	if isDecreaseTarget {
 		// 残り回数を減らす
-		beforeCount, afterCount, err := s.userRepository.DecreaseRemainingEntries(user.ID, 1)
+		beforeCount, afterCount, err := s.userRepository.DecreaseRemainingEntries(*user.ID, 1)
 		if err != nil {
 			return response.Entrance{}, err
 		}
 		// ログ保存
 
 		log := &model.RemainingEntriesLog{
-			UserID:          user.ID,
+			UserID:          *user.ID,
 			PreviousEntries: beforeCount,
 			NewEntries:      afterCount,
 			Reason:          "ハウス入場のため",
@@ -97,15 +97,15 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 	}
 
 	// 入場回数を増やす
-	err = s.userRepository.IncreaseTotalEntries(user.ID)
+	err = s.userRepository.IncreaseTotalEntries(*user.ID)
 	if err != nil {
 		return response.Entrance{}, err
 	}
 
 	// Response作成
 	response := response.Entrance{
-		UserID:     user.ID,
-		UserName:   user.Name,
+		UserID:     *user.ID,
+		UserName:   *user.Name,
 		Time:       time.Now(),
 		AccessType: "entry",
 	}
@@ -122,21 +122,21 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 	}
 
 	// 退場ログ作成
-	err = s.accessLogRepository.CreateExitAccessLog(user.ID)
+	err = s.accessLogRepository.CreateExitAccessLog(*user.ID)
 	if err != nil {
 		return response.Entrance{}, err
 	}
 
 	// 在室ユーザーから削除
-	err = s.currentUsersRepository.DeleteUserToCurrentUsers(user.ID)
+	err = s.currentUsersRepository.DeleteUserToCurrentUsers(*user.ID)
 	if err != nil {
 		return response.Entrance{}, err
 	}
 
 	// Response作成
 	response := response.Entrance{
-		UserID:     user.ID,
-		UserName:   user.Name,
+		UserID:     *user.ID,
+		UserName:   *user.Name,
 		Time:       time.Now(),
 		AccessType: "exit",
 	}
