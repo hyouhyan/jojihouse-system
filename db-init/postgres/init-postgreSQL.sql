@@ -9,7 +9,7 @@ CREATE TABLE users (
     registered_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     total_entries INT DEFAULT 0 CHECK (total_entries >= 0),
     allergy VARCHAR(255),
-    number INT UNIQUE NOT NULL
+    number INT UNIQUE
 );
 
 -- ロール
