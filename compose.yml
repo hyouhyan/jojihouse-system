@@ -31,7 +31,7 @@ services:
       - myNetwork
   
   mongoDb:
-    image: mongo:latest
+    image: mongo:4.4.18
     container_name: mongoDb
     ports:
       - "27017:27017"
