@@ -178,8 +178,13 @@ func (s *UserPortalService) GetUserByID(userID int) (*response.User, error) {
 	return s.cnvModelUserToResponseUser(user), nil
 }
 
-func (s *UserPortalService) GetUserByBarcode(barcode string) (*model.User, error) {
-	return s.userRepository.GetUserByBarcode(barcode)
+func (s *UserPortalService) GetUserByBarcode(barcode string) (*response.User, error) {
+	user, err := s.userRepository.GetUserByBarcode(barcode)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.cnvModelUserToResponseUser(user), nil
 }
 
 func (s *UserPortalService) GetAllRoles() ([]response.Role, error) {
