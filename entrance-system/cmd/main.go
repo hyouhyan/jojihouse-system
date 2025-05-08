@@ -8,7 +8,7 @@ import (
 	"jojihouse-entrance-system/internal/service"
 	"time"
 
-	_ "jojihouse-entrance-system/docs" // 生成される Swagger ドキュメントを読み込む
+	_ "jojihouse-entrance-system/swagger" // 生成される Swagger ドキュメントを読み込む
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
