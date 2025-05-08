@@ -274,3 +274,6 @@ $RECYCLE.BIN/
 
 /data
 test.go
+
+*/swagger/*
+!*/swagger/.gitkeep
