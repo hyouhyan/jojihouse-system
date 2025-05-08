@@ -79,7 +79,7 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 // @Param barcode path int false "バーコード"
 // @Success 200 {object} []response.User
 // @Router /users [get]
-func (h *UserHandler) GetAllUsers(c *gin.Context) {
+func (h *UserHandler) GetUsers(c *gin.Context) {
 	// クエリパラメータからbarcodeを取得
 	barcode := c.Query("barcode")
 
