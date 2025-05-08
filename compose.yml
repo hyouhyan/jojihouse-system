@@ -21,8 +21,6 @@ services:
       - "8081:8081"
     environment:
       DATABASE_URL: postgres://postgres:postgres@postgreSql:5432/postgres?sslmode=disable
-    links:
-      - postgreSql
     restart: always
     depends_on:
       - postgreSql
