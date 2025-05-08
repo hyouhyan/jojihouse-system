@@ -73,12 +73,31 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-// @Summary 全ユーザーの情報取得
+// @Summary ユーザーの情報取得
 // @Tags ユーザー管理
 // @Produce json
+// @Param barcode path int false "バーコード"
 // @Success 200 {object} []response.User
 // @Router /users [get]
 func (h *UserHandler) GetAllUsers(c *gin.Context) {
+	// クエリパラメータからbarcodeを取得
+	barcode := c.Query("barcode")
+
+	if barcode != "" {
+
+		// サービス層でユーザー情報を取得
+		user, err := h.userPortalService.GetUserByBarcode(barcode)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			log.Print(err)
+			return
+		}
+
+		// レスポンスを返す
+		c.JSON(http.StatusOK, gin.H{"users": user})
+		return
+	}
+
 	res, err := h.userPortalService.GetAllUsers()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get users"})
