@@ -35,10 +35,11 @@ definitions:
         type: string
       name:
         type: string
+      number:
+        type: integer
       remaining_entries:
         type: integer
     required:
-    - barcode
     - name
     type: object
   request.Entrance:
@@ -67,6 +68,8 @@ definitions:
         type: string
       name:
         type: string
+      number:
+        type: integer
       remaining_entries:
         type: integer
     type: object
@@ -139,6 +142,8 @@ definitions:
         type: integer
       name:
         type: string
+      number:
+        type: integer
       registered_at:
         type: string
       remaining_entries:
@@ -288,6 +293,11 @@ paths:
       - ロール管理
   /users:
     get:
+      parameters:
+      - description: バーコード
+        in: path
+        name: barcode
+        type: integer
       produces:
       - application/json
       responses:
@@ -297,7 +307,7 @@ paths:
             items:
               $ref: '#/definitions/response.User'
             type: array
-      summary: 全ユーザーの情報取得
+      summary: ユーザーの情報取得
       tags:
       - ユーザー管理
     post:
