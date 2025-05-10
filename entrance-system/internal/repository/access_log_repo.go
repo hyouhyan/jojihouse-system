@@ -50,6 +50,25 @@ func (r *AccessLogRepository) CreateExitAccessLog(userid int) error {
 	return r.CreateAccessLog(log)
 }
 
+// ログ修正
+func (r *AccessLogRepository) UpdateAccessLog(log *model.AccessLog) error {
+	// 既存のログを更新
+	filter := bson.D{{Key: "_id", Value: log.ID}}
+	update := bson.D{
+		{Key: "$set", Value: bson.D{
+			{Key: "user_id", Value: log.UserID},
+			{Key: "time", Value: log.Time},
+			{Key: "access_type", Value: log.AccessType},
+		}},
+	}
+
+	_, err := r.db.Collection("access_log").UpdateOne(context.Background(), filter, update)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *AccessLogRepository) GetAccessLogsByAnyFilter(lastID primitive.ObjectID, options model.AccessLogFilter) ([]model.AccessLog, error) {
 	filter := bson.D{}
 
@@ -82,6 +101,28 @@ func (r *AccessLogRepository) GetAccessLogsByAnyFilter(lastID primitive.ObjectID
 	}
 
 	return r._findAccessLogs(filter, lastID, limit)
+}
+
+// 最終アクセスログを取得
+func (r *AccessLogRepository) GetLastAccessLogByUserID(userID int) (*model.AccessLog, error) {
+	filter := bson.D{
+		{Key: "user_id", Value: userID},
+	}
+
+	findOptions := options.FindOne()
+	findOptions.SetSort(bson.D{{Key: "time", Value: -1}}) // `time` で降順ソート
+
+	var log model.AccessLog
+	err := r.db.Collection("access_log").FindOne(context.Background(), filter, findOptions).Decode(&log)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil // ドキュメントが見つからない場合は nil を返す
+		}
+		return nil, err
+	}
+
+	log.Time = log.Time.In(time.Local) // タイムゾーンの変換
+	return &log, nil
 }
 
 // 共通の検索処理

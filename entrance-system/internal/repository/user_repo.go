@@ -44,6 +44,15 @@ func (r *UserRepository) GetUserByBarcode(barcode string) (*model.User, error) {
 	return user, nil
 }
 
+func (r *UserRepository) GetUserByNumber(number int) (*model.User, error) {
+	user := &model.User{}
+	err := r.db.Get(user, "SELECT * FROM users WHERE number = $1", number)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
 func (r *UserRepository) CreateUser(user *model.User) (*model.User, error) {
 	// sql文の構築
 	columns := []string{}

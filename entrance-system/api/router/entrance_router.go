@@ -13,5 +13,6 @@ func SetupEntranceRoutes(router *gin.Engine, entranceHandler *handler.EntranceHa
 		entranceGroup.GET("/current", entranceHandler.GetCurrentUsers)
 		entranceGroup.GET("/logs", entranceHandler.GetAccessLogs)
 		entranceGroup.GET("/logs/:user_id", entranceHandler.GetAccessLogsByUserID)
+		entranceGroup.POST("/fix", entranceHandler.CreateFixedAccessLog)
 	}
 }
