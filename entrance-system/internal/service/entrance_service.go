@@ -149,3 +149,50 @@ func isSameDate(a, b time.Time) bool {
 	bDate := b.Truncate(24 * time.Hour)
 	return aDate.Equal(bDate)
 }
+
+// 入退室の修正
+func (s *EntranceService) UpdateAccessLog(log *model.AccessLog) error {
+	// 既存のログを更新
+	err := s.accessLogRepository.UpdateAccessLog(log)
+	if err != nil {
+		return err
+	}
+
+	// 最終アクセスログを取得
+	lastLog, err := s.accessLogRepository.GetLastAccessLogByUserID(log.UserID)
+	if err != nil {
+		return err
+	}
+
+	// 在室ユーザーを取得
+	currentUsers, err := s.currentUsersRepository.GetCurrentUsers()
+	if err != nil {
+		return err
+	}
+	// ユーザーが在室中か確認
+	var isCurrentUser bool
+	for _, user := range currentUsers {
+		if user.UserID == log.UserID {
+			isCurrentUser = true
+			break
+		}
+	}
+
+	// 最終アクセスを元に在室ユーザーを更新
+	if lastLog.AccessType == "exit" && isCurrentUser {
+		// 退場ログが最新で、在室ユーザーにいる場合は、在室ユーザーから削除
+		err = s.currentUsersRepository.DeleteUserToCurrentUsers(log.UserID)
+		if err != nil {
+			return err
+		}
+	}
+	if lastLog.AccessType == "entry" && !isCurrentUser {
+		// 入場ログが最新で、在室ユーザーにいない場合は、在室ユーザーに追加
+		err = s.currentUsersRepository.AddUserToCurrentUsers(log.UserID)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
