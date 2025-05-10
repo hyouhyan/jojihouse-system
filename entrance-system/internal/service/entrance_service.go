@@ -268,5 +268,13 @@ func (s *EntranceService) CreateFixedAccessLog(req *request.FixedAccessLog) erro
 		}
 	}
 
+	// 入場時は総入場回数を増やす
+	if lastLog.AccessType == "entry" {
+		err = s.userRepository.IncreaseTotalEntries(log.UserID)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
