@@ -103,6 +103,28 @@ func (r *AccessLogRepository) GetAccessLogsByAnyFilter(lastID primitive.ObjectID
 	return r._findAccessLogs(filter, lastID, limit)
 }
 
+// 最終アクセスログを取得
+func (r *AccessLogRepository) GetLastAccessLogByUserID(userID int) (*model.AccessLog, error) {
+	filter := bson.D{
+		{Key: "user_id", Value: userID},
+	}
+
+	findOptions := options.FindOne()
+	findOptions.SetSort(bson.D{{Key: "time", Value: -1}}) // `time` で降順ソート
+
+	var log model.AccessLog
+	err := r.db.Collection("access_log").FindOne(context.Background(), filter, findOptions).Decode(&log)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil // ドキュメントが見つからない場合は nil を返す
+		}
+		return nil, err
+	}
+
+	log.Time = log.Time.In(time.Local) // タイムゾーンの変換
+	return &log, nil
+}
+
 // 共通の検索処理
 func (r *AccessLogRepository) _findAccessLogs(filter bson.D, lastID primitive.ObjectID, limit int64) ([]model.AccessLog, error) {
 	var logs []model.AccessLog
