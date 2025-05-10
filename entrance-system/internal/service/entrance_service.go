@@ -1,6 +1,7 @@
 package service
 
 import (
+	"jojihouse-entrance-system/api/model/request"
 	"jojihouse-entrance-system/api/model/response"
 	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/repository"
@@ -154,6 +155,79 @@ func isSameDate(a, b time.Time) bool {
 func (s *EntranceService) UpdateAccessLog(log *model.AccessLog) error {
 	// 既存のログを更新
 	err := s.accessLogRepository.UpdateAccessLog(log)
+	if err != nil {
+		return err
+	}
+
+	// 最終アクセスログを取得
+	lastLog, err := s.accessLogRepository.GetLastAccessLogByUserID(log.UserID)
+	if err != nil {
+		return err
+	}
+
+	// 在室ユーザーを取得
+	currentUsers, err := s.currentUsersRepository.GetCurrentUsers()
+	if err != nil {
+		return err
+	}
+	// ユーザーが在室中か確認
+	var isCurrentUser bool
+	for _, user := range currentUsers {
+		if user.UserID == log.UserID {
+			isCurrentUser = true
+			break
+		}
+	}
+
+	// 最終アクセスを元に在室ユーザーを更新
+	if lastLog.AccessType == "exit" && isCurrentUser {
+		// 退場ログが最新で、在室ユーザーにいる場合は、在室ユーザーから削除
+		err = s.currentUsersRepository.DeleteUserToCurrentUsers(log.UserID)
+		if err != nil {
+			return err
+		}
+	}
+	if lastLog.AccessType == "entry" && !isCurrentUser {
+		// 入場ログが最新で、在室ユーザーにいない場合は、在室ユーザーに追加
+		err = s.currentUsersRepository.AddUserToCurrentUsers(log.UserID)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (s *EntranceService) CreateFixedAccessLog(req *request.FixedAccessLog) error {
+	// ユーザー情報を取得(存在するかの確認)
+	var user *model.User
+	var err error
+
+	if req.UserID != nil {
+		user, err = s.userRepository.GetUserByID(*req.UserID)
+		if err != nil {
+			return err
+		}
+	} else if req.Barcode != nil {
+		user, err = s.userRepository.GetUserByBarcode(*req.Barcode)
+		if err != nil {
+			return err
+		}
+	} else if req.Number != nil {
+		user, err = s.userRepository.GetUserByNumber(*req.Number)
+		if err != nil {
+			return err
+		}
+	}
+
+	log := &model.AccessLog{
+		UserID:     *user.ID,
+		Time:       *req.Time,
+		AccessType: *req.AccessType,
+	}
+
+	// ログを作成
+	err = s.accessLogRepository.CreateAccessLog(log)
 	if err != nil {
 		return err
 	}
