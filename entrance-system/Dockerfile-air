@@ -24,5 +24,9 @@ RUN /go/bin/swag init -g cmd/main.go -o ./swagger
 # ポート8080を公開
 EXPOSE 8080
 
+# ホットリロード系
+RUN go install github.com/air-verse/air@latest
+
 # 実行可能ファイルをデフォルトのコマンドとして設定
-CMD ["go", "run", "cmd/main.go"]
+# CMD ["go", "run", "cmd/main.go"]
+CMD ["air"]
