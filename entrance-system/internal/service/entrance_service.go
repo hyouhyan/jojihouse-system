@@ -274,6 +274,45 @@ func (s *EntranceService) CreateFixedAccessLog(req *request.FixedAccessLog) erro
 		if err != nil {
 			return err
 		}
+
+		// その日のうちにremaining_entries_logの減少があるか確認
+		lastRemainingLog, err := s.remainingEntriesLogRepository.GetLastRemainingEntriesLogByUserID(log.UserID)
+		if err != nil {
+			return err
+		}
+
+		// ハウス管理者か
+		isHouseAdmin, err := s.roleRepository.IsHouseAdmin(log.UserID)
+		if err != nil {
+			return err
+		}
+
+		// 指定日とログの日が同じなら、減少しない
+		if isSameDate(lastRemainingLog.UpdatedAt, *req.Time) || isHouseAdmin {
+			return nil
+		} else {
+			// 残り回数を減らす
+			beforeCount, afterCount, err := s.userRepository.DecreaseRemainingEntries(log.UserID, 1)
+			if err != nil {
+				return err
+			}
+			// ログ保存
+
+			log := &model.RemainingEntriesLog{
+				UserID:          log.UserID,
+				PreviousEntries: beforeCount,
+				NewEntries:      afterCount,
+				Reason:          "ハウス入場(修正)のため",
+				UpdatedBy:       "システム",
+				UpdatedAt:       *req.Time,
+			}
+
+			// ログ作成
+			err = s.remainingEntriesLogRepository.CreateFixedRemainingEntriesLog(log)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	return nil

@@ -31,6 +31,16 @@ func (r *RemainingEntriesLogRepository) CreateRemainingEntriesLog(log *model.Rem
 	return nil
 }
 
+func (r *RemainingEntriesLogRepository) CreateFixedRemainingEntriesLog(log *model.RemainingEntriesLog) error {
+	log.ID = primitive.NilObjectID
+
+	_, err := r.db.Collection("remaining_entries_log").InsertOne(context.Background(), log)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogs(lastID primitive.ObjectID, limit int64) ([]model.RemainingEntriesLog, error) {
 	// フィルターなしで全ログを取得
 	return r._findRemainingEntriesLogs(bson.D{}, lastID, limit)
