@@ -274,3 +274,5 @@ $RECYCLE.BIN/
 
 /data
 test.go
+
+init01.sql
