@@ -6,9 +6,8 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
-pre_cmd = ["/go/bin/swag", "init", "-g", "cmd/main.go", "-o", "./swagger"]
 # Just plain old shell command. You could use `make` as well.
-cmd = "go build -o ./tmp/main ./cmd/main.go"
+cmd = "/go/bin/swag init -g ./cmd/main.go -o ./swagger && go build -o ./tmp/main ./cmd/main.go"
 # Binary file yields from `cmd`.
 bin = "tmp/main"
 # Customize binary, can setup environment variables when run your app.
