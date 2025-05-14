@@ -95,6 +95,9 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 		if err != nil {
 			return response.Entrance{}, err
 		}
+
+		// Go側にも反映
+		*user.Remaining_entries = afterCount
 	}
 
 	// 入場回数を増やす
@@ -102,6 +105,8 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 	if err != nil {
 		return response.Entrance{}, err
 	}
+	// Go側にも反映
+	*user.Total_entries = *user.Total_entries + 1
 
 	// Response作成
 	response := response.Entrance{
