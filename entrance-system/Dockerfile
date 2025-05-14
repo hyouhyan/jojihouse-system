@@ -15,12 +15,6 @@ RUN go mod download
 # ソースコードをコンテナにコピー
 COPY . .
 
-# Swaggerの生成
-# Swaggerのインストール
-RUN go install github.com/swaggo/swag/cmd/swag@v1.8.7
-# Swaggerの初期化
-RUN /go/bin/swag init -g cmd/main.go -o ./swagger
-
 # ポート8080を公開
 EXPOSE 8080
 
