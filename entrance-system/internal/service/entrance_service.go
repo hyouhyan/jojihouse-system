@@ -105,10 +105,13 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 
 	// Response作成
 	response := response.Entrance{
-		UserID:     *user.ID,
-		UserName:   *user.Name,
-		Time:       time.Now(),
-		AccessType: "entry",
+		UserID:            *user.ID,
+		UserName:          *user.Name,
+		Time:              time.Now(),
+		AccessType:        "entry",
+		Remaining_entries: *user.Remaining_entries,
+		Number:            user.Number,
+		Total_entries:     *user.Total_entries,
 	}
 
 	return response, nil
@@ -136,10 +139,13 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 
 	// Response作成
 	response := response.Entrance{
-		UserID:     *user.ID,
-		UserName:   *user.Name,
-		Time:       time.Now(),
-		AccessType: "exit",
+		UserID:            *user.ID,
+		UserName:          *user.Name,
+		Time:              time.Now(),
+		AccessType:        "exit",
+		Remaining_entries: *user.Remaining_entries,
+		Number:            user.Number,
+		Total_entries:     *user.Total_entries,
 	}
 
 	return response, nil
