@@ -40,11 +40,13 @@ func main() {
 	remainingEntriesLogRepo := repository.NewRemainingEntriesLogRepository(database.MongoDB)
 	// 在室ユーザーリポジトリ
 	currentUsersRepo := repository.NewCurrentUsersRepository(database.PostgresDB)
+	// 支払いログリポジトリ
+	paymentLogRepo := repository.NewPaymentLogRepository(database.MongoDB)
 
 	// entranceサービス
 	entranceService := service.NewEntranceService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo, currentUsersRepo)
 	// adminManagementサービス
-	adminManagementService := service.NewAdminManagementService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo)
+	adminManagementService := service.NewAdminManagementService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo, paymentLogRepo)
 	// userPortalサービス
 	userPortalService := service.NewUserPortalService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo, currentUsersRepo)
 

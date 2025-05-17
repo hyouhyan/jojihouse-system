@@ -3,9 +3,11 @@ package handler
 import (
 	"fmt"
 	"jojihouse-entrance-system/api/model/request"
+	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/service"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -46,6 +48,21 @@ func (h *KaisukenHandler) BuyKaisuken(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not increase remaining entries"})
 		log.Print(err)
+	}
+
+	// 支払いログの作成
+	paymentLog := &model.PaymentLog{
+		UserID:      req.UserID,
+		Amount:      req.Amount,
+		Time:        time.Now(),
+		Description: description,
+		Payway:      req.Payway,
+	}
+	err = h.adminManagementService.CreatePaymentLog(paymentLog)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not create payment log"})
+		log.Print(err)
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Success"})

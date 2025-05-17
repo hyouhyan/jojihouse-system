@@ -15,10 +15,11 @@ type AdminManagementService struct {
 	roleRepository                *repository.RoleRepository
 	accessLogRepository           *repository.AccessLogRepository
 	remainingEntriesLogRepository *repository.RemainingEntriesLogRepository
+	paymentLogRepository          *repository.PaymentLogRepository
 }
 
-func NewAdminManagementService(userRepository *repository.UserRepository, roleRepository *repository.RoleRepository, accessLogRepository *repository.AccessLogRepository, remainingEntriesLogRepository *repository.RemainingEntriesLogRepository) *AdminManagementService {
-	return &AdminManagementService{userRepository: userRepository, roleRepository: roleRepository, accessLogRepository: accessLogRepository, remainingEntriesLogRepository: remainingEntriesLogRepository}
+func NewAdminManagementService(userRepository *repository.UserRepository, roleRepository *repository.RoleRepository, accessLogRepository *repository.AccessLogRepository, remainingEntriesLogRepository *repository.RemainingEntriesLogRepository, paymentLogRepository *repository.PaymentLogRepository) *AdminManagementService {
+	return &AdminManagementService{userRepository: userRepository, roleRepository: roleRepository, accessLogRepository: accessLogRepository, remainingEntriesLogRepository: remainingEntriesLogRepository, paymentLogRepository: paymentLogRepository}
 }
 
 func (s *AdminManagementService) CreateUser(req *request.CreateUser) (*response.User, error) {
@@ -138,4 +139,8 @@ func (s *AdminManagementService) GetRemainingEntriesLogs(lastID primitive.Object
 
 func (s *AdminManagementService) GetRemainingEntriesLogsOnlyIncrease(lastID primitive.ObjectID) ([]model.RemainingEntriesLog, error) {
 	return s.remainingEntriesLogRepository.GetRemainingEntriesLogsOnlyIncrease(lastID, 50)
+}
+
+func (s *AdminManagementService) CreatePaymentLog(log *model.PaymentLog) error {
+	return s.paymentLogRepository.CreatePaymentLog(log)
 }
