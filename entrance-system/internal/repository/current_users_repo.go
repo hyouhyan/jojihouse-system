@@ -44,7 +44,7 @@ func (r *CurrentUsersRepository) GetCurrentUsers() ([]model.CurrentUser, error) 
 	var users []model.CurrentUser
 
 	query := `
-		SELECT u.id AS user_id, u.name, c.entered_at
+		SELECT u.id AS user_id, u.name, c.entered_at, u.allergy
 		FROM current_users c
 		JOIN users u ON c.user_id = u.id
 	`
