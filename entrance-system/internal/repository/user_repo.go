@@ -19,7 +19,7 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 
 func (r *UserRepository) GetAllUsers() ([]model.User, error) {
 	var users []model.User
-	err := r.db.Select(&users, "SELECT * FROM users")
+	err := r.db.Select(&users, "SELECT * FROM users ORDER BY number")
 	if err != nil {
 		return nil, err
 	}
