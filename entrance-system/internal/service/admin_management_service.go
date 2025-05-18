@@ -144,3 +144,57 @@ func (s *AdminManagementService) GetRemainingEntriesLogsOnlyIncrease(lastID prim
 func (s *AdminManagementService) CreatePaymentLog(log *model.PaymentLog) error {
 	return s.paymentLogRepository.CreatePaymentLog(log)
 }
+
+func (s *AdminManagementService) GetAllPaymentLogs(lastID string, limit int64) ([]response.PaymentLog, error) {
+	var objectID primitive.ObjectID
+	var err error
+
+	// lastIDを変換
+	if lastID == "" {
+		objectID = primitive.NilObjectID
+	} else {
+		objectID, err = primitive.ObjectIDFromHex(lastID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	logs, err := s.paymentLogRepository.GetAllPaymentLogs(objectID, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	// UserIDの一覧を作成
+	userIDs := make([]int, len(logs))
+	for i, log := range logs {
+		userIDs[i] = log.UserID
+	}
+
+	// PostgreSQL から UserID に対応する UserName を取得
+	users, err := s.userRepository.GetUsersByIDs(userIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	// UserID -> UserName のマッピング
+	userMap := make(map[int]string)
+	for _, user := range users {
+		userMap[*user.ID] = *user.Name
+	}
+
+	// レスポンスデータの作成
+	var responseLogs []response.PaymentLog
+	for _, log := range logs {
+		responseLogs = append(responseLogs, response.PaymentLog{
+			ID:          log.ID.Hex(),
+			UserID:      log.UserID,
+			UserName:    userMap[log.UserID], // UserIDからUserNameを取得
+			Time:        log.Time,
+			Description: log.Description,
+			Amount:      log.Amount,
+			Payway:      log.Payway,
+		})
+	}
+
+	return responseLogs, nil
+}
