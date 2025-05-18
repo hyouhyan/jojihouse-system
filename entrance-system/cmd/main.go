@@ -55,6 +55,7 @@ func main() {
 	userHandler := handler.NewUserHandler(userPortalService, adminManagementService)
 	roleHandler := handler.NewRoleHandler(userPortalService)
 	kaisukenHandler := handler.NewKaisukenHandler(userPortalService, adminManagementService)
+	paymentHandler := handler.NewPaymentHandler(adminManagementService)
 
 	// Gin ルーターの設定
 	r := gin.Default()
@@ -77,6 +78,7 @@ func main() {
 	router.SetupUserRoutes(r, userHandler)
 	router.SetupRoleRoutes(r, roleHandler)
 	router.SetupKaisukenRoutes(r, kaisukenHandler)
+	router.SetupPaymentRoutes(r, paymentHandler)
 
 	// test(database.PostgresDB, database.MongoDB)
 
