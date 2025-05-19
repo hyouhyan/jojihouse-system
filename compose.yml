@@ -44,7 +44,6 @@ services:
   
   jojihouse-system:
     build: ./entrance-system
-    command: ./entrance-system/main
     container_name: jojihouse-system
     ports:
       - "8080:8080"
@@ -64,8 +63,6 @@ services:
       - MONGO_HOST=mongoDb
       - MONGO_PORT=27017
     restart: always
-    volumes: 
-      - ./entrance-system:/go/src
     tty: true
     networks:
       - myNetwork
