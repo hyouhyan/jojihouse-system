@@ -63,8 +63,6 @@ services:
       - MONGO_HOST=mongoDb
       - MONGO_PORT=27017
     restart: always
-    volumes: 
-      - ./entrance-system:/go/src
     tty: true
     networks:
       - myNetwork
