@@ -17,8 +17,8 @@ COPY . .
 # ポート8080を公開
 EXPOSE 8080
 
+# ビルド
 RUN go build -o main cmd/main.go
 
 # 実行可能ファイルをデフォルトのコマンドとして設定
-#CMD ["go", "run", "cmd/main.go"]
 CMD ["./main"]
