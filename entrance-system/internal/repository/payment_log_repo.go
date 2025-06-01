@@ -61,7 +61,7 @@ func (r *PaymentLogRepository) GetAllPaymentLogs(lastID primitive.ObjectID, limi
 	return logs, nil
 }
 
-func (r *PaymentLogRepository) GetPaymentLogsByMonth(year int, month int) ([]model.PaymentLog, error) {
+func (r *PaymentLogRepository) GetMonthlyPaymentLogs(year int, month int) ([]model.PaymentLog, error) {
 	startDate := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.Local)
 	endDate := startDate.AddDate(0, 1, -1).Add(24 * time.Hour) // 月末の翌日の0時
 

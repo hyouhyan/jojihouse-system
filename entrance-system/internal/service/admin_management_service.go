@@ -199,8 +199,8 @@ func (s *AdminManagementService) GetAllPaymentLogs(lastID string, limit int64) (
 	return responseLogs, nil
 }
 
-func (s *AdminManagementService) GetPaymentLogsByMonth(year int, month int) (response.MonthlyPaymentLog, error) {
-	logs, err := s.paymentLogRepository.GetPaymentLogsByMonth(year, month)
+func (s *AdminManagementService) GetMonthlyPaymentLogs(year int, month int) (response.MonthlyPaymentLog, error) {
+	logs, err := s.paymentLogRepository.GetMonthlyPaymentLogs(year, month)
 	if err != nil {
 		return response.MonthlyPaymentLog{}, err
 	}
