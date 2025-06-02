@@ -75,6 +75,9 @@ func (r *PaymentLogRepository) GetMonthlyPaymentLogs(year int, month int) ([]mod
 	opts := options.Find()
 	opts.SetSort(bson.D{{Key: "time", Value: 1}})
 
+	// Limitは無し(全部取得)
+	opts.SetLimit(0)
+
 	cursor, err := r.db.Collection("payment_log").Find(context.Background(), filter, opts)
 	if err != nil {
 		return nil, err
