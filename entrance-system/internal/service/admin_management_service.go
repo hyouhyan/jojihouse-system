@@ -200,7 +200,7 @@ func (s *AdminManagementService) GetAllPaymentLogs(lastID string, limit int64) (
 }
 
 func (s *AdminManagementService) GetMonthlyPaymentLogs(year int, month int) (response.MonthlyPaymentLog, error) {
-	logs, err := s.paymentLogRepository.GetMonthlyPaymentLogs(year, month)
+	logs, total, err := s.paymentLogRepository.GetMonthlyPaymentLogs(year, month)
 	if err != nil {
 		return response.MonthlyPaymentLog{}, err
 	}
@@ -225,7 +225,6 @@ func (s *AdminManagementService) GetMonthlyPaymentLogs(year int, month int) (res
 
 	// レスポンスデータの作成
 	var responseLogs []response.PaymentLog
-	totalAmount := 0
 	for _, log := range logs {
 		responseLogs = append(responseLogs, response.PaymentLog{
 			ID:          log.ID.Hex(),
@@ -236,13 +235,12 @@ func (s *AdminManagementService) GetMonthlyPaymentLogs(year int, month int) (res
 			Amount:      log.Amount,
 			Payway:      log.Payway,
 		})
-		totalAmount += log.Amount
 	}
 
 	return response.MonthlyPaymentLog{
 		Year:  year,
 		Month: month,
-		Total: totalAmount,
+		Total: total,
 		Logs:  responseLogs,
 	}, nil
 }
