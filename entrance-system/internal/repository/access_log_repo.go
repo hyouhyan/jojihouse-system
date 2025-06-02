@@ -133,11 +133,24 @@ func (r *AccessLogRepository) _findAccessLogs(filter bson.D, lastID primitive.Ob
 	findOptions.SetLimit(limit)
 	findOptions.SetSort(bson.D{{Key: "time", Value: -1}}) // `time` で昇順ソート
 
-	// lastIDからデータを取得して、lastTimeを設定
+	// lastIDからデータを取得して、timeフィールドからlastTimeを設定
 	var lastTime time.Time
 	if !lastID.IsZero() {
-		lastTime = lastID.Timestamp().In(time.Local) // lastIDからタイムスタンプを取得し、ローカルタイムゾーンに変換
-		filter = append(filter, bson.E{Key: "_id", Value: bson.D{{Key: "$lt", Value: lastID}}})
+		// lastIDから取得できるタイムスタンプとtimeフィールドの値は異なる可能性がある
+		// よって、ドキュメントから取得する必要がある
+		var lastLog model.AccessLog
+		err := r.db.Collection("access_log").FindOne(context.Background(), bson.D{{Key: "_id", Value: lastID}}).Decode(&lastLog)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				lastTime = time.Time{} // lastIDが存在しない場合はゼロ値を設定
+				filter = append(filter, bson.E{Key: "_id", Value: bson.D{{Key: "$lt", Value: lastID}}})
+			} else {
+				return nil, err // 他のエラーはそのまま返す
+			}
+		} else {
+			lastTime = lastLog.Time.In(time.Local) // lastIDからタイムスタンプを取得し、ローカルタイムゾーンに変換
+			filter = append(filter, bson.E{Key: "_id", Value: bson.D{{Key: "$lt", Value: lastID}}})
+		}
 	} else {
 		// lastIDがゼロの場合は、lastTimeをゼロに設定
 		lastTime = time.Time{}

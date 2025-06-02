@@ -95,8 +95,21 @@ func (r *RemainingEntriesLogRepository) _findRemainingEntriesLogs(filter bson.D,
 	// lastIDからデータを取得して、lastTimeを設定
 	var lastTime time.Time
 	if !lastID.IsZero() {
-		lastTime = lastID.Timestamp().In(time.Local) // lastIDからタイムスタンプを取得し、ローカルタイムゾーンに変換
-		filter = append(filter, bson.E{Key: "_id", Value: bson.D{{Key: "$lt", Value: lastID}}})
+		// lastIDから取得できるタイムスタンプとupdated_atフィールドの値は異なる可能性がある
+		// よって、ドキュメントから取得する必要がある
+		var lastLog model.RemainingEntriesLog
+		err := r.db.Collection("remaining_entries_log").FindOne(context.Background(), bson.D{{Key: "_id", Value: lastID}}).Decode(&lastLog)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				lastTime = time.Time{} // lastIDが存在しない場合はゼロ値を設定
+				filter = append(filter, bson.E{Key: "_id", Value: bson.D{{Key: "$lt", Value: lastID}}})
+			} else {
+				return nil, err // 他のエラーはそのまま返す
+			}
+		} else {
+			lastTime = lastLog.UpdatedAt.In(time.Local) // lastIDからタイムスタンプを取得し、ローカルタイムゾーンに変換
+			filter = append(filter, bson.E{Key: "_id", Value: bson.D{{Key: "$lt", Value: lastID}}})
+		}
 	} else {
 		// lastIDがゼロの場合は、lastTimeをゼロに設定
 		lastTime = time.Time{}
