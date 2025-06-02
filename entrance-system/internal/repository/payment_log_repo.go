@@ -34,7 +34,7 @@ func (r *PaymentLogRepository) GetAllPaymentLogs(lastID primitive.ObjectID, limi
 	var logs []model.PaymentLog
 	filter := bson.D{}
 	opts := options.Find()
-	opts.SetSort(bson.D{{Key: "time", Value: 1}})
+	opts.SetSort(bson.D{{Key: "time", Value: -1}})
 	opts.SetLimit(limit)
 	if !lastID.IsZero() {
 		filter = bson.D{
@@ -73,7 +73,7 @@ func (r *PaymentLogRepository) GetMonthlyPaymentLogs(year int, month int) ([]mod
 	}
 
 	opts := options.Find()
-	opts.SetSort(bson.D{{Key: "time", Value: 1}})
+	opts.SetSort(bson.D{{Key: "time", Value: -1}})
 
 	// Limitは無し(全部取得)
 	opts.SetLimit(0)
