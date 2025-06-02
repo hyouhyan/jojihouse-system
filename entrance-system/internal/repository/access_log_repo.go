@@ -133,9 +133,19 @@ func (r *AccessLogRepository) _findAccessLogs(filter bson.D, lastID primitive.Ob
 	findOptions.SetLimit(limit)
 	findOptions.SetSort(bson.D{{Key: "time", Value: -1}}) // `time` で昇順ソート
 
-	// lastID によるページネーション
+	// lastIDからデータを取得して、lastTimeを設定
+	var lastTime time.Time
 	if !lastID.IsZero() {
-		filter = append(filter, bson.E{Key: "_id", Value: bson.D{{Key: "$gt", Value: lastID}}})
+		lastTime = lastID.Timestamp().In(time.Local) // lastIDからタイムスタンプを取得し、ローカルタイムゾーンに変換
+		filter = append(filter, bson.E{Key: "_id", Value: bson.D{{Key: "$lt", Value: lastID}}})
+	} else {
+		// lastIDがゼロの場合は、lastTimeをゼロに設定
+		lastTime = time.Time{}
+	}
+
+	// lastTime によるページネーション
+	if !lastTime.IsZero() {
+		filter = append(filter, bson.E{Key: "time", Value: bson.D{{Key: "$lt", Value: lastTime}}})
 	}
 
 	cursor, err := r.db.Collection("access_log").Find(context.Background(), filter, findOptions)
