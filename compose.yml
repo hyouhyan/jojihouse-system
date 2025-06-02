@@ -11,21 +11,22 @@ services:
       - ./data/postgresql:/var/lib/postgresql/data
       - ./db-init/postgres:/docker-entrypoint-initdb.d
     restart: always
+    # ports: ["5432:5432"]
     networks:
       - myNetwork
   
-  pgweb: 
-    image: sosedoff/pgweb
-    container_name: pgweb
-    ports:
-      - "8081:8081"
-    environment:
-      DATABASE_URL: postgres://postgres:postgres@postgreSql:5432/postgres?sslmode=disable
-    restart: always
-    depends_on:
-      - postgreSql
-    networks:
-      - myNetwork
+  # pgweb: 
+  #   image: sosedoff/pgweb
+  #   container_name: pgweb
+  #   ports:
+  #     - "8081:8081"
+  #   environment:
+  #     DATABASE_URL: postgres://postgres:postgres@postgreSql:5432/postgres?sslmode=disable
+  #   restart: always
+  #   depends_on:
+  #     - postgreSql
+  #   networks:
+  #     - myNetwork
   
   mongoDb:
     image: mongo:4.4.18
@@ -38,6 +39,7 @@ services:
     volumes:
       - ./data/mongodb:/data/db
       - ./db-init/mongo:/docker-entrypoint-initdb.d
+    # ports: ["27017:27017"]
     restart: always
     networks:
       - myNetwork
