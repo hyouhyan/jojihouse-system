@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"jojihouse-entrance-system/internal/model"
@@ -143,13 +144,11 @@ func (r *AccessLogRepository) _findAccessLogs(filter bson.D, lastID primitive.Ob
 		if err != nil {
 			if err == mongo.ErrNoDocuments {
 				lastTime = time.Time{} // lastIDが存在しない場合はゼロ値を設定
-				filter = append(filter, bson.E{Key: "_id", Value: bson.D{{Key: "$lt", Value: lastID}}})
 			} else {
 				return nil, err // 他のエラーはそのまま返す
 			}
 		} else {
-			lastTime = lastLog.Time.In(time.Local) // lastIDからタイムスタンプを取得し、ローカルタイムゾーンに変換
-			filter = append(filter, bson.E{Key: "_id", Value: bson.D{{Key: "$lt", Value: lastID}}})
+			lastTime = lastLog.Time.In(time.Local) // lastIDから時間を取得し、ローカルタイムゾーンに変換
 		}
 	} else {
 		// lastIDがゼロの場合は、lastTimeをゼロに設定
@@ -175,6 +174,8 @@ func (r *AccessLogRepository) _findAccessLogs(filter bson.D, lastID primitive.Ob
 
 		// タイムゾーンの変換
 		log.Time = log.Time.In(time.Local)
+
+		fmt.Println("AccessLog:", log) // デバッグ用ログ出力
 
 		logs = append(logs, log)
 	}

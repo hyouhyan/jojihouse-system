@@ -107,8 +107,7 @@ func (r *RemainingEntriesLogRepository) _findRemainingEntriesLogs(filter bson.D,
 				return nil, err // 他のエラーはそのまま返す
 			}
 		} else {
-			lastTime = lastLog.UpdatedAt.In(time.Local) // lastIDからタイムスタンプを取得し、ローカルタイムゾーンに変換
-			filter = append(filter, bson.E{Key: "_id", Value: bson.D{{Key: "$lt", Value: lastID}}})
+			lastTime = lastLog.UpdatedAt.In(time.Local) // lastIDから時間を取得し、ローカルタイムゾーンに変換
 		}
 	} else {
 		// lastIDがゼロの場合は、lastTimeをゼロに設定
