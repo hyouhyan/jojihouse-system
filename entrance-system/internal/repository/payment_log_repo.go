@@ -63,7 +63,7 @@ func (r *PaymentLogRepository) GetAllPaymentLogs(lastID primitive.ObjectID, limi
 }
 
 // getMonthlyTotalAmount は指定された年月の支払い合計額を取得します
-func (r *PaymentLogRepository) getMonthlyTotalAmount(year int, month int) (int, error) {
+func (r *PaymentLogRepository) getMonthlyTotalAmount(year int, month int) (int, int, int, error) {
 	ctx := context.Background()
 	startDate := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.Local)
 	endDate := startDate.AddDate(0, 1, 0)
@@ -80,27 +80,38 @@ func (r *PaymentLogRepository) getMonthlyTotalAmount(year int, month int) (int, 
 		bson.D{{
 			Key: "$group",
 			Value: bson.D{
-				{Key: "_id", Value: nil},
-				{Key: "totalAmount", Value: bson.D{{Key: "$sum", Value: "$amount"}}},
+				{Key: "_id", Value: "$payway"},
+				{Key: "total", Value: bson.D{{Key: "$sum", Value: "$amount"}}},
 			},
 		}},
 	}
 
 	cursorTotal, err := r.db.Collection("payment_log").Aggregate(ctx, pipeline)
 	if err != nil {
-		return 0, fmt.Errorf("合計値の集計クエリ実行に失敗: %w", err)
+		return 0, 0, 0, fmt.Errorf("合計値の集計クエリ実行に失敗: %w", err)
 	}
 	defer cursorTotal.Close(ctx)
 
-	var aggResults []totalAmountResult
+	var aggResults []struct {
+		ID    string `bson:"_id"`
+		Total int    `bson:"total"`
+	}
 	if err = cursorTotal.All(ctx, &aggResults); err != nil {
-		return 0, fmt.Errorf("合計値の集計結果デコードに失敗: %w", err)
+		return 0, 0, 0, fmt.Errorf("合計値の集計結果デコードに失敗: %w", err)
 	}
 
-	if len(aggResults) > 0 {
-		return aggResults[0].TotalAmount, nil
+	var totalAmount, oliveTotal, cashTotal int
+	for _, result := range aggResults {
+		totalAmount += result.Total
+		switch result.ID {
+		case "olive":
+			oliveTotal = result.Total
+		case "cash":
+			cashTotal = result.Total
+		}
 	}
-	return 0, nil
+
+	return totalAmount, oliveTotal, cashTotal, nil
 }
 
 func (r *PaymentLogRepository) GetMonthlyPaymentLogs(year int, month int) (*model.MonthlyPaymentLog, error) {
@@ -115,7 +126,7 @@ func (r *PaymentLogRepository) GetMonthlyPaymentLogs(year int, month int) (*mode
 		}},
 	}
 
-	totalAmount, err := r.getMonthlyTotalAmount(year, month)
+	totalAmount, oliveTotal, cashTotal, err := r.getMonthlyTotalAmount(year, month)
 	if err != nil {
 		return nil, err
 	}
@@ -143,10 +154,12 @@ func (r *PaymentLogRepository) GetMonthlyPaymentLogs(year int, month int) (*mode
 	}
 
 	return &model.MonthlyPaymentLog{
-		Year:  year,
-		Month: month,
-		Total: totalAmount,
-		Logs:  logs,
+		Year:       year,
+		Month:      month,
+		Total:      totalAmount,
+		OliveTotal: oliveTotal,
+		CashTotal:  cashTotal,
+		Logs:       logs,
 	}, nil
 }
 

@@ -238,9 +238,11 @@ func (s *AdminManagementService) GetMonthlyPaymentLogs(year int, month int) (res
 	}
 
 	return response.MonthlyPaymentLog{
-		Year:  monthlyLog.Year,
-		Month: monthlyLog.Month,
-		Total: monthlyLog.Total,
-		Logs:  responseLogs,
+		Year:       monthlyLog.Year,
+		Month:      monthlyLog.Month,
+		Total:      monthlyLog.Total,
+		OliveTotal: monthlyLog.OliveTotal,
+		CashTotal:  monthlyLog.CashTotal,
+		Logs:       responseLogs,
 	}, nil
 }

@@ -15,8 +15,10 @@ type PaymentLog struct {
 }
 
 type MonthlyPaymentLog struct {
-	Year  int          `json:"year"`
-	Month int          `json:"month"`
-	Total int          `json:"total"`
-	Logs  []PaymentLog `json:"logs"`
+	Year       int          `json:"year"`
+	Month      int          `json:"month"`
+	Total      int          `json:"total"`
+	OliveTotal int          `json:"olive_total"`
+	CashTotal  int          `json:"cash_total"`
+	Logs       []PaymentLog `json:"logs"`
 }
