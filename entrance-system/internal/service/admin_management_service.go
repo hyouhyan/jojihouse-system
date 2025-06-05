@@ -200,14 +200,14 @@ func (s *AdminManagementService) GetAllPaymentLogs(lastID string, limit int64) (
 }
 
 func (s *AdminManagementService) GetMonthlyPaymentLogs(year int, month int) (response.MonthlyPaymentLog, error) {
-	logs, total, err := s.paymentLogRepository.GetMonthlyPaymentLogs(year, month)
+	monthlyLog, err := s.paymentLogRepository.GetMonthlyPaymentLogs(year, month)
 	if err != nil {
 		return response.MonthlyPaymentLog{}, err
 	}
 
 	// UserIDの一覧を作成
-	userIDs := make([]int, len(logs))
-	for i, log := range logs {
+	userIDs := make([]int, len(monthlyLog.Logs))
+	for i, log := range monthlyLog.Logs {
 		userIDs[i] = log.UserID
 	}
 
@@ -225,11 +225,11 @@ func (s *AdminManagementService) GetMonthlyPaymentLogs(year int, month int) (res
 
 	// レスポンスデータの作成
 	var responseLogs []response.PaymentLog
-	for _, log := range logs {
+	for _, log := range monthlyLog.Logs {
 		responseLogs = append(responseLogs, response.PaymentLog{
 			ID:          log.ID.Hex(),
 			UserID:      log.UserID,
-			UserName:    userMap[log.UserID], // UserIDからUserNameを取得
+			UserName:    userMap[log.UserID],
 			Time:        log.Time,
 			Description: log.Description,
 			Amount:      log.Amount,
@@ -238,9 +238,9 @@ func (s *AdminManagementService) GetMonthlyPaymentLogs(year int, month int) (res
 	}
 
 	return response.MonthlyPaymentLog{
-		Year:  year,
-		Month: month,
-		Total: total,
+		Year:  monthlyLog.Year,
+		Month: monthlyLog.Month,
+		Total: monthlyLog.Total,
 		Logs:  responseLogs,
 	}, nil
 }

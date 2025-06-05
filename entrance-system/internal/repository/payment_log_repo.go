@@ -103,7 +103,7 @@ func (r *PaymentLogRepository) getMonthlyTotalAmount(year int, month int) (int, 
 	return 0, nil
 }
 
-func (r *PaymentLogRepository) GetMonthlyPaymentLogs(year int, month int) ([]model.PaymentLog, int, error) {
+func (r *PaymentLogRepository) GetMonthlyPaymentLogs(year int, month int) (*model.MonthlyPaymentLog, error) {
 	ctx := context.Background()
 	startDate := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.Local)
 	endDate := startDate.AddDate(0, 1, 0)
@@ -117,7 +117,7 @@ func (r *PaymentLogRepository) GetMonthlyPaymentLogs(year int, month int) ([]mod
 
 	totalAmount, err := r.getMonthlyTotalAmount(year, month)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
 	opts := options.Find()
@@ -125,7 +125,7 @@ func (r *PaymentLogRepository) GetMonthlyPaymentLogs(year int, month int) ([]mod
 
 	cursor, err := r.db.Collection("payment_log").Find(ctx, filter, opts)
 	if err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 	defer cursor.Close(ctx)
 
@@ -133,16 +133,21 @@ func (r *PaymentLogRepository) GetMonthlyPaymentLogs(year int, month int) ([]mod
 	for cursor.Next(ctx) {
 		var logEntry model.PaymentLog
 		if err := cursor.Decode(&logEntry); err != nil {
-			return nil, 0, err
+			return nil, err
 		}
 		logs = append(logs, logEntry)
 	}
 
 	if err := cursor.Err(); err != nil {
-		return nil, 0, err
+		return nil, err
 	}
 
-	return logs, totalAmount, nil
+	return &model.MonthlyPaymentLog{
+		Year:  year,
+		Month: month,
+		Total: totalAmount,
+		Logs:  logs,
+	}, nil
 }
 
 // 集計結果（合計値）をマッピングするための構造体
