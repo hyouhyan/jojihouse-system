@@ -169,9 +169,3 @@ func (r *PaymentLogRepository) GetMonthlyPaymentLogs(year int, month int) (*mode
 		Logs:       logs,
 	}, nil
 }
-
-// 集計結果（合計値）をマッピングするための構造体
-type totalAmountResult struct {
-	ID          interface{} `bson:"_id"` // グループ化キー (nilが入る)
-	TotalAmount int         `bson:"totalAmount"`
-}
