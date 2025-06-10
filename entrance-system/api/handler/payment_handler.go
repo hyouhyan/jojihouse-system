@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"jojihouse-entrance-system/api/model/request"
+	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/service"
 	"log"
 	"net/http"
@@ -72,4 +74,30 @@ func (h *PaymentHandler) GetMonthlyPaymentLogs(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"monthlyPaymentLogs": paymentLogs})
+}
+
+func (h *PaymentHandler) CreatePaymentLog(c *gin.Context) {
+	var req request.Payment
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		log.Print(err)
+		return
+	}
+
+	paymentLog := &model.PaymentLog{
+		UserID:      req.UserID,
+		Amount:      req.Amount,
+		Description: req.Description,
+		Payway:      req.Payway,
+	}
+
+	err := h.adminManagementService.CreatePaymentLog(paymentLog)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create payment log"})
+		log.Print(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Payment log created successfully"})
 }
