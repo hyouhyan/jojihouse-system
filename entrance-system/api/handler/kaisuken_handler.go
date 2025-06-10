@@ -54,7 +54,6 @@ func (h *KaisukenHandler) BuyKaisuken(c *gin.Context) {
 	paymentLog := &model.PaymentLog{
 		UserID:      req.UserID,
 		Amount:      req.Amount,
-		Time:        time.Now(),
 		Description: description,
 		Payway:      req.Payway,
 	}
