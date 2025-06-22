@@ -42,9 +42,11 @@ func main() {
 	currentUsersRepo := repository.NewCurrentUsersRepository(database.PostgresDB)
 	// 支払いログリポジトリ
 	paymentLogRepo := repository.NewPaymentLogRepository(database.MongoDB)
+	// Discord通知
+	discordNoticeRepository := repository.NewDiscordNoticeRepository()
 
 	// entranceサービス
-	entranceService := service.NewEntranceService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo, currentUsersRepo)
+	entranceService := service.NewEntranceService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo, currentUsersRepo, discordNoticeRepository)
 	// adminManagementサービス
 	adminManagementService := service.NewAdminManagementService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo, paymentLogRepo)
 	// userPortalサービス

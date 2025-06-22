@@ -15,6 +15,7 @@ type EntranceService struct {
 	accessLogRepository           *repository.AccessLogRepository
 	remainingEntriesLogRepository *repository.RemainingEntriesLogRepository
 	currentUsersRepository        *repository.CurrentUsersRepository
+	discordNoticeRepository       *repository.DiscordNoticeRepository
 }
 
 func NewEntranceService(
@@ -23,6 +24,7 @@ func NewEntranceService(
 	accessLogRepository *repository.AccessLogRepository,
 	remainingEntriesLogRepository *repository.RemainingEntriesLogRepository,
 	currentUsersRepository *repository.CurrentUsersRepository,
+	discordNoticeRepository *repository.DiscordNoticeRepository,
 ) *EntranceService {
 	return &EntranceService{
 		userRepository:                userRepository,
@@ -30,6 +32,7 @@ func NewEntranceService(
 		accessLogRepository:           accessLogRepository,
 		remainingEntriesLogRepository: remainingEntriesLogRepository,
 		currentUsersRepository:        currentUsersRepository,
+		discordNoticeRepository:       discordNoticeRepository,
 	}
 }
 
@@ -108,6 +111,9 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 	// Go側にも反映
 	*user.Total_entries = *user.Total_entries + 1
 
+	// Discordに通知
+	s.discordNoticeRepository.NoticeEntry(*user.Name, "")
+
 	// Response作成
 	response := response.Entrance{
 		UserID:            *user.ID,
@@ -141,6 +147,9 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 	if err != nil {
 		return response.Entrance{}, err
 	}
+
+	// Discordに通知
+	s.discordNoticeRepository.NoticeExit(*user.Name, "")
 
 	// Response作成
 	response := response.Entrance{
