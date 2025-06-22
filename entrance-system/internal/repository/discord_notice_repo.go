@@ -37,15 +37,21 @@ type Footer struct {
 // 日本語の曜日スライス
 var weekdays = []string{"日", "月", "火", "水", "木", "金", "土"}
 
-func NoticeEntry(userName string, userAvatarUrl string) {
-	noticeAccess(userName, userAvatarUrl, "入室")
+type DiscordNoticeRepository struct{}
+
+func NewDiscordNoticeRepository() *DiscordNoticeRepository {
+	return &DiscordNoticeRepository{}
 }
 
-func NoticeExit(userName string, userAvatarUrl string) {
-	noticeAccess(userName, userAvatarUrl, "退室")
+func (r *DiscordNoticeRepository) NoticeEntry(userName string, userAvatarUrl string) {
+	r.noticeAccess(userName, userAvatarUrl, "入室")
 }
 
-func noticeAccess(userName string, userAvatarUrl string, accessType string) {
+func (r *DiscordNoticeRepository) NoticeExit(userName string, userAvatarUrl string) {
+	r.noticeAccess(userName, userAvatarUrl, "退室")
+}
+
+func (r *DiscordNoticeRepository) noticeAccess(userName string, userAvatarUrl string, accessType string) {
 	config.Env_load()
 
 	WEBHOOK_URL := os.Getenv("WEBHOOK_URL")
