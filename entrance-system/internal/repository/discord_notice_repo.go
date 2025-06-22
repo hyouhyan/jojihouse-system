@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"jojihouse-entrance-system/internal/config"
-	"log"
 	"net/http"
 	"os"
 	"time"
@@ -51,7 +50,7 @@ func (r *DiscordNoticeRepository) NoticeExit(userName string, userAvatarUrl stri
 	r.noticeAccess(userName, userAvatarUrl, "退室")
 }
 
-func (r *DiscordNoticeRepository) noticeAccess(userName string, userAvatarUrl string, accessType string) {
+func (r *DiscordNoticeRepository) noticeAccess(userName string, userAvatarUrl string, accessType string) error {
 	config.Env_load()
 
 	WEBHOOK_URL := os.Getenv("WEBHOOK_URL")
@@ -99,20 +98,20 @@ func (r *DiscordNoticeRepository) noticeAccess(userName string, userAvatarUrl st
 	// ペイロードをJSON形式のバイト配列に変換（マーシャリング）
 	jsonPayload, err := json.Marshal(payload)
 	if err != nil {
-		log.Fatalf("JSONのマーシャリングに失敗しました: %v", err)
+		return fmt.Errorf("JSONのマーシャリングに失敗しました: %v", err)
 	}
 
 	// HTTP POSTリクエストを作成して送信
 	req, err := http.NewRequest("POST", WEBHOOK_URL, bytes.NewBuffer(jsonPayload))
 	if err != nil {
-		log.Fatalf("リクエストの作成に失敗しました: %v", err)
+		return fmt.Errorf("リクエストの作成に失敗しました: %v", err)
 	}
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatalf("リクエストの送信に失敗しました: %v", err)
+		return fmt.Errorf("リクエストの送信に失敗しました: %v", err)
 	}
 	defer resp.Body.Close()
 
@@ -121,7 +120,9 @@ func (r *DiscordNoticeRepository) noticeAccess(userName string, userAvatarUrl st
 	body := &bytes.Buffer{}
 	_, err = body.ReadFrom(resp.Body)
 	if err != nil {
-		log.Fatalf("レスポンスボディの読み込みに失敗しました: %v", err)
+		return fmt.Errorf("レスポンスボディの読み込みに失敗しました: %v", err)
 	}
 	fmt.Println("Response Body:", body.String())
+
+	return nil
 }

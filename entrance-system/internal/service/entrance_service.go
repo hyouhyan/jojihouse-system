@@ -1,11 +1,11 @@
 package service
 
 import (
+	"fmt"
 	"jojihouse-entrance-system/api/model/request"
 	"jojihouse-entrance-system/api/model/response"
 	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/repository"
-	"log"
 	"time"
 )
 
@@ -60,7 +60,7 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 	// ハウス管理者か
 	isHouseAdmin, err := s.roleRepository.IsHouseAdmin(*user.ID)
 	if err != nil {
-		log.Fatalf("Failed to check if the user is a house admin: %v", err)
+		return response.Entrance{}, fmt.Errorf("failed to check if the user is a house admin: %v", err)
 	}
 	if isHouseAdmin {
 		isDecreaseTarget = false
