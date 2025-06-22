@@ -6,15 +6,24 @@ import (
 	"jojihouse-entrance-system/internal/database"
 	"jojihouse-entrance-system/internal/repository"
 	"jojihouse-entrance-system/internal/service"
+	"log"
 	"time"
 
 	_ "jojihouse-entrance-system/swagger" // 生成される Swagger ドキュメントを読み込む
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
+
+func Env_load() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("No .env file found, using environment variables")
+	}
+}
 
 // @title JojiHouse Entrance System API
 // @version 1.0
@@ -22,6 +31,8 @@ import (
 // @host 127.0.0.1:8080
 // @BasePath /
 func main() {
+	Env_load()
+
 	database.ConnectPostgres()
 	defer database.ClosePostgres()
 

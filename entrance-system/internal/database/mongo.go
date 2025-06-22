@@ -14,7 +14,6 @@ var MongoDB *mongo.Database
 var mongoClient *mongo.Client
 
 func ConnectMongo() {
-	Env_load()
 	dst := fmt.Sprintf(
 		"mongodb://%s:%s@%s:%s",
 		os.Getenv("MONGO_USER"),
