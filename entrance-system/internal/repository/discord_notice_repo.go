@@ -4,16 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"jojihouse-entrance-system/internal/config"
 	"log"
 	"net/http"
 	"os"
 	"time"
-)
-
-var (
-	WEBHOOK_URL        string = os.Getenv("WEBHOOK_URL")
-	WEBHOOK_USERNAME   string = os.Getenv("WEBHOOK_USERNAME")
-	WEBHOOK_AVATAR_URL string = os.Getenv("WEBHOOK_AVATAR_URL")
 )
 
 // Discord Webhookに送信するJSONデータ構造を定義します
@@ -51,6 +46,12 @@ func NoticeExit(userName string, userAvatarUrl string) {
 }
 
 func noticeAccess(userName string, userAvatarUrl string, accessType string) {
+	config.Env_load()
+
+	WEBHOOK_URL := os.Getenv("WEBHOOK_URL")
+	WEBHOOK_USERNAME := os.Getenv("WEBHOOK_USERNAME")
+	WEBHOOK_AVATAR_URL := os.Getenv("WEBHOOK_AVATAR_URL")
+
 	colorGreen := 0x2ECC71 // 10進数: 3066993
 	colorRed := 0xE74C3C   // 10進数: 15158332
 

@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"jojihouse-entrance-system/internal/config"
 	"log"
 	"os"
 
@@ -12,6 +13,8 @@ import (
 var PostgresDB *sqlx.DB
 
 func ConnectPostgres() {
+	config.Env_load()
+
 	dst := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		os.Getenv("POSTGRES_HOST"),

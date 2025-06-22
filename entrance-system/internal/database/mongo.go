@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+	"jojihouse-entrance-system/internal/config"
 	"log"
 	"os"
 
@@ -14,6 +15,8 @@ var MongoDB *mongo.Database
 var mongoClient *mongo.Client
 
 func ConnectMongo() {
+	config.Env_load()
+
 	dst := fmt.Sprintf(
 		"mongodb://%s:%s@%s:%s",
 		os.Getenv("MONGO_USER"),
