@@ -19,14 +19,8 @@ type WebhookPayload struct {
 
 type Embed struct {
 	Title  string `json:"title"`
-	Author Author `json:"author"`
 	Footer Footer `json:"footer"`
 	Color  int    `json:"color"`
-}
-
-type Author struct {
-	Name    string `json:"name"`
-	IconURL string `json:"icon_url"`
 }
 
 type Footer struct {
@@ -42,15 +36,15 @@ func NewDiscordNoticeRepository() *DiscordNoticeRepository {
 	return &DiscordNoticeRepository{}
 }
 
-func (r *DiscordNoticeRepository) NoticeEntry(userName string, userAvatarUrl string) {
-	r.noticeAccess(userName, userAvatarUrl, "入室")
+func (r *DiscordNoticeRepository) NoticeEntry(userName string) {
+	r.noticeAccess(userName, "入室")
 }
 
-func (r *DiscordNoticeRepository) NoticeExit(userName string, userAvatarUrl string) {
-	r.noticeAccess(userName, userAvatarUrl, "退室")
+func (r *DiscordNoticeRepository) NoticeExit(userName string) {
+	r.noticeAccess(userName, "退室")
 }
 
-func (r *DiscordNoticeRepository) noticeAccess(userName string, userAvatarUrl string, accessType string) error {
+func (r *DiscordNoticeRepository) noticeAccess(userName string, accessType string) error {
 	config.Env_load()
 
 	WEBHOOK_URL := os.Getenv("WEBHOOK_URL")
@@ -83,10 +77,6 @@ func (r *DiscordNoticeRepository) noticeAccess(userName string, userAvatarUrl st
 		Embeds: []Embed{
 			{
 				Title: fmt.Sprintf("%s が%sしました", userName, accessType),
-				Author: Author{
-					Name:    userName,
-					IconURL: userAvatarUrl,
-				},
 				Footer: Footer{
 					Text: footerText,
 				},
