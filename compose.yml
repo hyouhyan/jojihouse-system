@@ -93,27 +93,6 @@ services:
       - postgreSql
       - mongoDb
 
-  # 定期実行を管理するスケジューラサービス (Ofelia)
-  scheduler:
-    # image: mcuadros/ofelia:latest
-    build:
-      context: ./scheduler
-      dockerfile: Dockerfile
-    container_name: ofelia_scheduler
-    restart: always
-    # `docker-compose`コマンドを実行させるため、docker-compose.ymlをマウント
-    volumes:
-      - ./compose.yml:/docker-compose.yml
-      - ./.env:/.env
-      - /var/run/docker.sock:/var/run/docker.sock
-    environment:
-      TZ: Asia/Tokyo
-    command: daemon --docker
-    labels:
-      # m h  dom mon dow   command
-      ofelia.job-run.backup-task.schedule: "0 * * * * *"
-      ofelia.job-run.backup-task.command: "docker-compose run --rm backup"
-
 networks:
   myNetwork:
     driver: bridge
