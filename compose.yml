@@ -59,6 +59,54 @@ services:
     networks:
       - myNetwork
 
+  # DBのバックアップ用サービス
+  backup:
+    # PostgreSQLとMongoDBのクライアントツールが含まれるイメージを使用
+    build: 
+      context: ./db-backup
+      dockerfile: Dockerfile
+    image: jojihouse-db-backup:latest # ビルドしたイメージに名前を付ける
+    container_name: jojihouse-db-backup
+    # このサービスは常時起動しない
+    restart: "no"
+    networks:
+      - myNetwork
+    volumes:
+      # バックアップスクリプトをコンテナ内にマウント
+      - ./db-backup/backup.sh:/usr/local/bin/backup.sh
+      # バックアップデータ保存用のNASをマウント
+      - /バックアップデータ保存用NASのパス/:/backups/
+    environment:
+      # postgreSqlコンテナの環境変数を参照
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_HOST: postgreSql # ネットワーク内のコンテナ名で接続
+      # pg_dumpallがパスワードを要求しないように設定
+      PGPASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      # mongoDbコンテナの環境変数を参照
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-mongo}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-mongo}
+    # Ofeliaから実行されるコマンド
+    command: ["/usr/local/bin/backup.sh"]
+
+  # 定期実行を管理するスケジューラサービス (Ofelia)
+  scheduler:
+    image: mcuadros/ofelia:latest
+    container_name: ofelia_scheduler
+    restart: always
+    # `docker-compose`コマンドを実行させるため、docker-compose.ymlをマウント
+    volumes:
+      - ./docker-compose.yml:/docker-compose.yml
+      - /var/run/docker.sock:/var/run/docker.sock
+    # `docker compose` コマンド(v2)をインストールしたカスタムイメージを使うか、
+    # 以下のようにコンテナ起動時にインストールします
+    command: >
+      sh -c "apk add --no-cache docker-compose && 
+      ofelia daemon --config /etc/ofelia/config.ini"
+    labels:
+      # 毎日AM 3:00に `backup` サービスを実行するジョブを定義
+      ofelia.job-run.backup-task.schedule: "0 0 3 * * *"
+      ofelia.job-run.backup-task.command: "docker-compose run --rm backup"
+
 networks:
   myNetwork:
     driver: bridge
