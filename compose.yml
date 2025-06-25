@@ -95,21 +95,23 @@ services:
 
   # 定期実行を管理するスケジューラサービス (Ofelia)
   scheduler:
-    image: mcuadros/ofelia:latest
+    # image: mcuadros/ofelia:latest
+    build:
+      context: ./scheduler
+      dockerfile: Dockerfile
     container_name: ofelia_scheduler
     restart: always
     # `docker-compose`コマンドを実行させるため、docker-compose.ymlをマウント
     volumes:
-      - ./docker-compose.yml:/docker-compose.yml
+      - ./compose.yml:/docker-compose.yml
+      - ./.env:/.env
       - /var/run/docker.sock:/var/run/docker.sock
-    # `docker compose` コマンド(v2)をインストールしたカスタムイメージを使うか、
-    # 以下のようにコンテナ起動時にインストールします
-    command: >
-      sh -c "apk add --no-cache docker-compose && 
-      ofelia daemon --config /etc/ofelia/config.ini"
+    environment:
+      TZ: Asia/Tokyo
+    command: daemon --docker
     labels:
-      # 毎日AM 3:00に `backup` サービスを実行するジョブを定義
-      ofelia.job-run.backup-task.schedule: "0 0 3 * * *"
+      # m h  dom mon dow   command
+      ofelia.job-run.backup-task.schedule: "0 * * * * *"
       ofelia.job-run.backup-task.command: "docker-compose run --rm backup"
 
 networks:
