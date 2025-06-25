@@ -76,7 +76,7 @@ func (r *DiscordNoticeRepository) noticeAccess(userName string, accessType strin
 		AvatarURL: WEBHOOK_AVATAR_URL,
 		Embeds: []Embed{
 			{
-				Title: fmt.Sprintf("%s が%sしました", userName, accessType),
+				Title: fmt.Sprintf("%sが%sしました", userName, accessType),
 				Footer: Footer{
 					Text: footerText,
 				},
