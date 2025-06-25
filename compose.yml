@@ -15,19 +15,6 @@ services:
     networks:
       - myNetwork
   
-  # pgweb: 
-  #   image: sosedoff/pgweb
-  #   container_name: pgweb
-  #   ports:
-  #     - "8081:8081"
-  #   environment:
-  #     DATABASE_URL: postgres://postgres:postgres@postgreSql:5432/postgres?sslmode=disable
-  #   restart: always
-  #   depends_on:
-  #     - postgreSql
-  #   networks:
-  #     - myNetwork
-  
   mongoDb:
     image: mongo:4.4.18
     container_name: mongoDb
@@ -71,6 +58,40 @@ services:
     tty: true
     networks:
       - myNetwork
+
+  # DBのバックアップ用サービス
+  backup:
+    # PostgreSQLとMongoDBのクライアントツールが含まれるイメージを使用
+    build: 
+      context: ./db-backup
+      dockerfile: Dockerfile
+    image: jojihouse-db-backup:latest # ビルドしたイメージに名前を付ける
+    container_name: jojihouse-db-backup
+    # このサービスは常時起動しない
+    restart: "no"
+    networks:
+      - myNetwork
+    volumes:
+      # バックアップスクリプトをコンテナ内にマウント
+      - ./db-backup/backup.sh:/usr/local/bin/backup.sh
+      # バックアップデータ保存用のNASをマウント
+      # - /バックアップデータ保存用NASのパス/:/backups/
+      - ${NAS_BACKUP_PATH}:/backups/
+    environment:
+      # postgreSqlコンテナの環境変数を参照
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_HOST: postgreSql # ネットワーク内のコンテナ名で接続
+      # pg_dumpallがパスワードを要求しないように設定
+      PGPASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      # mongoDbコンテナの環境変数を参照
+      MONGO_HOST: mongoDb # ネットワーク内のコンテナ名で接続
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-mongo}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-mongo}
+    # Ofeliaから実行されるコマンド
+    command: ["/usr/local/bin/backup.sh"]
+    depends_on:
+      - postgreSql
+      - mongoDb
 
 networks:
   myNetwork:

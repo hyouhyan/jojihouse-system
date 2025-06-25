@@ -1,5 +1,15 @@
 # JOJIハウス 入退室管理システム(jojihouse-entrance-system)
 
+# cron設定メモ
+
+```
+crontab -e
+```
+
+```
+0 * * * * cd /root/jojihouse-system/ && /usr/local/bin/docker compose run --rm backup
+```
+
 # API エンドポイント一覧
 
 ## ユーザー関連
