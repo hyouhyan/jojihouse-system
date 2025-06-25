@@ -7,3 +7,6 @@ up:
 
 down:
 	docker-compose down
+
+dump:
+	docker-compose run --rm backup
