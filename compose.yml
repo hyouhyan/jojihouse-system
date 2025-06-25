@@ -89,6 +89,9 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-mongo}
     # Ofeliaから実行されるコマンド
     command: ["/usr/local/bin/backup.sh"]
+    depends_on:
+      - postgreSql
+      - mongoDb
 
   # 定期実行を管理するスケジューラサービス (Ofelia)
   scheduler:
