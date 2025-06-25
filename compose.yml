@@ -15,19 +15,6 @@ services:
     networks:
       - myNetwork
   
-  # pgweb: 
-  #   image: sosedoff/pgweb
-  #   container_name: pgweb
-  #   ports:
-  #     - "8081:8081"
-  #   environment:
-  #     DATABASE_URL: postgres://postgres:postgres@postgreSql:5432/postgres?sslmode=disable
-  #   restart: always
-  #   depends_on:
-  #     - postgreSql
-  #   networks:
-  #     - myNetwork
-  
   mongoDb:
     image: mongo:4.4.18
     container_name: mongoDb
