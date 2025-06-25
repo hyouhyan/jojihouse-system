@@ -75,7 +75,8 @@ services:
       # バックアップスクリプトをコンテナ内にマウント
       - ./db-backup/backup.sh:/usr/local/bin/backup.sh
       # バックアップデータ保存用のNASをマウント
-      - /バックアップデータ保存用NASのパス/:/backups/
+      # - /バックアップデータ保存用NASのパス/:/backups/
+      - ${NAS_BACKUP_PATH}:/backups/
     environment:
       # postgreSqlコンテナの環境変数を参照
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
