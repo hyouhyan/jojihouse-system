@@ -83,6 +83,7 @@ services:
       # pg_dumpallがパスワードを要求しないように設定
       PGPASSWORD: ${POSTGRES_PASSWORD:-postgres}
       # mongoDbコンテナの環境変数を参照
+      MONGO_HOST: mongoDb # ネットワーク内のコンテナ名で接続
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-mongo}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-mongo}
     # Ofeliaから実行されるコマンド
