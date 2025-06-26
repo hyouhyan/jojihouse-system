@@ -3,7 +3,6 @@
 reup:
 	make down
 	make up
-	make clear
 
 up:
 	docker compose up -d --build
