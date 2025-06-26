@@ -89,6 +89,25 @@ services:
       - postgreSql
       - mongoDb
 
+  # 定期実行を管理するスケジューラサービス (Ofelia)
+  scheduler:
+    # image: mcuadros/ofelia:latest
+    build:
+      context: ./scheduler
+      dockerfile: Dockerfile
+    container_name: ofelia_scheduler
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      TZ: Asia/Tokyo
+    command: daemon --docker
+    labels:
+      # sec min hour day month day_of_week
+      # 毎時0分0秒にバックアップタスクを実行
+      ofelia.job-local.backup-task.schedule: "0 0 * * * *"
+      ofelia.job-local.backup-task.command: "docker start jojihouse-db-backup"
+
 networks:
   myNetwork:
     driver: bridge
