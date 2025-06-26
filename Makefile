@@ -14,5 +14,10 @@ down:
 clean:
 	docker image prune -f
 
+deploy:
+	git fetch
+	git pull
+	make reup
+
 dump:
 	docker compose run --rm backup
