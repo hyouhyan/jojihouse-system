@@ -8,9 +8,14 @@ set -e # スクリプトのいずれかのコマンドが失敗したら、ス�
 BACKUP_DIR="/backups"
 
 # 日付フォーマット
-DATE=$(date "+%Y%m%d_%H%M%S")
+DATE=$(date "+%Y%m%d")
+TIME=$(date "+%H%M%S")
 
-echo "--- Starting backup at ${DATE} ---"
+# 日付によってバックアップディレクトリを作成
+BACKUP_DIR="${BACKUP_DIR}/${DATE}"
+mkdir -p "${BACKUP_DIR}"
+
+echo "--- Starting backup at ${DATE}_${TIME} ---"
 
 # --- PostgreSQLのバックアップ ---
 echo "Dumping PostgreSQL database..."
@@ -20,13 +25,13 @@ if ! pg_isready -U ${POSTGRES_USER} -h ${POSTGRES_HOST}; then
     exit 1
 fi
 # pg_dumpallを使って全データベースのバックアップを取得
-pg_dumpall -U ${POSTGRES_USER} -h ${POSTGRES_HOST}  > "${BACKUP_DIR}/postgres_backup_${DATE}.sql"
+pg_dumpall -U ${POSTGRES_USER} -h ${POSTGRES_HOST}  > "${BACKUP_DIR}/postgres_backup_${DATE}_${TIME}.sql"
 echo "PostgreSQL dump successful."
 
 # --- MongoDBのバックアップ ---
 echo "Dumping MongoDB database..."
 # mongodumpを使ってMongoDBのバックアップを取得
-mongodump --host ${MONGO_HOST} --username ${MONGO_INITDB_ROOT_USERNAME} --password ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin --archive > "${BACKUP_DIR}/mongodb_backup_${DATE}.archive"
+mongodump --host ${MONGO_HOST} --username ${MONGO_INITDB_ROOT_USERNAME} --password ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin --archive > "${BACKUP_DIR}/mongodb_backup_${DATE}_${TIME}.archive"
 echo "MongoDB dump successful."
 
 echo "--- Backup completed successfully ---"
