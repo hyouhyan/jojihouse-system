@@ -72,8 +72,6 @@ services:
     networks:
       - myNetwork
     volumes:
-      # バックアップスクリプトをコンテナ内にマウント
-      - ./db-backup/backup.sh:/usr/local/bin/backup.sh
       # バックアップデータ保存用のNASをマウント
       # - /バックアップデータ保存用NASのパス/:/backups/
       - ${NAS_BACKUP_PATH}:/backups/
@@ -87,8 +85,6 @@ services:
       MONGO_HOST: mongoDb # ネットワーク内のコンテナ名で接続
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-mongo}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-mongo}
-    # Ofeliaから実行されるコマンド
-    command: ["/usr/local/bin/backup.sh"]
     depends_on:
       - postgreSql
       - mongoDb
