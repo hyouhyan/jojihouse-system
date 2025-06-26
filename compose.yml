@@ -91,7 +91,6 @@ services:
 
   # 定期実行を管理するスケジューラサービス (Ofelia)
   scheduler:
-    # image: mcuadros/ofelia:latest
     build:
       context: ./scheduler
       dockerfile: Dockerfile
@@ -101,7 +100,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       TZ: Asia/Tokyo
-    command: daemon --docker
     labels:
       # sec min hour day month day_of_week
       # 毎時0分0秒にバックアップタスクを実行
