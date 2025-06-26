@@ -73,8 +73,7 @@ services:
       - myNetwork
     volumes:
       # バックアップデータ保存用のNASをマウント
-      # - /バックアップデータ保存用NASのパス/:/backups/
-      - ${NAS_BACKUP_PATH}:/backups/
+      - db-backup-nas:/backups/
     environment:
       # postgreSqlコンテナの環境変数を参照
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -111,3 +110,10 @@ networks:
     driver: bridge
     ipam:
       driver: default
+
+volumes:
+  db-backup-nas:
+    driver_opts:
+      type: cifs
+      o: "username=${BACKUP_NAS_USERNAME},password=${BACKUP_NAS_PASSWORD}"
+      device: ${BACKUP_NAS_PATH}
