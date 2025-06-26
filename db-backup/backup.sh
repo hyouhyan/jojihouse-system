@@ -14,12 +14,18 @@ echo "--- Starting backup at ${DATE} ---"
 
 # --- PostgreSQLのバックアップ ---
 echo "Dumping PostgreSQL database..."
-# 環境変数はOfeliaの定義から引き継ぐか、ここで指定します
+# postgresが生きてるか確認
+if ! pg_isready -U ${POSTGRES_USER} -h ${POSTGRES_HOST}; then
+    echo "PostgreSQL is not ready. Exiting."
+    exit 1
+fi
+# pg_dumpallを使って全データベースのバックアップを取得
 pg_dumpall -U ${POSTGRES_USER} -h ${POSTGRES_HOST}  > "${BACKUP_DIR}/postgres_backup_${DATE}.sql"
 echo "PostgreSQL dump successful."
 
 # --- MongoDBのバックアップ ---
 echo "Dumping MongoDB database..."
+# mongodumpを使ってMongoDBのバックアップを取得
 mongodump --host ${MONGO_HOST} --username ${MONGO_INITDB_ROOT_USERNAME} --password ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin --archive > "${BACKUP_DIR}/mongodb_backup_${DATE}.archive"
 echo "MongoDB dump successful."
 
