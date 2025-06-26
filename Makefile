@@ -1,14 +1,19 @@
+.PHONY: reup up down clean dump
+
 reup:
-	docker compose down
-	docker compose up -d --build
-	docker image prune -f
+	make down
+	make up
+	make clear
 
 up:
 	docker compose up -d --build
-	docker image prune -f
+	make clean
 
 down:
 	docker compose down
+
+clean:
+	docker image prune -f
 
 dump:
 	docker compose run --rm backup
