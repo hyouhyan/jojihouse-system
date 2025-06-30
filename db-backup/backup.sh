@@ -17,7 +17,9 @@ TIME=$(date "+%H%M%S")
 BACKUP_DIR="${BACKUP_DIR}/${YEAR}-${MONTH}/${FULLDATE}"
 mkdir -p "${BACKUP_DIR}"
 
-echo "--- Starting backup at ${FULLDATE}_${TIME} ---"
+FILENAME=${FULLDATE}_${TIME}
+
+echo "--- Starting backup at ${FILENAME} ---"
 
 # --- PostgreSQLのバックアップ ---
 echo "Dumping PostgreSQL database..."
@@ -27,13 +29,13 @@ if ! pg_isready -U ${POSTGRES_USER} -h ${POSTGRES_HOST}; then
     exit 1
 fi
 # pg_dumpallを使って全データベースのバックアップを取得
-pg_dumpall -U ${POSTGRES_USER} -h ${POSTGRES_HOST}  > "${BACKUP_DIR}/postgres_backup_${FULLDATE}_${TIME}.sql"
+pg_dumpall -U ${POSTGRES_USER} -h ${POSTGRES_HOST}  > "${BACKUP_DIR}/postgres_backup_${FILENAME}.sql"
 echo "PostgreSQL dump successful."
 
 # --- MongoDBのバックアップ ---
 echo "Dumping MongoDB database..."
 # mongodumpを使ってMongoDBのバックアップを取得
-mongodump --host ${MONGO_HOST} --username ${MONGO_INITDB_ROOT_USERNAME} --password ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin --archive > "${BACKUP_DIR}/mongodb_backup_${FULLDATE}_${TIME}.archive"
+mongodump --host ${MONGO_HOST} --username ${MONGO_INITDB_ROOT_USERNAME} --password ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin --archive > "${BACKUP_DIR}/mongodb_backup_${FILENAME}.archive"
 echo "MongoDB dump successful."
 
 echo "--- Backup completed successfully ---"
