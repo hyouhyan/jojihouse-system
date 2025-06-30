@@ -1,0 +1,132 @@
+services:
+  postgreSql:
+    image: postgres:latest
+    container_name: postgreSql
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      TZ: Asia/Tokyo
+    volumes:
+      - ./data/postgresql:/var/lib/postgresql/data
+      - ./db-init/postgres:/docker-entrypoint-initdb.d
+    restart: always
+    ports: ["5432:5432"]
+    networks:
+      - myNetwork
+
+  pgweb: 
+    image: sosedoff/pgweb
+    container_name: pgweb
+    ports:
+      - "8081:8081"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgreSql:5432/postgres?sslmode=disable
+    restart: always
+    depends_on:
+      - postgreSql
+    networks:
+      - myNetwork
+  
+  mongoDb:
+    image: mongo:4.4.18
+    container_name: mongoDb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: mongo
+      MONGO_INITDB_ROOT_PASSWORD: mongo
+      MONGO_INITDB_DATABASE: jojihouse
+      TZ: Asia/Tokyo
+    volumes:
+      - ./data/mongodb:/data/db
+      - ./db-init/mongo:/docker-entrypoint-initdb.d
+    ports: ["27017:27017"]
+    restart: always
+    networks:
+      - myNetwork
+  
+  jojihouse-system:
+    build: 
+      context: ./entrance-system
+      dockerfile: Dockerfile.air
+    container_name: jojihouse-system
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgreSql
+      - mongoDb
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+      - POSTGRES_HOST=postgreSql
+      - POSTGRES_PORT=5432
+
+      - MONGO_USER=mongo
+      - MONGO_PASSWORD=mongo
+      - MONGO_DB=jojihouse
+      - MONGO_HOST=mongoDb
+      - MONGO_PORT=27017
+    restart: always
+    tty: true
+    networks:
+      - myNetwork
+
+  # DBのバックアップ用サービス
+  backup:
+    # PostgreSQLとMongoDBのクライアントツールが含まれるイメージを使用
+    build: 
+      context: ./db-backup
+      dockerfile: Dockerfile
+    image: jojihouse-db-backup:latest # ビルドしたイメージに名前を付ける
+    container_name: jojihouse-db-backup
+    # このサービスは常時起動しない
+    restart: "no"
+    networks:
+      - myNetwork
+    volumes:
+      # バックアップデータ保存用のNASをマウント
+      # - db-backup-nas:/backups/
+      - ./nas_mock:/backups/
+    environment:
+      # postgreSqlコンテナの環境変数を参照
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_HOST: postgreSql # ネットワーク内のコンテナ名で接続
+      # pg_dumpallがパスワードを要求しないように設定
+      PGPASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      # mongoDbコンテナの環境変数を参照
+      MONGO_HOST: mongoDb # ネットワーク内のコンテナ名で接続
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME:-mongo}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD:-mongo}
+    depends_on:
+      - postgreSql
+      - mongoDb
+
+  # 定期実行を管理するスケジューラサービス (Ofelia)
+  scheduler:
+    build:
+      context: ./scheduler
+      dockerfile: Dockerfile
+    container_name: ofelia_scheduler
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      TZ: Asia/Tokyo
+    labels:
+      # sec min hour day month day_of_week
+      # 毎時0分0秒にバックアップタスクを実行
+      ofelia.job-local.backup-task.schedule: "0 0 * * * *"
+      ofelia.job-local.backup-task.command: "docker start jojihouse-db-backup"
+
+networks:
+  myNetwork:
+    driver: bridge
+    ipam:
+      driver: default
+
+volumes:
+  db-backup-nas:
+    driver_opts:
+      type: cifs
+      o: "username=${BACKUP_NAS_USERNAME},password=${BACKUP_NAS_PASSWORD}"
+      device: ${BACKUP_NAS_PATH}

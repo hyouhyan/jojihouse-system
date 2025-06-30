@@ -1,4 +1,4 @@
-.PHONY: reup up down clean dump
+.PHONY: reup up down clean dump deploy dev
 
 reup:
 	make down
@@ -22,3 +22,6 @@ deploy:
 
 dump:
 	docker compose run --rm backup
+
+dev:
+	docker compose -f dev-compose.yml up -d --build
