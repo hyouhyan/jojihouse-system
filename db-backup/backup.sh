@@ -29,13 +29,13 @@ if ! pg_isready -U ${POSTGRES_USER} -h ${POSTGRES_HOST}; then
     exit 1
 fi
 # pg_dumpallを使って全データベースのバックアップを取得
-pg_dumpall -U ${POSTGRES_USER} -h ${POSTGRES_HOST}  > "${BACKUP_DIR}/postgres_backup_${FILENAME}.sql"
+pg_dumpall -U ${POSTGRES_USER} -h ${POSTGRES_HOST}  > "${BACKUP_DIR}/${FILENAME}_postgres_backup.sql"
 echo "PostgreSQL dump successful."
 
 # --- MongoDBのバックアップ ---
 echo "Dumping MongoDB database..."
 # mongodumpを使ってMongoDBのバックアップを取得
-mongodump --host ${MONGO_HOST} --username ${MONGO_INITDB_ROOT_USERNAME} --password ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin --archive > "${BACKUP_DIR}/mongodb_backup_${FILENAME}.archive"
+mongodump --host ${MONGO_HOST} --username ${MONGO_INITDB_ROOT_USERNAME} --password ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin --archive > "${BACKUP_DIR}/${FILENAME}_mongodb_backup.archive"
 echo "MongoDB dump successful."
 
 echo "--- Backup completed successfully ---"
