@@ -16,8 +16,9 @@ clean:
 
 deploy:
 	git fetch
+	make down
 	git pull
-	make reup
+	make up
 
 dump:
 	docker compose run --rm backup
