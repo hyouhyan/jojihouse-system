@@ -74,6 +74,7 @@ services:
     volumes:
       # バックアップデータ保存用のNASをマウント
       - db-backup-nas:/backups/
+      # - ./nas_mock:/backups
     environment:
       # postgreSqlコンテナの環境変数を参照
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
