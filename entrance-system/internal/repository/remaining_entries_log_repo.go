@@ -65,7 +65,7 @@ func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogsByUserID(userID i
 
 func (r *RemainingEntriesLogRepository) GetLastRemainingEntriesLogByUserID(userID int) (model.RemainingEntriesLog, error) {
 	findOptions := options.FindOne()
-	findOptions.SetSort(bson.D{{Key: "updated_at", Value: -1}}) // これは-1が正しい、mongo compassで確認してみて
+	findOptions.SetSort(bson.D{{Key: "updated_at", Value: -1}}) // これは-1が正しい、怪しく感じたらmongo compassで確認してみて
 
 	filter := bson.D{{Key: "user_id", Value: userID}}
 
