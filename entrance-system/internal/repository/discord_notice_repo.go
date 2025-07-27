@@ -45,6 +45,8 @@ func (r *DiscordNoticeRepository) NoticeExit(userName string) {
 }
 
 func (r *DiscordNoticeRepository) noticeAccess(userName string, accessType string) error {
+	fmt.Println("DiscordNoticeRepository.noticeAccess called")
+
 	config.Env_load()
 
 	WEBHOOK_URL := os.Getenv("WEBHOOK_URL")
