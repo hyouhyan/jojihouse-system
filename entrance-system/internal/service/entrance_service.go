@@ -72,6 +72,9 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 		return response.Entrance{}, err
 	}
 
+	// DEBUG
+	fmt.Printf("Last Entries Date: %s, Current Date: %s\n", lastRemainingLog.UpdatedAt.Format("2006-01-02"), time.Now().Format("2006-01-02"))
+
 	// ログの日が今日なら同日再入場
 	if isSameDate(lastRemainingLog.UpdatedAt, time.Now()) {
 		isDecreaseTarget = false
