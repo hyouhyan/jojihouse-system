@@ -90,7 +90,7 @@ func (r *RemainingEntriesLogRepository) _findRemainingEntriesLogs(filter bson.D,
 
 	findOptions := options.Find()
 	findOptions.SetLimit(limit)
-	findOptions.SetSort(bson.D{{Key: "updated_at", Value: 1}}) // `updated_at` で昇順ソート
+	findOptions.SetSort(bson.D{{Key: "updated_at", Value: -1}}) // これは-1が正しい、怪しく感じたらmongo compassで確認してみて
 
 	// lastIDからデータを取得して、lastTimeを設定
 	var lastTime time.Time
