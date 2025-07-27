@@ -37,11 +37,21 @@ func NewDiscordNoticeRepository() *DiscordNoticeRepository {
 }
 
 func (r *DiscordNoticeRepository) NoticeEntry(userName string) {
-	r.noticeAccess(userName, "入室")
+	result := r.noticeAccess(userName, "入室")
+	if result != nil {
+		fmt.Printf("Error sending entry notice: %v\n", result)
+	} else {
+		fmt.Println("Entry notice sent successfully")
+	}
 }
 
 func (r *DiscordNoticeRepository) NoticeExit(userName string) {
-	r.noticeAccess(userName, "退室")
+	result := r.noticeAccess(userName, "退室")
+	if result != nil {
+		fmt.Printf("Error sending exit notice: %v\n", result)
+	} else {
+		fmt.Println("Entry notice sent successfully")
+	}
 }
 
 func (r *DiscordNoticeRepository) noticeAccess(userName string, accessType string) error {
