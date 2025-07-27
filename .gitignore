@@ -275,6 +275,6 @@ $RECYCLE.BIN/
 /data
 test.go
 
-init01.sql
+init01.*
 
 /nas_mock
