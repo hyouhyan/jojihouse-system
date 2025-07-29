@@ -23,5 +23,8 @@ EXPOSE 8080
 # ビルド
 RUN go build -o main cmd/main.go
 
+# ログディレクトリを作成
+RUN mkdir -p /var/log/jojihouse
+
 # 実行可能ファイルをデフォルトのコマンドとして設定
-CMD ["./main"]
+CMD ["/bin/sh", "-c", "./main > /var/log/jojihouse/entrance-system.log 2>&1"]
