@@ -11,7 +11,7 @@ services:
       - ./data/postgresql:/var/lib/postgresql/data
       - ./db-init/postgres:/docker-entrypoint-initdb.d
     restart: always
-    # ports: ["5432:5432"]
+    ports: ["5432:5432"]
     networks:
       - myNetwork
 
