@@ -37,26 +37,24 @@ func NewDiscordNoticeRepository() *DiscordNoticeRepository {
 }
 
 func (r *DiscordNoticeRepository) NoticeEntry(userName string) {
-	result := r.noticeAccess(userName, "入室")
-	if result != nil {
-		fmt.Printf("Error sending entry notice: %v\n", result)
+	err := r.noticeAccess(userName, "入室")
+	if err != nil {
+		fmt.Printf("Error sending entry notice: %v\n", err)
 	} else {
 		fmt.Println("Entry notice sent successfully")
 	}
 }
 
 func (r *DiscordNoticeRepository) NoticeExit(userName string) {
-	result := r.noticeAccess(userName, "退室")
-	if result != nil {
-		fmt.Printf("Error sending exit notice: %v\n", result)
+	err := r.noticeAccess(userName, "退室")
+	if err != nil {
+		fmt.Printf("Error sending exit notice: %v\n", err)
 	} else {
 		fmt.Println("Entry notice sent successfully")
 	}
 }
 
 func (r *DiscordNoticeRepository) noticeAccess(userName string, accessType string) error {
-	fmt.Println("DiscordNoticeRepository.noticeAccess called")
-
 	config.Env_load()
 
 	WEBHOOK_URL := os.Getenv("WEBHOOK_URL")
@@ -119,12 +117,6 @@ func (r *DiscordNoticeRepository) noticeAccess(userName string, accessType strin
 
 	// レスポンスを表示
 	fmt.Println("Response Status:", resp.Status)
-	body := &bytes.Buffer{}
-	_, err = body.ReadFrom(resp.Body)
-	if err != nil {
-		return fmt.Errorf("レスポンスボディの読み込みに失敗しました: %v", err)
-	}
-	fmt.Println("Response Body:", body.String())
 
 	return nil
 }

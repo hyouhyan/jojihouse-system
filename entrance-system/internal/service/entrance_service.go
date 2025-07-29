@@ -115,7 +115,6 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 	*user.Total_entries = *user.Total_entries + 1
 
 	// Discordに通知
-	fmt.Println("Discordに入場通知を送信します")
 	go s.discordNoticeRepository.NoticeEntry(*user.Name)
 
 	// Response作成
@@ -153,7 +152,6 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 	}
 
 	// Discordに通知
-	fmt.Println("Discordに退場通知を送信します")
 	go s.discordNoticeRepository.NoticeExit(*user.Name)
 
 	// Response作成
