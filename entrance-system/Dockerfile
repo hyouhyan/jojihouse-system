@@ -27,4 +27,4 @@ RUN go build -o main cmd/main.go
 RUN mkdir -p /var/log/jojihouse
 
 # 実行可能ファイルをデフォルトのコマンドとして設定
-CMD ["/bin/sh", "-c", "./main > /var/log/jojihouse/entrance-system.log 2>&1"]
+CMD ["/bin/sh", "-c", "exec ./main >> /var/log/jojihouse/entrance-system_$(date +'%Y-%m-%d_%H%M%S').log 2>&1"]
