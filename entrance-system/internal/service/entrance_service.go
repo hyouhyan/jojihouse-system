@@ -166,10 +166,29 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 		return response.Entrance{}, fmt.Errorf("failed to check if the user is a house admin: %v", err)
 	}
 
+	// 計算のためにTimezoneをlocalに変換
+	lastDate := lastRemainingLog.UpdatedAt.In(time.Local)
+	currentDate := time.Now()
+
+	// 00:00:00どうしで比較
+	lastDate = time.Date(
+		lastDate.Year(),
+		lastDate.Month(),
+		lastDate.Day(),
+		0, 0, 0, 0, lastDate.Location())
+	currentDate = time.Date(
+		currentDate.Year(),
+		currentDate.Month(),
+		currentDate.Day(),
+		0, 0, 0, 0, currentDate.Location())
+
+	// DEBUG
+	fmt.Println("Last Date:", lastDate, "Current Date:", currentDate)
+
 	// ログ日から今日までの時間差を確認
-	if !isSameDate(lastRemainingLog.UpdatedAt, time.Now()) && !isHouseAdmin {
+	if !isSameDate(lastDate, time.Now()) && !isHouseAdmin {
 		// 何日経過したかの計算
-		daysPassed := int(time.Since(lastRemainingLog.UpdatedAt).Hours() / 24)
+		daysPassed := int(currentDate.Sub(lastDate).Hours() / 24)
 		if daysPassed == 0 {
 			fmt.Println("起こり得ないエラー: 日を跨いでいるのに経過日数が0")
 		}
