@@ -72,11 +72,27 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 		return response.Entrance{}, err
 	}
 
+	// 計算のためにTimezoneをlocalに変換
+	lastDate := lastRemainingLog.UpdatedAt.In(time.Local)
+	currentDate := time.Now()
+
+	// 00:00:00どうしで比較
+	lastDate = time.Date(
+		lastDate.Year(),
+		lastDate.Month(),
+		lastDate.Day(),
+		0, 0, 0, 0, lastDate.Location())
+	currentDate = time.Date(
+		currentDate.Year(),
+		currentDate.Month(),
+		currentDate.Day(),
+		0, 0, 0, 0, currentDate.Location())
+
 	// DEBUG
-	fmt.Printf("Last Entries Date: %s, Current Date: %s\n", lastRemainingLog.UpdatedAt.Format("2006-01-02"), time.Now().Format("2006-01-02"))
+	fmt.Println("Last Date:", lastDate, "Current Date:", currentDate)
 
 	// ログの日が今日なら同日再入場
-	if isSameDate(lastRemainingLog.UpdatedAt, time.Now()) {
+	if isSameDate(lastDate, currentDate) {
 		isDecreaseTarget = false
 	}
 
@@ -149,6 +165,72 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 	err = s.currentUsersRepository.DeleteUserToCurrentUsers(*user.ID)
 	if err != nil {
 		return response.Entrance{}, err
+	}
+
+	// 日をまたいでいないか確認
+	// 最後に「入場可能回数を消費した」入場を取得
+	lastRemainingLog, err := s.remainingEntriesLogRepository.GetLastRemainingEntriesLogByUserID(*user.ID)
+	if err != nil {
+		return response.Entrance{}, err
+	}
+
+	isHouseAdmin, err := s.roleRepository.IsHouseAdmin(*user.ID)
+	if err != nil {
+		return response.Entrance{}, fmt.Errorf("failed to check if the user is a house admin: %v", err)
+	}
+
+	// 計算のためにTimezoneをlocalに変換
+	lastDate := lastRemainingLog.UpdatedAt.In(time.Local)
+	currentDate := time.Now()
+
+	// 00:00:00どうしで比較
+	lastDate = time.Date(
+		lastDate.Year(),
+		lastDate.Month(),
+		lastDate.Day(),
+		0, 0, 0, 0, lastDate.Location())
+	currentDate = time.Date(
+		currentDate.Year(),
+		currentDate.Month(),
+		currentDate.Day(),
+		0, 0, 0, 0, currentDate.Location())
+
+	// DEBUG
+	fmt.Println("Last Date:", lastDate, "Current Date:", currentDate)
+
+	// ログ日から今日までの時間差を確認
+	if !isSameDate(lastDate, time.Now()) && !isHouseAdmin {
+		// 何日経過したかの計算
+		daysPassed := int(currentDate.Sub(lastDate).Hours() / 24)
+		if daysPassed == 0 {
+			fmt.Println("起こり得ないエラー: 日を跨いでいるのに経過日数が0")
+		}
+
+		fmt.Printf("Days Passed: %d\n", daysPassed)
+
+		// 残り回数を減らす
+		beforeCount, afterCount, err := s.userRepository.DecreaseRemainingEntries(*user.ID, daysPassed)
+		if err != nil {
+			return response.Entrance{}, err
+		}
+
+		// ログ保存
+		log := &model.RemainingEntriesLog{
+			UserID:          *user.ID,
+			PreviousEntries: beforeCount,
+			NewEntries:      afterCount,
+			Reason:          "ハウス入場(日跨ぎ)のため",
+			UpdatedBy:       "システム",
+		}
+
+		// ログ作成
+		err = s.remainingEntriesLogRepository.CreateRemainingEntriesLog(log)
+		if err != nil {
+			return response.Entrance{}, err
+		}
+
+		// Go側にも反映
+		*user.Remaining_entries = afterCount
 	}
 
 	// Discordに通知
