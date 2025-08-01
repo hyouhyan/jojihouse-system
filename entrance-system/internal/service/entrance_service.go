@@ -219,7 +219,7 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 			UserID:          *user.ID,
 			PreviousEntries: beforeCount,
 			NewEntries:      afterCount,
-			Reason:          "ハウス入場(日跨ぎ)のため",
+			Reason:          "日付を跨いだハウス利用のため",
 			UpdatedBy:       "システム",
 		}
 
