@@ -151,6 +151,49 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 		return response.Entrance{}, err
 	}
 
+	// 日をまたいでいないか確認
+	// 最後に「入場可能回数を消費した」入場を取得
+	lastRemainingLog, err := s.remainingEntriesLogRepository.GetLastRemainingEntriesLogByUserID(*user.ID)
+	if err != nil {
+		return response.Entrance{}, err
+	}
+
+	// DEBUG
+	fmt.Printf("Last Entries Date: %s, Current Date: %s\n", lastRemainingLog.UpdatedAt.Format("2006-01-02"), time.Now().Format("2006-01-02"))
+
+	// ログ日から今日までの時間差を確認
+	if !isSameDate(lastRemainingLog.UpdatedAt, time.Now()) {
+		// 何日経過したかの計算
+		daysPassed := int(time.Since(lastRemainingLog.UpdatedAt).Hours() / 24)
+		if daysPassed == 0 {
+			fmt.Println("起こり得ないエラー: 日を跨いでいるのに経過日数が0")
+		}
+
+		// 残り回数を減らす
+		beforeCount, afterCount, err := s.userRepository.DecreaseRemainingEntries(*user.ID, 1)
+		if err != nil {
+			return response.Entrance{}, err
+		}
+		// ログ保存
+
+		log := &model.RemainingEntriesLog{
+			UserID:          *user.ID,
+			PreviousEntries: beforeCount,
+			NewEntries:      afterCount,
+			Reason:          "ハウス入場(日跨ぎ)のため",
+			UpdatedBy:       "システム",
+		}
+
+		// ログ作成
+		err = s.remainingEntriesLogRepository.CreateRemainingEntriesLog(log)
+		if err != nil {
+			return response.Entrance{}, err
+		}
+
+		// Go側にも反映
+		*user.Remaining_entries = afterCount
+	}
+
 	// Discordに通知
 	go s.discordNoticeRepository.NoticeExit(*user.Name)
 
