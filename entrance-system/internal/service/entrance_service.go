@@ -72,11 +72,27 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 		return response.Entrance{}, err
 	}
 
+	// 計算のためにTimezoneをlocalに変換
+	lastDate := lastRemainingLog.UpdatedAt.In(time.Local)
+	currentDate := time.Now()
+
+	// 00:00:00どうしで比較
+	lastDate = time.Date(
+		lastDate.Year(),
+		lastDate.Month(),
+		lastDate.Day(),
+		0, 0, 0, 0, lastDate.Location())
+	currentDate = time.Date(
+		currentDate.Year(),
+		currentDate.Month(),
+		currentDate.Day(),
+		0, 0, 0, 0, currentDate.Location())
+
 	// DEBUG
-	fmt.Printf("Last Entries Date: %s, Current Date: %s\n", lastRemainingLog.UpdatedAt.Format("2006-01-02"), time.Now().Format("2006-01-02"))
+	fmt.Println("Last Date:", lastDate, "Current Date:", currentDate)
 
 	// ログの日が今日なら同日再入場
-	if isSameDate(lastRemainingLog.UpdatedAt, time.Now()) {
+	if isSameDate(lastDate, currentDate) {
 		isDecreaseTarget = false
 	}
 
@@ -157,9 +173,6 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 	if err != nil {
 		return response.Entrance{}, err
 	}
-
-	// DEBUG
-	fmt.Printf("Last Entries Date: %s, Current Date: %s\n", lastRemainingLog.UpdatedAt.Format("2006-01-02"), time.Now().Format("2006-01-02"))
 
 	isHouseAdmin, err := s.roleRepository.IsHouseAdmin(*user.ID)
 	if err != nil {
