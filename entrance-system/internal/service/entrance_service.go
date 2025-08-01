@@ -161,21 +161,28 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 	// DEBUG
 	fmt.Printf("Last Entries Date: %s, Current Date: %s\n", lastRemainingLog.UpdatedAt.Format("2006-01-02"), time.Now().Format("2006-01-02"))
 
+	isHouseAdmin, err := s.roleRepository.IsHouseAdmin(*user.ID)
+	if err != nil {
+		return response.Entrance{}, fmt.Errorf("failed to check if the user is a house admin: %v", err)
+	}
+
 	// ログ日から今日までの時間差を確認
-	if !isSameDate(lastRemainingLog.UpdatedAt, time.Now()) {
+	if !isSameDate(lastRemainingLog.UpdatedAt, time.Now()) && !isHouseAdmin {
 		// 何日経過したかの計算
 		daysPassed := int(time.Since(lastRemainingLog.UpdatedAt).Hours() / 24)
 		if daysPassed == 0 {
 			fmt.Println("起こり得ないエラー: 日を跨いでいるのに経過日数が0")
 		}
 
+		fmt.Printf("Days Passed: %d\n", daysPassed)
+
 		// 残り回数を減らす
-		beforeCount, afterCount, err := s.userRepository.DecreaseRemainingEntries(*user.ID, 1)
+		beforeCount, afterCount, err := s.userRepository.DecreaseRemainingEntries(*user.ID, daysPassed)
 		if err != nil {
 			return response.Entrance{}, err
 		}
-		// ログ保存
 
+		// ログ保存
 		log := &model.RemainingEntriesLog{
 			UserID:          *user.ID,
 			PreviousEntries: beforeCount,
