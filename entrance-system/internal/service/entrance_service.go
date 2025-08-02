@@ -67,7 +67,7 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 	}
 
 	// 最後に「入場可能回数を消費した」入場を取得
-	lastRemainingLog, err := s.remainingEntriesLogRepository.GetLastRemainingEntriesLogByUserID(*user.ID)
+	lastRemainingLog, err := s.remainingEntriesLogRepository.GetLastRemainingEntriesLogOnlyDecreaseByUserID(*user.ID)
 	if err != nil {
 		return response.Entrance{}, err
 	}
@@ -75,6 +75,9 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 	// 計算のためにTimezoneをlocalに変換
 	lastDate := lastRemainingLog.UpdatedAt.In(time.Local)
 	currentDate := time.Now()
+
+	// DEBUG
+	fmt.Println("変換前、Last Date:", lastDate, "Current Date:", currentDate)
 
 	// 00:00:00どうしで比較
 	lastDate = time.Date(
@@ -89,7 +92,7 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 		0, 0, 0, 0, currentDate.Location())
 
 	// DEBUG
-	fmt.Println("Last Date:", lastDate, "Current Date:", currentDate)
+	fmt.Println("変換後、Last Date:", lastDate, "Current Date:", currentDate)
 
 	// ログの日が今日なら同日再入場
 	if isSameDate(lastDate, currentDate) {
@@ -169,7 +172,7 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 
 	// 日をまたいでいないか確認
 	// 最後に「入場可能回数を消費した」入場を取得
-	lastRemainingLog, err := s.remainingEntriesLogRepository.GetLastRemainingEntriesLogByUserID(*user.ID)
+	lastRemainingLog, err := s.remainingEntriesLogRepository.GetLastRemainingEntriesLogOnlyDecreaseByUserID(*user.ID)
 	if err != nil {
 		return response.Entrance{}, err
 	}
@@ -182,6 +185,9 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 	// 計算のためにTimezoneをlocalに変換
 	lastDate := lastRemainingLog.UpdatedAt.In(time.Local)
 	currentDate := time.Now()
+
+	// DEBUG
+	fmt.Println("変換前、Last Date:", lastDate, "Current Date:", currentDate)
 
 	// 00:00:00どうしで比較
 	lastDate = time.Date(
@@ -196,7 +202,7 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 		0, 0, 0, 0, currentDate.Location())
 
 	// DEBUG
-	fmt.Println("Last Date:", lastDate, "Current Date:", currentDate)
+	fmt.Println("変換後、Last Date:", lastDate, "Current Date:", currentDate)
 
 	// ログ日から今日までの時間差を確認
 	if !isSameDate(lastDate, time.Now()) && !isHouseAdmin {
@@ -381,7 +387,7 @@ func (s *EntranceService) CreateFixedAccessLog(req *request.FixedAccessLog) erro
 		}
 
 		// その日のうちにremaining_entries_logの減少があるか確認
-		lastRemainingLog, err := s.remainingEntriesLogRepository.GetLastRemainingEntriesLogByUserID(log.UserID)
+		lastRemainingLog, err := s.remainingEntriesLogRepository.GetLastRemainingEntriesLogOnlyDecreaseByUserID(log.UserID)
 		if err != nil {
 			return err
 		}

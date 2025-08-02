@@ -63,11 +63,17 @@ func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogsByUserID(userID i
 	return r._findRemainingEntriesLogs(filter, lastID, limit)
 }
 
-func (r *RemainingEntriesLogRepository) GetLastRemainingEntriesLogByUserID(userID int) (model.RemainingEntriesLog, error) {
+func (r *RemainingEntriesLogRepository) GetLastRemainingEntriesLogOnlyDecreaseByUserID(userID int) (model.RemainingEntriesLog, error) {
 	findOptions := options.FindOne()
 	findOptions.SetSort(bson.D{{Key: "updated_at", Value: -1}}) // これは-1が正しい、怪しく感じたらmongo compassで確認してみて
 
-	filter := bson.D{{Key: "user_id", Value: userID}}
+	// user_idと new_entries より previous_entries の方が大きいデータを取得
+	filter := bson.D{
+		{Key: "user_id", Value: userID},
+		{Key: "$expr", Value: bson.D{
+			{Key: "$lt", Value: bson.A{"$new_entries", "$previous_entries"}},
+		}},
+	}
 
 	cursor := r.db.Collection("remaining_entries_log").FindOne(context.Background(), filter, findOptions)
 
