@@ -67,7 +67,7 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 	}
 
 	// 最後に「入場可能回数を消費した」入場を取得
-	lastRemainingLog, err := s.remainingEntriesLogRepository.GetLastRemainingEntriesLogOnlyDecreaseByUserID(*user.ID)
+	lastRemainingLog, err := s.remainingEntriesLogRepository.GetLastDecreaseRemainingEntriesLogByUserID(*user.ID)
 	if err != nil {
 		return response.Entrance{}, err
 	}
@@ -172,7 +172,7 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 
 	// 日をまたいでいないか確認
 	// 最後に「入場可能回数を消費した」入場を取得
-	lastRemainingLog, err := s.remainingEntriesLogRepository.GetLastRemainingEntriesLogOnlyDecreaseByUserID(*user.ID)
+	lastRemainingLog, err := s.remainingEntriesLogRepository.GetLastDecreaseRemainingEntriesLogByUserID(*user.ID)
 	if err != nil {
 		return response.Entrance{}, err
 	}
@@ -387,7 +387,7 @@ func (s *EntranceService) CreateFixedAccessLog(req *request.FixedAccessLog) erro
 		}
 
 		// その日のうちにremaining_entries_logの減少があるか確認
-		lastRemainingLog, err := s.remainingEntriesLogRepository.GetLastRemainingEntriesLogOnlyDecreaseByUserID(log.UserID)
+		lastRemainingLog, err := s.remainingEntriesLogRepository.GetLastDecreaseRemainingEntriesLogByUserID(log.UserID)
 		if err != nil {
 			return err
 		}
