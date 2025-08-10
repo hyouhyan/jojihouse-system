@@ -50,7 +50,7 @@ func (r *DiscordNoticeRepository) NoticeExit(userName string) {
 	if err != nil {
 		fmt.Printf("Error sending exit notice: %v\n", err)
 	} else {
-		fmt.Println("Entry notice sent successfully")
+		fmt.Println("Exit notice sent successfully")
 	}
 }
 
