@@ -259,6 +259,11 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 func isSameDate(a, b time.Time) bool {
 	aDate := a.Truncate(24 * time.Hour)
 	bDate := b.Truncate(24 * time.Hour)
+
+	//DEBUG
+	fmt.Println("before Comparing Dates:", a, b)
+	fmt.Println("after Comparing Dates:", aDate, bDate)
+
 	return aDate.Equal(bDate)
 }
 
