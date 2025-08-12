@@ -95,7 +95,7 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 	fmt.Println("変換後、Last Date:", lastDate, "Current Date:", currentDate)
 
 	// ログの日が今日なら同日再入場
-	if isSameDate(lastDate, currentDate) {
+	if s.isSameDate(lastDate, currentDate) {
 		isDecreaseTarget = false
 	}
 
@@ -205,7 +205,7 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 	fmt.Println("変換後、Last Date:", lastDate, "Current Date:", currentDate)
 
 	// ログ日から今日までの時間差を確認
-	if !isSameDate(lastDate, time.Now()) && !isHouseAdmin {
+	if !s.isSameDate(lastDate, time.Now()) && !isHouseAdmin {
 		// 何日経過したかの計算
 		daysPassed := int(currentDate.Sub(lastDate).Hours() / 24)
 		if daysPassed == 0 {
@@ -256,15 +256,23 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 	return response, nil
 }
 
-func isSameDate(a, b time.Time) bool {
-	aDate := a.Truncate(24 * time.Hour)
-	bDate := b.Truncate(24 * time.Hour)
+func (s *EntranceService) isSameDate(a, b time.Time) bool {
+	aDate := s.cnvTo00Time(a)
+	bDate := s.cnvTo00Time(b)
 
 	//DEBUG
 	fmt.Println("before Comparing Dates:", a, b)
 	fmt.Println("after Comparing Dates:", aDate, bDate)
 
 	return aDate.Equal(bDate)
+}
+
+func (s *EntranceService) cnvTo00Time(t time.Time) time.Time {
+	return time.Date(
+		t.Year(),
+		t.Month(),
+		t.Day(),
+		0, 0, 0, 0, t.Location())
 }
 
 // 入退室の修正
@@ -404,7 +412,7 @@ func (s *EntranceService) CreateFixedAccessLog(req *request.FixedAccessLog) erro
 		}
 
 		// 指定日とログの日が同じなら、減少しない
-		if isSameDate(lastRemainingLog.UpdatedAt, *req.Time) || isHouseAdmin {
+		if s.isSameDate(lastRemainingLog.UpdatedAt, *req.Time) || isHouseAdmin {
 			return nil
 		} else {
 			// 残り回数を減らす
