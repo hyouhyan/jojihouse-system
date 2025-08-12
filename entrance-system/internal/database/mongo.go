@@ -36,7 +36,7 @@ func ConnectMongo() {
 		log.Fatalf("Failed to ping: %v", err)
 	}
 
-	fmt.Println("Successfully connected to mongo!")
+	log.Println("Successfully connected to mongo!")
 
 	mongoClient = client
 	MongoDB = client.Database(os.Getenv("MONGO_DB"))
@@ -48,6 +48,6 @@ func CloseMongo() {
 		if err != nil {
 			log.Fatalf("Failed to close: %v", err)
 		}
-		fmt.Println("Successfully closed mongo!")
+		log.Println("Successfully closed mongo!")
 	}
 }
