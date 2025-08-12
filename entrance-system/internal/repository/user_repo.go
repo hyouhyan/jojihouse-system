@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"jojihouse-entrance-system/internal/model"
@@ -20,36 +21,56 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 func (r *UserRepository) GetAllUsers() ([]model.User, error) {
 	var users []model.User
 	err := r.db.Select(&users, "SELECT * FROM users ORDER BY number")
+
 	if err != nil {
-		return nil, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, model.ErrUserNotFound
+		}
+		return nil, fmt.Errorf("failed to get users: %w", err)
 	}
+
 	return users, nil
 }
 
 func (r *UserRepository) GetUserByID(id int) (*model.User, error) {
 	user := &model.User{}
 	err := r.db.Get(user, "SELECT * FROM users WHERE id = $1", id)
+
 	if err != nil {
-		return nil, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, model.ErrUserNotFound
+		}
+		return nil, fmt.Errorf("failed to get users: %w", err)
 	}
+
 	return user, nil
 }
 
 func (r *UserRepository) GetUserByBarcode(barcode string) (*model.User, error) {
 	user := &model.User{}
 	err := r.db.Get(user, "SELECT * FROM users WHERE barcode = $1", barcode)
+
 	if err != nil {
-		return nil, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, model.ErrUserNotFound
+		}
+		return nil, fmt.Errorf("failed to get users: %w", err)
 	}
+
 	return user, nil
 }
 
 func (r *UserRepository) GetUserByNumber(number int) (*model.User, error) {
 	user := &model.User{}
 	err := r.db.Get(user, "SELECT * FROM users WHERE number = $1", number)
+	
 	if err != nil {
-		return nil, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, model.ErrUserNotFound
+		}
+		return nil, fmt.Errorf("failed to get users: %w", err)
 	}
+	
 	return user, nil
 }
 

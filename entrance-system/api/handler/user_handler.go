@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"errors"
 	"jojihouse-entrance-system/api/model/request"
 	"jojihouse-entrance-system/api/model/response"
+	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/service"
 	"log"
 	"net/http"
@@ -64,7 +66,12 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 	// サービス層でユーザー情報を取得
 	user, err := h.userPortalService.GetUserByID(userID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		switch {
+		case errors.Is(err, model.ErrUserNotFound):
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
+		}
 		log.Print(err)
 		return
 	}
@@ -84,11 +91,15 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 	barcode := c.Query("barcode")
 
 	if barcode != "" {
-
 		// サービス層でユーザー情報を取得
 		user, err := h.userPortalService.GetUserByBarcode(barcode)
 		if err != nil {
-			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			switch {
+			case errors.Is(err, model.ErrUserNotFound):
+				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			default:
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
+			}
 			log.Print(err)
 			return
 		}
@@ -100,7 +111,12 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 
 	res, err := h.userPortalService.GetAllUsers()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get users"})
+		switch {
+		case errors.Is(err, model.ErrUserNotFound):
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
+		}
 		log.Print(err)
 	}
 

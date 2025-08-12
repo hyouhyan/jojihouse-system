@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"jojihouse-entrance-system/api/model/request"
 	"jojihouse-entrance-system/api/model/response"
 	"jojihouse-entrance-system/internal/model"
@@ -57,20 +58,35 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 		}
 	}
 
-	if req.Type == "entry" {
+	switch req.Type {
+	case "entry":
 		response, err = h.entranceService.EnterUser(req.Barcode)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to record entry"})
+			switch {
+			case errors.Is(err, model.ErrUserNotFound):
+				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			default:
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to record entry"})
+			}
 			log.Print(err)
 			return
 		}
-	} else {
+	case "exit":
 		response, err = h.entranceService.ExitUser(req.Barcode)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to record exit"})
+			switch {
+			case errors.Is(err, model.ErrUserNotFound):
+				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			default:
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to record exit"})
+			}
 			log.Print(err)
 			return
 		}
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid type. Must be 'entry', 'exit', or 'auto'"})
+		log.Print("Invalid type. " + req.Type)
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"entrance_log": response})
