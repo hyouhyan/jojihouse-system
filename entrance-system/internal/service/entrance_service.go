@@ -87,7 +87,7 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 		if err != nil {
 			return response.Entrance{}, err
 		}
-		
+
 		// ログ保存
 		log := &model.RemainingEntriesLog{
 			UserID:          *user.ID,
@@ -244,18 +244,18 @@ func (s *EntranceService) cnvTo00Time(t time.Time) time.Time {
 		0, 0, 0, 0, t.Location())
 }
 
-func (s *EntranceService) getPassedDays(a, b time.Time) int {
+func (s *EntranceService) getPassedDays(targetDate, currentDate time.Time) int {
 	// aとbのtimezoneを揃える
-	if a.Location() != b.Location() {
-		b = b.In(a.Location())
+	if targetDate.Location() != currentDate.Location() {
+		currentDate = currentDate.In(targetDate.Location())
 	}
 
 	// 00:00:00どうしで比較
-	aDate := s.cnvTo00Time(a)
-	bDate := s.cnvTo00Time(b)
+	targetDate = s.cnvTo00Time(targetDate)
+	currentDate = s.cnvTo00Time(currentDate)
 
 	// 日数の差を計算
-	daysPassed := int(bDate.Sub(aDate).Hours() / 24)
+	daysPassed := int(currentDate.Sub(targetDate).Hours() / 24)
 
 	return daysPassed
 }
