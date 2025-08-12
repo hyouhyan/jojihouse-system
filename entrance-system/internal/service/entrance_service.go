@@ -80,6 +80,7 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 	// ログの日が今日なら同日再入場
 	if s.isSameDate(lastDate, currentDate) {
 		isDecreaseTarget = false
+		log.Printf("User %s re-entered on the same day.", *user.Name)
 	}
 
 	if isDecreaseTarget {
@@ -90,7 +91,7 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 		}
 
 		// ログ保存
-		log := &model.RemainingEntriesLog{
+		logData := &model.RemainingEntriesLog{
 			UserID:          *user.ID,
 			PreviousEntries: beforeCount,
 			NewEntries:      afterCount,
@@ -99,13 +100,15 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 		}
 
 		// ログ作成
-		err = s.remainingEntriesLogRepository.CreateRemainingEntriesLog(log)
+		err = s.remainingEntriesLogRepository.CreateRemainingEntriesLog(logData)
 		if err != nil {
 			return response.Entrance{}, err
 		}
 
 		// Go側にも反映
 		*user.Remaining_entries = afterCount
+
+		log.Printf("%s's remaining entries decreased %d -> %d", *user.Name, beforeCount, afterCount)
 	}
 
 	// 入場回数を増やす
@@ -192,7 +195,7 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 		}
 
 		// ログ保存
-		log := &model.RemainingEntriesLog{
+		logData := &model.RemainingEntriesLog{
 			UserID:          *user.ID,
 			PreviousEntries: beforeCount,
 			NewEntries:      afterCount,
@@ -201,13 +204,15 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 		}
 
 		// ログ作成
-		err = s.remainingEntriesLogRepository.CreateRemainingEntriesLog(log)
+		err = s.remainingEntriesLogRepository.CreateRemainingEntriesLog(logData)
 		if err != nil {
 			return response.Entrance{}, err
 		}
 
 		// Go側にも反映
 		*user.Remaining_entries = afterCount
+
+		log.Printf("%s's remaining entries decreased %d -> %d due to date crossing", *user.Name, beforeCount, afterCount)
 	}
 
 	// Logに出力
