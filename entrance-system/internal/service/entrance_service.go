@@ -116,6 +116,9 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 	// Go側にも反映
 	*user.Total_entries = *user.Total_entries + 1
 
+	// Logに出力
+	log.Printf("User %s entered. Barcode: %s, Remaining entries: %d, Total entries: %d", *user.Name, *user.Barcode, *user.Remaining_entries, *user.Total_entries)
+
 	// Discordに通知
 	go s.discordNoticeRepository.NoticeEntry(*user.Name)
 
@@ -206,6 +209,9 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 		// Go側にも反映
 		*user.Remaining_entries = afterCount
 	}
+
+	// Logに出力
+	log.Printf("User %s exited. Barcode: %s, Remaining entries: %d, Total entries: %d", *user.Name, *user.Barcode, *user.Remaining_entries, *user.Total_entries)
 
 	// Discordに通知
 	go s.discordNoticeRepository.NoticeExit(*user.Name)
