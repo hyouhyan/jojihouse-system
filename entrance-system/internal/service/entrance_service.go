@@ -229,10 +229,6 @@ func (s *EntranceService) isSameDate(a, b time.Time) bool {
 	aDate := s.cnvTo00Time(a)
 	bDate := s.cnvTo00Time(b)
 
-	//DEBUG
-	fmt.Println("before Comparing Dates:", a, b)
-	fmt.Println("after Comparing Dates:", aDate, bDate)
-
 	return aDate.Equal(bDate)
 }
 
