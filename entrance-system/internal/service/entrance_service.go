@@ -257,6 +257,11 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 }
 
 func (s *EntranceService) isSameDate(a, b time.Time) bool {
+	// bのtimezoneをaのtimezoneに合わせる
+	if a.Location() != b.Location() {
+		b = b.In(a.Location())
+	}
+
 	aDate := s.cnvTo00Time(a)
 	bDate := s.cnvTo00Time(b)
 
