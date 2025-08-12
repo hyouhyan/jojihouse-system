@@ -58,7 +58,8 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 		}
 	}
 
-	if req.Type == "entry" {
+	switch req.Type {
+	case "entry":
 		response, err = h.entranceService.EnterUser(req.Barcode)
 		if err != nil {
 			switch {
@@ -70,7 +71,7 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 			log.Print(err)
 			return
 		}
-	} else if req.Type == "exit" {
+	case "exit":
 		response, err = h.entranceService.ExitUser(req.Barcode)
 		if err != nil {
 			switch {
@@ -82,7 +83,7 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 			log.Print(err)
 			return
 		}
-	} else {
+	default:
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid type. Must be 'entry', 'exit', or 'auto'"})
 		log.Print("Invalid type. " + req.Type)
 		return
