@@ -6,6 +6,7 @@ import (
 	"jojihouse-entrance-system/api/model/response"
 	"jojihouse-entrance-system/internal/model"
 	"jojihouse-entrance-system/internal/repository"
+	"log"
 	"time"
 )
 
@@ -173,10 +174,10 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 		// 何日経過したかの計算
 		daysPassed := s.getPassedDays(lastDate, currentDate)
 		if daysPassed == 0 {
-			fmt.Println("起こり得ないエラー: 日を跨いでいるのに経過日数が0")
+			log.Println("起こり得ないエラー: 日を跨いでいるのに経過日数が0")
 		}
 
-		fmt.Printf("Days Passed: %d\n", daysPassed)
+		log.Printf("Days Passed: %d\n", daysPassed)
 
 		// 残り回数を減らす
 		beforeCount, afterCount, err := s.userRepository.DecreaseRemainingEntries(*user.ID, daysPassed)
