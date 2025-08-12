@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"jojihouse-entrance-system/internal/model"
@@ -174,8 +173,6 @@ func (r *AccessLogRepository) _findAccessLogs(filter bson.D, lastID primitive.Ob
 
 		// タイムゾーンの変換
 		log.Time = log.Time.In(time.Local)
-
-		fmt.Println("AccessLog:", log) // デバッグ用ログ出力
 
 		logs = append(logs, log)
 	}

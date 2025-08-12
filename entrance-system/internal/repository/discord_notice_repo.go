@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"jojihouse-entrance-system/internal/config"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -39,18 +40,18 @@ func NewDiscordNoticeRepository() *DiscordNoticeRepository {
 func (r *DiscordNoticeRepository) NoticeEntry(userName string) {
 	err := r.noticeAccess(userName, "入室")
 	if err != nil {
-		fmt.Printf("Error sending entry notice: %v\n", err)
+		log.Printf("Error sending entry notice: %v\n", err)
 	} else {
-		fmt.Println("Entry notice sent successfully")
+		log.Println("Entry notice sent successfully")
 	}
 }
 
 func (r *DiscordNoticeRepository) NoticeExit(userName string) {
 	err := r.noticeAccess(userName, "退室")
 	if err != nil {
-		fmt.Printf("Error sending exit notice: %v\n", err)
+		log.Printf("Error sending exit notice: %v\n", err)
 	} else {
-		fmt.Println("Exit notice sent successfully")
+		log.Println("Exit notice sent successfully")
 	}
 }
 
@@ -116,7 +117,7 @@ func (r *DiscordNoticeRepository) noticeAccess(userName string, accessType strin
 	defer resp.Body.Close()
 
 	// レスポンスを表示
-	fmt.Println("Response Status:", resp.Status)
+	log.Println("Response Status:", resp.Status)
 
 	return nil
 }
