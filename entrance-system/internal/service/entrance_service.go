@@ -175,6 +175,9 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 		daysPassed := s.getPassedDays(lastDate, currentDate)
 		if daysPassed == 0 {
 			log.Println("起こり得ないエラー: 日を跨いでいるのに経過日数が0")
+
+			log.Println("lastDate: ", lastDate)
+			log.Println("currentDate: ", currentDate)
 		}
 
 		log.Printf("Days Passed: %d\n", daysPassed)
