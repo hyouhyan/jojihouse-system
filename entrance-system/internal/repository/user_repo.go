@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"jojihouse-entrance-system/internal/model"
@@ -20,9 +21,14 @@ func NewUserRepository(db *sqlx.DB) *UserRepository {
 func (r *UserRepository) GetAllUsers() ([]model.User, error) {
 	var users []model.User
 	err := r.db.Select(&users, "SELECT * FROM users ORDER BY number")
+
 	if err != nil {
-		return nil, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, model.ErrUserNotFound
+		}
+		return nil, fmt.Errorf("failed to get users: %w", err)
 	}
+
 	return users, nil
 }
 
