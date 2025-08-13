@@ -47,7 +47,12 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 		// ユーザーの在室を確認
 		isCurrent, err := h.userPortalService.IsCurrentUserByBarcode(req.Barcode)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check current user"})
+			switch {
+			case errors.Is(err, model.ErrUserNotFound):
+				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			default:
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check current user"})
+			}
 			log.Print(err)
 			return
 		}
