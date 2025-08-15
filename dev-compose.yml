@@ -12,8 +12,6 @@ services:
       - ./db-init/postgres:/docker-entrypoint-initdb.d
     restart: always
     ports: ["5432:5432"]
-    networks:
-      - myNetwork
 
   pgweb: 
     image: sosedoff/pgweb
@@ -25,8 +23,6 @@ services:
     restart: always
     depends_on:
       - postgreSql
-    networks:
-      - myNetwork
   
   mongoDb:
     image: mongo:4.4.18
@@ -41,8 +37,6 @@ services:
       - ./db-init/mongo:/docker-entrypoint-initdb.d
     ports: ["27017:27017"]
     restart: always
-    networks:
-      - myNetwork
   
   jojihouse-system:
     build: 
@@ -71,8 +65,6 @@ services:
       - ./log:/var/log/jojihouse
     restart: always
     tty: true
-    networks:
-      - myNetwork
 
   # DBのバックアップ用サービス
   backup:
@@ -84,8 +76,6 @@ services:
     container_name: jojihouse-db-backup
     # このサービスは常時起動しない
     restart: "no"
-    networks:
-      - myNetwork
     volumes:
       # バックアップデータ保存用のNASをマウント
       # - db-backup-nas:/backups/
@@ -121,11 +111,6 @@ services:
       ofelia.job-local.backup-task.schedule: "0 0 * * * *"
       ofelia.job-local.backup-task.command: "docker start jojihouse-db-backup"
 
-networks:
-  myNetwork:
-    driver: bridge
-    ipam:
-      driver: default
 
 # volumes:
 #   db-backup-nas:
