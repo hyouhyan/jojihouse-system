@@ -1,10 +1,13 @@
 package model
 
 import (
+	"errors"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+var ErrInvalidPaymentLog = errors.New("invalid payment log")
 
 type PaymentLog struct {
 	ID          primitive.ObjectID `json:"id" bson:"_id,omitempty"`

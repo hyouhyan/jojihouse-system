@@ -159,8 +159,14 @@ func (s *AdminManagementService) GetRemainingEntriesLogsOnlyIncrease(lastID prim
 	return s.remainingEntriesLogRepository.GetRemainingEntriesLogsOnlyIncrease(lastID, 50)
 }
 
-func (s *AdminManagementService) CreatePaymentLog(log *model.PaymentLog) error {
-	return s.paymentLogRepository.CreatePaymentLog(log)
+func (s *AdminManagementService) CreatePaymentLog(logData *model.PaymentLog) error {
+	if logData == nil {
+		return model.ErrInvalidPaymentLog
+	}
+
+	log.Println("[AdminManagementService] Creating payment log:", logData.Description)
+
+	return s.paymentLogRepository.CreatePaymentLog(logData)
 }
 
 func (s *AdminManagementService) GetAllPaymentLogs(lastID string, limit int64) ([]response.PaymentLog, error) {
