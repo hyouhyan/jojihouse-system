@@ -39,18 +39,18 @@ func NewDiscordNoticeRepository() *DiscordNoticeRepository {
 func (r *DiscordNoticeRepository) NoticeEntry(userName string) {
 	err := r.noticeAccess(userName, "入室")
 	if err != nil {
-		log.Printf("Error sending entry notice: %v\n", err)
+		log.Printf("[Webhook] Error sending entry notice: %v\n", err)
 	} else {
-		log.Println("Entry notice sent successfully")
+		log.Println("[Webhook] ", "Entry notice sent successfully")
 	}
 }
 
 func (r *DiscordNoticeRepository) NoticeExit(userName string) {
 	err := r.noticeAccess(userName, "退室")
 	if err != nil {
-		log.Printf("Error sending exit notice: %v\n", err)
+		log.Printf("[Webhook] Error sending entry notice: %v\n", err)
 	} else {
-		log.Println("Exit notice sent successfully")
+		log.Println("[Webhook] ", "Exit notice sent successfully")
 	}
 }
 
@@ -114,7 +114,7 @@ func (r *DiscordNoticeRepository) noticeAccess(userName string, accessType strin
 	defer resp.Body.Close()
 
 	// レスポンスを表示
-	log.Println("Response Status:", resp.Status)
+	log.Println("[Webhook] ", "Response Status:", resp.Status)
 
 	return nil
 }
