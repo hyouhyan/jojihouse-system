@@ -115,6 +115,7 @@
 | access_type | 入退室の種類 | "entry" or "exit" |
 
 ### 入場可能回数ログ(remaining_entries_log)
+
 `remaining_entries_log` コレクションでは、入場可能回数の変更履歴を管理します。
 
 | フィールド名 | 説明 | 備考 |
@@ -126,3 +127,14 @@
 | reason | 追加理由 |  |
 | updated_by | 変更を行った管理者名 |  |
 | updated_at | 変更日時 |  |
+
+### 支払いログ(payment_log)
+
+| フィールド名 | 説明 | 備考 |
+|-------------|------|------|
+| log_id | 内部処理用 | primary key |
+| user_id | users テーブルと紐づけ |  |
+| time | 変更日時 |  |
+| description | 追加理由 |  |
+| amount | 金額 |  |
+| payway | 支払い方法 | "cash" or "olive" |
