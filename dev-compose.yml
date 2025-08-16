@@ -13,7 +13,7 @@ services:
     restart: always
     ports: ["5432:5432"]
 
-  pgweb: 
+  pgweb:
     image: sosedoff/pgweb
     container_name: pgweb
     ports:
@@ -39,10 +39,9 @@ services:
     restart: always
 
   jojihouse-system:
-    build: 
+    build:
       context: ./jojihouse-system
-      # dockerfile: Dockerfile.air
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.air
     container_name: jojihouse-system
     ports:
       - "8080:8080"
@@ -63,13 +62,14 @@ services:
       - MONGO_PORT=27017
     volumes:
       - ./log:/var/log/jojihouse
+      - ./jojihouse-system:/go/src
     restart: always
     tty: true
 
   # DBのバックアップ用サービス
   backup:
     # PostgreSQLとMongoDBのクライアントツールが含まれるイメージを使用
-    build: 
+    build:
       context: ./script/db-backup
       dockerfile: Dockerfile
     image: jojihouse-db-backup:latest # ビルドしたイメージに名前を付ける
