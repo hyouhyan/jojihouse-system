@@ -8,12 +8,8 @@ import (
 	"jojihouse-system/internal/service"
 	"time"
 
-	_ "jojihouse-system/swagger" // 生成される Swagger ドキュメントを読み込む
-
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // @title JojiHouse Entrance System API
@@ -83,11 +79,6 @@ func main() {
 	router.SetupRoleRoutes(r, roleHandler)
 	router.SetupKaisukenRoutes(r, kaisukenHandler)
 	router.SetupPaymentRoutes(r, paymentHandler)
-
-	// test(database.PostgresDB, database.MongoDB)
-
-	// Swagger のエンドポイントを追加
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// サーバー起動
 	r.Run("0.0.0.0:8080")
