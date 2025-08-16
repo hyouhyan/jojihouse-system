@@ -1,4 +1,4 @@
-# JOJIハウス管理システム(jojihouse-management-system)
+# JOJIハウス管理システム(jojihouse-system)
 
 # API エンドポイント一覧
 

@@ -29,7 +29,7 @@ services:
   
   jojihouse-system:
     build: 
-      context: ./jojihouse-management-system
+      context: ./jojihouse-system
       # dockerfile: Dockerfile.air
       dockerfile: Dockerfile
     container_name: jojihouse-system
