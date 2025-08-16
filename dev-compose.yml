@@ -23,7 +23,7 @@ services:
     restart: always
     depends_on:
       - postgreSql
-  
+
   mongoDb:
     image: mongo:4.4.18
     container_name: mongoDb
@@ -37,7 +37,7 @@ services:
       - ./script/db-init/mongo:/docker-entrypoint-initdb.d
     ports: ["27017:27017"]
     restart: always
-  
+
   jojihouse-system:
     build: 
       context: ./jojihouse-system

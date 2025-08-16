@@ -11,7 +11,7 @@ services:
       - ./data/postgresql:/var/lib/postgresql/data
       - ./script/db-init/postgres:/docker-entrypoint-initdb.d
     restart: always
-  
+
   mongoDb:
     image: mongo:4.4.18
     container_name: mongoDb
@@ -24,7 +24,7 @@ services:
       - ./data/mongodb:/data/db
       - ./script/db-init/mongo:/docker-entrypoint-initdb.d
     restart: always
-  
+
   jojihouse-system:
     build: 
       context: ./jojihouse-system
