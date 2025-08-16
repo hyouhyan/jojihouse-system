@@ -96,7 +96,7 @@
 ### 在室ユーザー(current_users)
 
 | フィールド名 | データタイプ | 説明 | 備考 |
-|-------------|------|------|
+|-------------|------|------|------|
 | user_id | INT | ユーザーID | REFERENCES users(id) ON DELETE CASCADE |
 | entered_at | TIMESTAMP WITH TIME ZONE | 入場時間 | NOT NULL |
 
