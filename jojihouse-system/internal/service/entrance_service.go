@@ -67,6 +67,7 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 	}
 	if isHouseAdmin {
 		isDecreaseTarget = false
+		log.Printf("[EntranceService] %s is a house admin", *user.Name)
 	}
 
 	// 最後に「入場可能回数を消費した」入場を取得
@@ -82,7 +83,7 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 	// ログの日が今日なら同日再入場
 	if s.isSameDate(lastDate, currentDate) {
 		isDecreaseTarget = false
-		log.Println("[EntranceService] Re-entered on the same day: ", *user.Name)
+		log.Printf("[EntranceService] %s re-entered on the same day", *user.Name)
 	}
 
 	if isDecreaseTarget {
