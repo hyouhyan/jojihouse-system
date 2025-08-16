@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"jojihouse-system/internal/config"
 	"log"
 	"net/http"
 	"os"
@@ -56,8 +55,6 @@ func (r *DiscordNoticeRepository) NoticeExit(userName string) {
 }
 
 func (r *DiscordNoticeRepository) noticeAccess(userName string, accessType string) error {
-	config.Env_load()
-
 	WEBHOOK_URL := os.Getenv("WEBHOOK_URL")
 	WEBHOOK_USERNAME := os.Getenv("WEBHOOK_USERNAME")
 	WEBHOOK_AVATAR_URL := os.Getenv("WEBHOOK_AVATAR_URL")
