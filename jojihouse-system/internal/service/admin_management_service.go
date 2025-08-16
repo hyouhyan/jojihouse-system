@@ -5,6 +5,7 @@ import (
 	"jojihouse-system/api/model/response"
 	"jojihouse-system/internal/model"
 	"jojihouse-system/internal/repository"
+	"log"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -53,6 +54,8 @@ func (s *AdminManagementService) CreateUser(req *request.CreateUser) (*response.
 		Number:            user.Number,
 	}
 
+	log.Println("[AdminManagementService] New user created: ", *user.Name)
+
 	return res, nil
 }
 
@@ -84,6 +87,8 @@ func (s *AdminManagementService) UpdateUser(userID int, user *request.UpdateUser
 		userModel.Number = user.Number
 	}
 
+	log.Println("[AdminManagementService] User updated: ", *user.Name)
+
 	return s.userRepository.UpdateUser(userModel)
 }
 
@@ -99,15 +104,26 @@ func (s *AdminManagementService) DeleteUser(userID int) error {
 
 // 入場可能回数の追加
 func (s *AdminManagementService) IncreaseRemainingEntries(userID int, count int, reason string, updatedBy string) error {
+	// ユーザー情報を取得(存在するかの確認)
+	user, err := s.userRepository.GetUserByID(userID)
+	if err != nil {
+		return err
+	}
+
+	// ユーザーが存在しない場合はエラーを返す
+	if user == nil {
+		return model.ErrUserNotFound
+	}
+
 	// 入場可能回数 追加
-	beforeCount, afterCount, err := s.userRepository.IncreaseRemainingEntries(userID, count)
+	beforeCount, afterCount, err := s.userRepository.IncreaseRemainingEntries(*user.ID, count)
 	if err != nil {
 		return err
 	}
 
 	// ログに保存
-	log := &model.RemainingEntriesLog{
-		UserID:          userID,
+	logData := &model.RemainingEntriesLog{
+		UserID:          *user.ID,
 		PreviousEntries: beforeCount,
 		NewEntries:      afterCount,
 		Reason:          reason,
@@ -115,7 +131,9 @@ func (s *AdminManagementService) IncreaseRemainingEntries(userID int, count int,
 		UpdatedAt:       time.Now(),
 	}
 
-	return s.remainingEntriesLogRepository.CreateRemainingEntriesLog(log)
+	log.Printf("[AdminManagementService] %s's remaining entries increased %d -> %d: %s", *user.Name, beforeCount, afterCount, reason)
+
+	return s.remainingEntriesLogRepository.CreateRemainingEntriesLog(logData)
 }
 
 func (s *AdminManagementService) AddRoleToUser(userID, roleID int) error {
