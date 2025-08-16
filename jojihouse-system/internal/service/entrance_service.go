@@ -39,6 +39,8 @@ func NewEntranceService(
 
 // 入場したときの処理
 func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
+	log.Println("[EntranceService] Enter Requested: ", barcode)
+
 	// ユーザー情報を取得(存在するかの確認)
 	user, err := s.userRepository.GetUserByBarcode(barcode)
 	if err != nil {
@@ -80,7 +82,7 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 	// ログの日が今日なら同日再入場
 	if s.isSameDate(lastDate, currentDate) {
 		isDecreaseTarget = false
-		log.Printf("User %s re-entered on the same day.", *user.Name)
+		log.Println("[EntranceService] Re-entered on the same day: ", *user.Name)
 	}
 
 	if isDecreaseTarget {
@@ -108,7 +110,7 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 		// Go側にも反映
 		*user.Remaining_entries = afterCount
 
-		log.Printf("%s's remaining entries decreased %d -> %d", *user.Name, beforeCount, afterCount)
+		log.Printf("[EntranceService] %s's remaining entries decreased %d -> %d", *user.Name, beforeCount, afterCount)
 	}
 
 	// 入場回数を増やす
@@ -120,7 +122,7 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 	*user.Total_entries = *user.Total_entries + 1
 
 	// Logに出力
-	log.Printf("User %s entered. Barcode: %s, Remaining entries: %d, Total entries: %d", *user.Name, *user.Barcode, *user.Remaining_entries, *user.Total_entries)
+	log.Printf("[EntranceService] %s entered. Barcode: %s, Remaining entries: %d, Total entries: %d", *user.Name, *user.Barcode, *user.Remaining_entries, *user.Total_entries)
 
 	// Discordに通知
 	go s.discordNoticeRepository.NoticeEntry(*user.Name)
@@ -141,6 +143,8 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 
 // 退場したときの処理
 func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
+	log.Println("[EntranceService] Exit Requested: ", barcode)
+
 	// ユーザー情報を取得(存在するかの確認)
 	user, err := s.userRepository.GetUserByBarcode(barcode)
 	if err != nil {
@@ -180,13 +184,13 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 		// 何日経過したかの計算
 		daysPassed := s.getPassedDays(lastDate, currentDate)
 		if daysPassed == 0 {
-			log.Println("起こり得ないエラー: 日を跨いでいるのに経過日数が0")
+			log.Println("[EntranceService] 起こり得ないエラー: 日を跨いでいるのに経過日数が0")
 
-			log.Println("lastDate: ", lastDate)
-			log.Println("currentDate: ", currentDate)
+			log.Println("[EntranceService] lastDate: ", lastDate)
+			log.Println("[EntranceService] currentDate: ", currentDate)
 		}
 
-		log.Printf("Days Passed: %d\n", daysPassed)
+		log.Printf("[EntranceService] Days Passed: %d\n", daysPassed)
 
 		// 残り回数を減らす
 		beforeCount, afterCount, err := s.userRepository.DecreaseRemainingEntries(*user.ID, daysPassed)
@@ -212,11 +216,11 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 		// Go側にも反映
 		*user.Remaining_entries = afterCount
 
-		log.Printf("%s's remaining entries decreased %d -> %d due to date crossing", *user.Name, beforeCount, afterCount)
+		log.Printf("[EntranceService] %s's remaining entries decreased %d -> %d due to date crossing", *user.Name, beforeCount, afterCount)
 	}
 
 	// Logに出力
-	log.Printf("User %s exited. Barcode: %s, Remaining entries: %d, Total entries: %d", *user.Name, *user.Barcode, *user.Remaining_entries, *user.Total_entries)
+	log.Printf("[EntranceService] %s exited. Barcode: %s, Remaining entries: %d, Total entries: %d", *user.Name, *user.Barcode, *user.Remaining_entries, *user.Total_entries)
 
 	// Discordに通知
 	go s.discordNoticeRepository.NoticeExit(*user.Name)
