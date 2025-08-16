@@ -65,6 +65,8 @@ services:
       - WEBHOOK_URL=${WEBHOOK_URL}
       - WEBHOOK_USERNAME=${WEBHOOK_USERNAME}
       - WEBHOOK_AVATAR_URL=${WEBHOOK_AVATAR_URL}
+
+      - GIN_MODE=release
     volumes:
       - ./log/jojihouse:/var/log/jojihouse
     restart: always
