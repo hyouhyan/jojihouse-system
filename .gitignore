@@ -278,3 +278,5 @@ test.go
 init01.*
 
 /nas_mock
+
+*/tmp/
