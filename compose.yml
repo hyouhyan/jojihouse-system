@@ -9,7 +9,7 @@ services:
       TZ: Asia/Tokyo
     volumes:
       - ./data/postgresql:/var/lib/postgresql/data
-      - ./db-init/postgres:/docker-entrypoint-initdb.d
+      - ./script/db-init/postgres:/docker-entrypoint-initdb.d
     restart: always
     # ports: ["5432:5432"]
   
@@ -23,13 +23,13 @@ services:
       TZ: Asia/Tokyo
     volumes:
       - ./data/mongodb:/data/db
-      - ./db-init/mongo:/docker-entrypoint-initdb.d
+      - ./script/db-init/mongo:/docker-entrypoint-initdb.d
     # ports: ["27017:27017"]
     restart: always
   
   jojihouse-system:
     build: 
-      context: ./entrance-system
+      context: ./jojihouse-management-system
       # dockerfile: Dockerfile.air
       dockerfile: Dockerfile
     container_name: jojihouse-system
@@ -59,7 +59,7 @@ services:
   backup:
     # PostgreSQLとMongoDBのクライアントツールが含まれるイメージを使用
     build: 
-      context: ./db-backup
+      context: ./script/db-backup
       dockerfile: Dockerfile
     image: jojihouse-db-backup:latest # ビルドしたイメージに名前を付ける
     container_name: jojihouse-db-backup
@@ -86,7 +86,7 @@ services:
   # 定期実行を管理するスケジューラサービス (Ofelia)
   scheduler:
     build:
-      context: ./scheduler
+      context: ./docker/scheduler
       dockerfile: Dockerfile
     container_name: ofelia_scheduler
     restart: always
