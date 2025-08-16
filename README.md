@@ -135,6 +135,6 @@
 | log_id | 内部処理用 | primary key |
 | user_id | users テーブルと紐づけ |  |
 | time | 支払い日時 |  |
-| description | 追加理由 |  |
+| description | 説明 |  |
 | amount | 金額 |  |
 | payway | 支払い方法 | "cash" or "olive" |
