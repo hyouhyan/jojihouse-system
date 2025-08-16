@@ -65,7 +65,6 @@ services:
       - WEBHOOK_USERNAME=${WEBHOOK_USERNAME}
       - WEBHOOK_AVATAR_URL=${WEBHOOK_AVATAR_URL}
     volumes:
-      - ./log:/var/log/jojihouse
       - ./jojihouse-system:/go/src
     restart: always
     tty: true
