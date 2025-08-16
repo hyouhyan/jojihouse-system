@@ -56,23 +56,25 @@
 
 `users` テーブルでは、オフィスの利用メンバーの情報を管理します。
 
-| フィールド名 | 説明 | 備考 |
+| フィールド名 | データタイプ | 説明 | 備考 |
 |-------------|------|------|
-| id | 内部処理用 | primary key |
-| name | ニックネーム |  |
-| description | 概要（任意） |  |
-| barcode | カードに印刷するバーコード（EAN-13） | 13桁の数字 |
-| contact | 連絡先情報（Xアカウントなど） |  |
-| remaining_entries | 入場可能回数 | 入場ごとに減少（同日再入場では減らない） |
-| registered_at | 登録日 |  |
-| total_entries | 総入場回数 |  |
+| id | SERIAL | 内部処理用 | primary key |
+| name | VARCHAR(255) | 名前 | NOT NULL |
+| description | TEXT | 概要（任意） |  |
+| barcode | VARCHAR(64) | カードに印刷するバーコード（EAN-8） | 8桁の数字 NOT NULL |
+| contact | VARCHAR(255) | 連絡先（Xアカウントなど） |  |
+| remaining_entries | INT | 入場可能回数 | 入場ごとに減少 |
+| registered_at | TIMESTAMP WITH TIME ZONE | 登録日 |  |
+| total_entries | INT | 総入場回数 |  |
+| allergy | VARCHAT(255) | アレルギー | |
+| number | INT | 会員番号 | UNIQUE |
 
 ### ロール(roles)
 
-| フィールド名 | 説明 | 備考 |
+| フィールド名 | データタイプ | 説明 | 備考 |
 |-------------|------|------|
-|id|役割のid||
-|name|役割名||
+| id | SERIAL | ロールid | |
+| name | VARCHAR(255) | ロール名 | |
 
 初期データ  
 |name|説明|
@@ -80,23 +82,23 @@
 |member|一般Labメンバー|
 |student|学生|
 |system-admin|システム管理者|
-|house-admin|ハウス管理者(月額出資者)|
+|house-admin|家賃負担者|
 |guest|ゲスト(ラボメン以外, 使うことある？)|
 
 ### ロール用中間テーブル(user_roles)
 
-| フィールド名 | 説明 |
+| フィールド名 | 説明 | 備考 |
 |-------------|------|
-|user_id|メンバーID|
-|role_id|ロールID|
-|(user_id, role_id)|Primary Key|
+|user_id|メンバーID| REFERENCES users(id) |
+|role_id|ロールID| REFERENCES roles(id) |
+|(user_id, role_id)| | Primary Key | 
 
 ### 在室ユーザー(current_users)
 
-| フィールド名 | 説明 |
+| フィールド名 | データタイプ | 説明 | 備考 |
 |-------------|------|
-|user_id|ユーザーID|
-|entered_at|入場時間|
+| user_id | INT | ユーザーID | REFERENCES users(id) ON DELETE CASCADE |
+| entered_at | TIMESTAMP WITH TIME ZONE | 入場時間 | NOT NULL |
 
 
 ## MongoDB
