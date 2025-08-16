@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"jojihouse-entrance-system/internal/config"
+	"jojihouse-management-system/internal/config"
 	"log"
 	"net/http"
 	"os"

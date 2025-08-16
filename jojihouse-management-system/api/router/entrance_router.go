@@ -1,7 +1,7 @@
 package router
 
 import (
-	"jojihouse-entrance-system/api/handler"
+	"jojihouse-management-system/api/handler"
 
 	"github.com/gin-gonic/gin"
 )

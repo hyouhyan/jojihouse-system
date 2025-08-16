@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"jojihouse-entrance-system/internal/service"
+	"jojihouse-management-system/internal/service"
 	"log"
 	"net/http"
 

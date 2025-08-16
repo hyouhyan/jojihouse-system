@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"jojihouse-entrance-system/internal/model"
+	"jojihouse-management-system/internal/model"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

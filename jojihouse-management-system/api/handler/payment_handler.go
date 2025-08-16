@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"jojihouse-entrance-system/api/model/request"
-	"jojihouse-entrance-system/internal/model"
-	"jojihouse-entrance-system/internal/service"
+	"jojihouse-management-system/api/model/request"
+	"jojihouse-management-system/internal/model"
+	"jojihouse-management-system/internal/service"
 	"log"
 	"net/http"
 	"strconv"

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"jojihouse-entrance-system/internal/model"
+	"jojihouse-management-system/internal/model"
 	"strings"
 
 	"github.com/jmoiron/sqlx"

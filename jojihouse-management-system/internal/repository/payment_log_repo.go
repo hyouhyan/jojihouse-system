@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"fmt"
-	"jojihouse-entrance-system/internal/model"
+	"jojihouse-management-system/internal/model"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"

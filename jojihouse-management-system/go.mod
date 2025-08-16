@@ -1,4 +1,4 @@
-module jojihouse-entrance-system
+module jojihouse-management-system
 
 go 1.23.7
 

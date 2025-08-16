@@ -2,7 +2,7 @@ package database
 
 import (
 	"fmt"
-	"jojihouse-entrance-system/internal/config"
+	"jojihouse-management-system/internal/config"
 	"log"
 	"os"
 

@@ -1,14 +1,14 @@
 package main
 
 import (
-	"jojihouse-entrance-system/api/handler"
-	"jojihouse-entrance-system/api/router"
-	"jojihouse-entrance-system/internal/database"
-	"jojihouse-entrance-system/internal/repository"
-	"jojihouse-entrance-system/internal/service"
+	"jojihouse-management-system/api/handler"
+	"jojihouse-management-system/api/router"
+	"jojihouse-management-system/internal/database"
+	"jojihouse-management-system/internal/repository"
+	"jojihouse-management-system/internal/service"
 	"time"
 
-	_ "jojihouse-entrance-system/swagger" // 生成される Swagger ドキュメントを読み込む
+	_ "jojihouse-management-system/swagger" // 生成される Swagger ドキュメントを読み込む
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

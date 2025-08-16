@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"jojihouse-entrance-system/internal/model"
+	"jojihouse-management-system/internal/model"
 
 	"github.com/jmoiron/sqlx"
 )

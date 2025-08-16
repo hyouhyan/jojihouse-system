@@ -1,10 +1,10 @@
 package service
 
 import (
-	"jojihouse-entrance-system/api/model/request"
-	"jojihouse-entrance-system/api/model/response"
-	"jojihouse-entrance-system/internal/model"
-	"jojihouse-entrance-system/internal/repository"
+	"jojihouse-management-system/api/model/request"
+	"jojihouse-management-system/api/model/response"
+	"jojihouse-management-system/internal/model"
+	"jojihouse-management-system/internal/repository"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
