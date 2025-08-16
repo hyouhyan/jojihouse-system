@@ -57,7 +57,7 @@
 `users` テーブルでは、オフィスの利用メンバーの情報を管理します。
 
 | フィールド名 | データタイプ | 説明 | 備考 |
-|-------------|------|------|
+|-------------|------|------|------|
 | id | SERIAL | 内部処理用 | primary key |
 | name | VARCHAR(255) | 名前 | NOT NULL |
 | description | TEXT | 概要（任意） |  |
@@ -72,7 +72,7 @@
 ### ロール(roles)
 
 | フィールド名 | データタイプ | 説明 | 備考 |
-|-------------|------|------|
+|-------------|------|------|------|
 | id | SERIAL | ロールid | |
 | name | VARCHAR(255) | ロール名 | |
 
@@ -88,7 +88,7 @@
 ### ロール用中間テーブル(user_roles)
 
 | フィールド名 | 説明 | 備考 |
-|-------------|------|
+|-------------|------|------|
 |user_id|メンバーID| REFERENCES users(id) |
 |role_id|ロールID| REFERENCES roles(id) |
 |(user_id, role_id)| | Primary Key | 
@@ -96,7 +96,7 @@
 ### 在室ユーザー(current_users)
 
 | フィールド名 | データタイプ | 説明 | 備考 |
-|-------------|------|
+|-------------|------|------|
 | user_id | INT | ユーザーID | REFERENCES users(id) ON DELETE CASCADE |
 | entered_at | TIMESTAMP WITH TIME ZONE | 入場時間 | NOT NULL |
 
