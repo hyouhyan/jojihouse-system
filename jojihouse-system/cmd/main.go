@@ -61,7 +61,8 @@ func main() {
 	// CORSの設定
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: []string{
-			"http://127.0.0.1",
+			"http://localhost:1024",
+			"http://127.0.0.1:1024",
 			"http://house.joji",
 			"https://house.joji",
 			"http://*.jojilab.hyouhyan.com",
