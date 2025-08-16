@@ -47,6 +47,10 @@ services:
       - MONGO_DB=${MONGO_INITDB_DATABASE}
       - MONGO_HOST=mongoDb
       - MONGO_PORT=27017
+
+      - WEBHOOK_URL=${WEBHOOK_URL}
+      - WEBHOOK_USERNAME=${WEBHOOK_USERNAME}
+      - WEBHOOK_AVATAR_URL=${WEBHOOK_AVATAR_URL}
     volumes:
       - ./log:/var/log/jojihouse
     restart: always
