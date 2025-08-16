@@ -64,5 +64,5 @@ func (h *KaisukenHandler) BuyKaisuken(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Success", "time": paymentLog.Time.Format(time.RFC3339)})
+	c.JSON(http.StatusOK, gin.H{"time": paymentLog.Time.Format(time.RFC3339), "amount": paymentLog.Amount, "payway": paymentLog.Payway, "description": paymentLog.Description})
 }

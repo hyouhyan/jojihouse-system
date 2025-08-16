@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -99,5 +100,5 @@ func (h *PaymentHandler) CreatePaymentLog(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Payment log created successfully"})
+	c.JSON(http.StatusOK, gin.H{"time": paymentLog.Time.Format(time.RFC3339), "amount": paymentLog.Amount, "payway": paymentLog.Payway, "description": paymentLog.Description})
 }
