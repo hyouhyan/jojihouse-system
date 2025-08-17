@@ -25,6 +25,8 @@ dump:
 
 dev:
 	make dev/reup
+	@echo "Dev mode is active."
+	@echo "Try this -> http://localhost:1024/"
 
 dev/up:
 	docker compose -f dev-compose.yml up -d --build
