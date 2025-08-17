@@ -70,7 +70,6 @@ services:
     volumes:
       - ./log/jojihouse:/var/log/jojihouse
     restart: always
-    tty: true
 
   # DBのバックアップ用サービス
   backup:

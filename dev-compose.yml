@@ -81,4 +81,3 @@ services:
     volumes:
       - ./jojihouse-system:/go/src
     restart: always
-    tty: true
