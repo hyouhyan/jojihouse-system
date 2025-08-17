@@ -81,3 +81,11 @@ services:
     volumes:
       - ./jojihouse-system:/go/src
     restart: always
+
+  web:
+    image: httpd:latest
+    container_name: jojihouse-web
+    ports:
+      - "1024:80"
+    volumes:
+      - "../jojihouse-system-web:/usr/local/apache2/htdocs"
