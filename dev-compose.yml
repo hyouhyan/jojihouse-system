@@ -85,6 +85,8 @@ services:
   web:
     image: httpd:latest
     container_name: jojihouse-web
+    depends_on:
+      - jojihouse-system
     ports:
       - "1024:80"
     volumes:
