@@ -25,8 +25,8 @@ dump:
 
 dev:
 	make dev/reup
-	@echo "Dev mode is active."
-	@echo "Try this -> http://localhost:1024/"
+	@echo "Dev mode is \033[32mactive\033[m."
+	@echo "Try this -> \033[4m\033[34mhttp://localhost:1024/\033[m\033[m"
 
 dev/up:
 	docker compose -f dev-compose.yml up -d --build
