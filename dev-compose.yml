@@ -78,6 +78,8 @@ services:
       - WEBHOOK_URL=${WEBHOOK_URL}
       - WEBHOOK_USERNAME=${WEBHOOK_USERNAME}
       - WEBHOOK_AVATAR_URL=${WEBHOOK_AVATAR_URL}
+
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
     volumes:
       - ./jojihouse-system:/go/src
     restart: always
