@@ -6,6 +6,8 @@ import (
 	"jojihouse-system/internal/database"
 	"jojihouse-system/internal/repository"
 	"jojihouse-system/internal/service"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -54,16 +56,14 @@ func main() {
 	// Gin ルーターの設定
 	r := gin.Default()
 
+	// 環境変数から許可するオリジンのリストを取得
+	allowedOrigins := os.Getenv("CORS_ALLOWED_ORIGINS")
+	// カンマ区切りの文字列を文字列スライスに変換
+	originsList := strings.Split(allowedOrigins, ",")
+
 	// CORSの設定
 	r.Use(cors.New(cors.Config{
-		AllowOrigins: []string{
-			"http://localhost:1024",
-			"http://127.0.0.1:1024",
-			"http://house.joji",
-			"https://house.joji",
-			"http://*.jojilab.hyouhyan.com",
-			"https://*.jojilab.hyouhyan.com",
-		},
+		AllowOrigins:     originsList,
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
