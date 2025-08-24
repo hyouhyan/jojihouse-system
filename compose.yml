@@ -11,6 +11,12 @@ services:
       - ./data/postgresql:/var/lib/postgresql/data
       - ./script/db-init/postgres:/docker-entrypoint-initdb.d
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} || exit 1"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
 
   mongoDb:
     image: mongo:4.4.18
@@ -24,6 +30,12 @@ services:
       - ./data/mongodb:/data/db
       - ./script/db-init/mongo:/docker-entrypoint-initdb.d
     restart: always
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
 
   jojihouse-system:
     build:
@@ -33,8 +45,10 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - postgreSql
-      - mongoDb
+      postgreSql:
+        condition: service_healthy
+      mongoDb:
+        condition: service_healthy
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -51,10 +65,11 @@ services:
       - WEBHOOK_URL=${WEBHOOK_URL}
       - WEBHOOK_USERNAME=${WEBHOOK_USERNAME}
       - WEBHOOK_AVATAR_URL=${WEBHOOK_AVATAR_URL}
+
+      - GIN_MODE=release
     volumes:
-      - ./log:/var/log/jojihouse
+      - ./log/jojihouse:/var/log/jojihouse
     restart: always
-    tty: true
 
   # DBのバックアップ用サービス
   backup:
@@ -78,8 +93,10 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     depends_on:
-      - postgreSql
-      - mongoDb
+      postgreSql:
+        condition: service_healthy
+      mongoDb:
+        condition: service_healthy
 
   # 定期実行を管理するスケジューラサービス (Ofelia)
   scheduler:

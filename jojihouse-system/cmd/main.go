@@ -12,12 +12,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @title JojiHouse Entrance System API
-// @version 1.0
-// @description JojiHouse の入退室管理システム API ドキュメント
-// @host 127.0.0.1:8080
-// @BasePath /
 func main() {
+	// DBへ接続
 	database.ConnectPostgres()
 	defer database.ClosePostgres()
 
