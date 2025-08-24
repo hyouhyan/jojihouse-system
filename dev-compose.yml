@@ -94,7 +94,7 @@ services:
 
   consistency-checker:
     build:
-      context: ./Docker/consistency-checker
+      context: ./script/consistency-checker
     depends_on:
       postgreSql:
         condition: service_healthy
