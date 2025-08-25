@@ -5,6 +5,10 @@ import (
 	"fmt"
 	"jojihouse-system-consistency-checker/database"
 	"jojihouse-system-consistency-checker/model"
+	"log"
+	"math"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -14,11 +18,32 @@ import (
 )
 
 type usersAccessCount struct {
-	username   string
-	accesCount int
+	username      string
+	daysPassed    int
+	accesCount    int
+	decreaseCount int
 }
 
 func main() {
+	if len(os.Args) < 3 {
+		log.Fatal("Usage: go run main.go <year> <month>")
+		return
+	}
+
+	yearStr := os.Args[1]
+	monthStr := os.Args[2]
+
+	year, err := strconv.Atoi(yearStr)
+	if err != nil {
+		log.Printf("Invalid year: %v\n", err)
+		return
+	}
+	month, err := strconv.Atoi(monthStr)
+	if err != nil {
+		log.Printf("Invalid month: %v\n", err)
+		return
+	}
+
 	// DBへ接続
 	database.ConnectPostgres()
 	defer database.ClosePostgres()
@@ -28,23 +53,22 @@ func main() {
 
 	users, err := GetAllUsers(database.PostgresDB)
 	if err != nil {
-		fmt.Printf("Error fetching users: %v\n", err)
+		log.Printf("Error fetching users: %v\n", err)
 		return
 	}
 
 	var accessCounts []usersAccessCount
 
 	for _, user := range users {
-		year := 2025
-		month := 6
 		logs, err := GetUsersAccessLog(database.MongoDB, *user.ID, year, month)
 		if err != nil {
-			fmt.Printf("Error fetching access logs for user %d: %v\n", user.Number, err)
+			log.Printf("Error fetching access logs for user %d: %v\n", user.Number, err)
 			continue
 		}
 
 		var lastEntryLog *model.AccessLog
 		accessCount := 0
+		daysPassed := 0
 		for _, log := range logs {
 			if log.AccessType == "entry" {
 				if lastEntryLog == nil {
@@ -60,24 +84,30 @@ func main() {
 				if lastEntryLog != nil {
 					if !isSameDate(log.Time, lastEntryLog.Time) {
 						accessCount += getPassedDays(lastEntryLog.Time, log.Time)
+						daysPassed += getPassedDays(lastEntryLog.Time, log.Time)
 						lastEntryLog = &log
 					}
 				}
 			}
 		}
+		count, err := GetRemainingEntriesLogsDecreaseCount(database.MongoDB, *user.ID, year, month)
+		if err != nil {
+			log.Printf("Error fetching remaining entries logs: %v\n", err)
+			return
+		}
 		accessCounts = append(accessCounts, usersAccessCount{
-			username:   *user.Name,
-			accesCount: accessCount,
+			username:      *user.Name,
+			daysPassed:    daysPassed,
+			accesCount:    accessCount,
+			decreaseCount: count,
 		})
 	}
 
-	count, err := GetRemainingEntriesLogsDecreaseCount(database.MongoDB, 12, 2025, 6)
-	if err != nil {
-		fmt.Printf("Error fetching remaining entries logs: %v\n", err)
-		return
+	// CSV出力
+	fmt.Println("ユーザー名,経過日数,入場回数,入場可能回数減少分")
+	for _, ac := range accessCounts {
+		fmt.Printf("%s,%d,%d,%d\n", ac.username, ac.daysPassed, ac.accesCount, ac.decreaseCount)
 	}
-
-	fmt.Println(count)
 }
 
 func GetAllUsers(db *sqlx.DB) ([]model.User, error) {
@@ -188,8 +218,9 @@ func GetRemainingEntriesLogsDecreaseCount(db *mongo.Database, userID int, year i
 		}
 
 		count += log.NewEntries - log.PreviousEntries
-		fmt.Println(log)
 	}
+
+	count = int(math.Abs(float64(count)))
 
 	return count, nil
 }
