@@ -210,36 +210,3 @@ func (h *EntranceHandler) GetAccessLogsByUserID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"access_logs": accessLogs})
 }
-
-// @Summary 入退室ログを手動で追加
-// @Tags エントランス(入退室)管理
-// @Description 手動で入退室ログを追加します
-// @Accept json
-// @Produce json
-// @Param entrance body request.FixedAccessLog true "入退室データ"
-// @Success 200 {object} response.Entrance
-// @Router /entrance/fix [post]
-func (h *EntranceHandler) CreateFixedAccessLog(c *gin.Context) {
-	var req request.FixedAccessLog
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
-		log.Print(err)
-		return
-	}
-
-	// バーコード、UserID、会員番号のいずれかが埋まってるか確認
-	if req.Barcode == nil && req.UserID == nil && req.Number == nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Either barcode, user_id or number must be provided"})
-		log.Print("Either barcode, user_id or number must be provided")
-		return
-	}
-
-	err := h.entranceService.CreateFixedAccessLog(&req)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create fixed access log"})
-		log.Print(err)
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Fixed access log created successfully"})
-}
