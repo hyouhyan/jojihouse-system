@@ -93,3 +93,24 @@ services:
       - "1024:80"
     volumes:
       - "../jojihouse-system-web:/usr/local/apache2/htdocs"
+
+  consistency-checker:
+    build:
+      context: ./script/consistency-checker
+    depends_on:
+      postgreSql:
+        condition: service_healthy
+      mongoDb:
+        condition: service_healthy
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_HOST=postgreSql
+      - POSTGRES_PORT=5432
+
+      - MONGO_USER=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_DB=${MONGO_INITDB_DATABASE}
+      - MONGO_HOST=mongoDb
+      - MONGO_PORT=27017
