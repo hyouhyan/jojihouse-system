@@ -12,6 +12,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+type usersAccessCount struct {
+	username   string
+	accesCount int
+}
+
 func main() {
 	// DBへ接続
 	database.ConnectPostgres()
@@ -26,19 +31,46 @@ func main() {
 		return
 	}
 
+	var accessCounts []usersAccessCount
+
 	for _, user := range users {
 		year := 2025
-		month := 8
+		month := 6
 		logs, err := GetUsersAccessLog(database.MongoDB, *user.ID, year, month)
 		if err != nil {
 			fmt.Printf("Error fetching access logs for user %d: %v\n", user.Number, err)
 			continue
 		}
 
+		var lastEntryLog *model.AccessLog
+		accessCount := 0
 		for _, log := range logs {
-			fmt.Printf("User %s accessed at %s\n", *user.Name, log.Time)
+			if log.AccessType == "entry" {
+				if lastEntryLog == nil {
+					accessCount++
+				} else {
+					if !isSameDate(log.Time, lastEntryLog.Time) {
+						accessCount++
+					}
+				}
+				lastEntryLog = &log
+			}
+			if log.AccessType == "exit" {
+				if lastEntryLog != nil {
+					if !isSameDate(log.Time, lastEntryLog.Time) {
+						accessCount += getPassedDays(lastEntryLog.Time, log.Time)
+						lastEntryLog = &log
+					}
+				}
+			}
 		}
+		accessCounts = append(accessCounts, usersAccessCount{
+			username:   *user.Name,
+			accesCount: accessCount,
+		})
 	}
+
+	fmt.Println(accessCounts)
 }
 
 func GetAllUsers(db *sqlx.DB) ([]model.User, error) {
@@ -84,4 +116,40 @@ func GetUsersAccessLog(db *mongo.Database, userID int, year int, month int) ([]m
 	}
 
 	return logs, nil
+}
+
+func isSameDate(a, b time.Time) bool {
+	// bのtimezoneをaのtimezoneに合わせる
+	if a.Location() != b.Location() {
+		b = b.In(a.Location())
+	}
+
+	aDate := cnvTo00Time(a)
+	bDate := cnvTo00Time(b)
+
+	return aDate.Equal(bDate)
+}
+
+func cnvTo00Time(t time.Time) time.Time {
+	return time.Date(
+		t.Year(),
+		t.Month(),
+		t.Day(),
+		0, 0, 0, 0, t.Location())
+}
+
+func getPassedDays(targetDate, currentDate time.Time) int {
+	// aとbのtimezoneを揃える
+	if targetDate.Location() != currentDate.Location() {
+		currentDate = currentDate.In(targetDate.Location())
+	}
+
+	// 00:00:00どうしで比較
+	targetDate = cnvTo00Time(targetDate)
+	currentDate = cnvTo00Time(currentDate)
+
+	// 日数の差を計算
+	daysPassed := int(currentDate.Sub(targetDate).Hours() / 24)
+
+	return daysPassed
 }
