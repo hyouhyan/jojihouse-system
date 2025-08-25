@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -70,7 +71,13 @@ func main() {
 		})
 	}
 
-	fmt.Println(accessCounts)
+	count, err := GetRemainingEntriesLogsDecreaseCount(database.MongoDB, 12, 2025, 6)
+	if err != nil {
+		fmt.Printf("Error fetching remaining entries logs: %v\n", err)
+		return
+	}
+
+	fmt.Println(count)
 }
 
 func GetAllUsers(db *sqlx.DB) ([]model.User, error) {
@@ -152,4 +159,37 @@ func getPassedDays(targetDate, currentDate time.Time) int {
 	daysPassed := int(currentDate.Sub(targetDate).Hours() / 24)
 
 	return daysPassed
+}
+
+func GetRemainingEntriesLogsDecreaseCount(db *mongo.Database, userID int, year int, month int) (int, error) {
+	collection := db.Collection("remaining_entries_log")
+	filter := bson.D{
+		{Key: "user_id", Value: userID},
+		{Key: "$expr", Value: bson.D{
+			{Key: "$gt", Value: bson.A{"$previous_entries", "$new_entries"}},
+		}},
+		{Key: "updated_at", Value: bson.D{
+			{Key: "$gte", Value: time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.Local)},
+			{Key: "$lt", Value: time.Date(year, time.Month(month+1), 1, 0, 0, 0, 0, time.Local)},
+		}},
+	}
+
+	cursor, err := collection.Find(context.Background(), filter)
+	if err != nil {
+		return 0, fmt.Errorf("failed to find access logs: %w", err)
+	}
+	defer cursor.Close(context.Background())
+
+	count := 0
+	for cursor.Next(context.Background()) {
+		var log model.RemainingEntriesLog
+		if err := cursor.Decode(&log); err != nil {
+			return 0, err
+		}
+
+		count += log.NewEntries - log.PreviousEntries
+		fmt.Println(log)
+	}
+
+	return count, nil
 }
