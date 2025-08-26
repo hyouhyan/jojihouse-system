@@ -7,11 +7,22 @@ import (
 )
 
 func SetupEntranceRoutes(router *gin.Engine, entranceHandler *handler.EntranceHandler) {
-	entranceGroup := router.Group("/entrance")
+	entranceGroupMember := router.Group("/entrance")
+	// entranceGroupMember.Use()
 	{
-		entranceGroup.POST("", entranceHandler.RecordEntrance)
-		entranceGroup.GET("/current", entranceHandler.GetCurrentUsers)
-		entranceGroup.GET("/logs", entranceHandler.GetAccessLogs)
-		entranceGroup.GET("/logs/:user_id", entranceHandler.GetAccessLogsByUserID)
+		entranceGroupMember.GET("/current", entranceHandler.GetCurrentUsers)
+	}
+
+	entranceGroupHouseAdmin := router.Group("/entrance")
+	// entranceGroupHouseAdmin.Use()
+	{
+		entranceGroupHouseAdmin.GET("/logs", entranceHandler.GetAccessLogs)
+		entranceGroupHouseAdmin.GET("/logs/:user_id", entranceHandler.GetAccessLogsByUserID)
+	}
+
+	entranceGroupEntrance := router.Group("/entrance")
+	// entranceGroupEntrance.Use()
+	{
+		entranceGroupEntrance.POST("", entranceHandler.RecordEntrance)
 	}
 }
