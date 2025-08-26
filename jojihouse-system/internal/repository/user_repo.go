@@ -159,7 +159,7 @@ func (r *UserRepository) UpdateUser(user *model.User) error {
 			discord_id = :discord_id,
 			remaining_entries = :remaining_entries,
 			total_entries = :total_entries,
-			allergy = :allergy
+			allergy = :allergy,
 			number = :number
 		WHERE id = :id
 	`, user)
