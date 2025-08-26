@@ -7,8 +7,9 @@ import (
 )
 
 func SetupKaisukenRoutes(router *gin.Engine, handler *handler.KaisukenHandler) {
-	group := router.Group("/kaisuken")
+	kaisukenGroupHouseAdmin := router.Group("/kaisuken")
+	// kaisukenGroupHouseAdmin.Use()
 	{
-		group.POST("", handler.BuyKaisuken)
+		kaisukenGroupHouseAdmin.POST("", handler.BuyKaisuken)
 	}
 }

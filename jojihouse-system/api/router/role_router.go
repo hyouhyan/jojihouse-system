@@ -7,8 +7,9 @@ import (
 )
 
 func SetupRoleRoutes(router *gin.Engine, roleHandler *handler.RoleHandler) {
-	userGroup := router.Group("/roles")
+	roleGroupMember := router.Group("/roles")
+	// roleGroupMember.Use()
 	{
-		userGroup.GET("", roleHandler.GetAllRoles)
+		roleGroupMember.GET("", roleHandler.GetAllRoles)
 	}
 }

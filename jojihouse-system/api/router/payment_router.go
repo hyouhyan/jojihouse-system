@@ -7,10 +7,11 @@ import (
 )
 
 func SetupPaymentRoutes(router *gin.Engine, handler *handler.PaymentHandler) {
-	group := router.Group("/payment")
+	paymentGroupHouseAdmin := router.Group("/payment")
+	// paymentGroupHouseAdmin.Use()
 	{
-		group.GET("", handler.GetAllPaymentLogs)
-		group.POST("", handler.CreatePaymentLog)
-		group.GET("/monthly", handler.GetMonthlyPaymentLogs)
+		paymentGroupHouseAdmin.GET("", handler.GetAllPaymentLogs)
+		paymentGroupHouseAdmin.POST("", handler.CreatePaymentLog)
+		paymentGroupHouseAdmin.GET("/monthly", handler.GetMonthlyPaymentLogs)
 	}
 }
