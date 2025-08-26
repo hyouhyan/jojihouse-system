@@ -7,19 +7,26 @@ import (
 )
 
 func SetupUserRoutes(router *gin.Engine, userHandler *handler.UserHandler) {
-	userGroup := router.Group("/users")
+	userGroupMember := router.Group("/users")
+	// userGroupMember.Use()
 	{
-		userGroup.POST("", userHandler.CreateUser)
-		userGroup.GET("", userHandler.GetUsers)
+		userGroupMember.GET("", userHandler.GetUsers)
+		userGroupMember.GET("/:user_id", userHandler.GetUserByID)
 
-		userGroup.GET("/:user_id", userHandler.GetUserByID)
-		userGroup.PATCH("/:user_id", userHandler.UpdateUser)
-		userGroup.DELETE("/:user_id", userHandler.DeleteUser)
+		userGroupMember.GET("/:user_id/roles", userHandler.GetRolesByUserID)
+	}
 
-		userGroup.GET("/:user_id/roles", userHandler.GetRolesByUserID)
-		userGroup.POST("/:user_id/roles", userHandler.AddRoleToUser)
-		userGroup.DELETE("/:user_id/roles/:role_id", userHandler.RemoveRoleFromUser)
+	userGroupAdmin := router.Group("/users")
+	// userGroupAdmin.Use()
+	{
+		userGroupAdmin.POST("", userHandler.CreateUser)
 
-		userGroup.GET("/:user_id/logs", userHandler.GetUserLogs)
+		userGroupAdmin.PATCH("/:user_id", userHandler.UpdateUser)
+		userGroupAdmin.DELETE("/:user_id", userHandler.DeleteUser)
+
+		userGroupAdmin.POST("/:user_id/roles", userHandler.AddRoleToUser)
+		userGroupAdmin.DELETE("/:user_id/roles/:role_id", userHandler.RemoveRoleFromUser)
+
+		userGroupAdmin.GET("/:user_id/logs", userHandler.GetUserLogs)
 	}
 }
