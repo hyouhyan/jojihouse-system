@@ -12,7 +12,7 @@ type User struct {
 	Name              *string    `db:"name"`
 	Description       *string    `db:"description"`
 	Barcode           *string    `db:"barcode"`
-	Contact           *string    `db:"contact"`
+	DiscordID         *string    `db:"discord_id"`
 	Remaining_entries *int       `db:"remaining_entries"`
 	Registered_at     *time.Time `db:"registered_at"`
 	Total_entries     *int       `db:"total_entries"`

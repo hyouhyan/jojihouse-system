@@ -95,10 +95,10 @@ func (r *UserRepository) CreateUser(user *model.User) (*model.User, error) {
 		values = append(values, ":barcode")
 		args["barcode"] = *user.Barcode
 	}
-	if user.Contact != nil {
-		columns = append(columns, "contact")
-		values = append(values, ":contact")
-		args["contact"] = *user.Contact
+	if user.DiscordID != nil {
+		columns = append(columns, "discord_id")
+		values = append(values, ":discord_id")
+		args["discord_id"] = *user.DiscordID
 	}
 	if user.Remaining_entries != nil {
 		columns = append(columns, "remaining_entries")
@@ -156,7 +156,7 @@ func (r *UserRepository) UpdateUser(user *model.User) error {
 			name = :name,
 			description = :description,
 			barcode = :barcode,
-			contact = :contact,
+			discord_id = :discord_id,
 			remaining_entries = :remaining_entries,
 			total_entries = :total_entries,
 			allergy = :allergy
@@ -184,8 +184,8 @@ func (r *UserRepository) DecreaseRemainingEntries(id int, count int) (int, int, 
 
 	// remaining_entries を更新しつつ、更新前後の値を取得
 	err := r.db.QueryRow(`
-		UPDATE users 
-		SET remaining_entries = remaining_entries - $1 
+		UPDATE users
+		SET remaining_entries = remaining_entries - $1
 		WHERE id = $2
 		RETURNING remaining_entries + $1, remaining_entries
 	`, count, id).Scan(&before, &after)
