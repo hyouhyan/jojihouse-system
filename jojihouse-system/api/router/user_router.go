@@ -16,17 +16,22 @@ func SetupUserRoutes(router *gin.Engine, userHandler *handler.UserHandler) {
 		userGroupMember.GET("/:user_id/roles", userHandler.GetRolesByUserID)
 	}
 
-	userGroupAdmin := router.Group("/users")
-	// userGroupAdmin.Use()
+	userGroupHouseAdmin := router.Group("/users")
+	// userGroupHouseAdmin.Use()
 	{
-		userGroupAdmin.POST("", userHandler.CreateUser)
+		userGroupHouseAdmin.PATCH("/:user_id", userHandler.UpdateUser)
 
-		userGroupAdmin.PATCH("/:user_id", userHandler.UpdateUser)
-		userGroupAdmin.DELETE("/:user_id", userHandler.DeleteUser)
+		userGroupHouseAdmin.GET("/:user_id/logs", userHandler.GetUserLogs)
+	}
 
-		userGroupAdmin.POST("/:user_id/roles", userHandler.AddRoleToUser)
-		userGroupAdmin.DELETE("/:user_id/roles/:role_id", userHandler.RemoveRoleFromUser)
+	userGroupSysAdmin := router.Group("/users")
+	// userGroupSysAdmin.Use()
+	{
+		userGroupSysAdmin.POST("", userHandler.CreateUser)
 
-		userGroupAdmin.GET("/:user_id/logs", userHandler.GetUserLogs)
+		userGroupSysAdmin.DELETE("/:user_id", userHandler.DeleteUser)
+
+		userGroupSysAdmin.POST("/:user_id/roles", userHandler.AddRoleToUser)
+		userGroupSysAdmin.DELETE("/:user_id/roles/:role_id", userHandler.RemoveRoleFromUser)
 	}
 }
