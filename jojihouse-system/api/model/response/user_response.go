@@ -9,7 +9,7 @@ type User struct {
 	Name              *string    `json:"name"`
 	Description       *string    `json:"description"`
 	Barcode           *string    `json:"barcode"`
-	DiscordID         *string    `json:"discord_id"`
+	DiscordID         *int       `json:"discord_id"`
 	Remaining_entries *int       `json:"remaining_entries"`
 	Registered_at     *time.Time `json:"registered_at"`
 	Total_entries     *int       `json:"total_entries"`
