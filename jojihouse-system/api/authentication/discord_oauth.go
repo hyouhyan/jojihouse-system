@@ -1,14 +1,13 @@
 package authentication
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"strings"
 )
-
-
 
 const DISCORD_API_URL = "https://discordapp.com/api/oauth2/token"
 
@@ -62,7 +61,17 @@ func (a *DiscordAuthentication) GetToken(code string) (token string, err error) 
 		return "", fmt.Errorf("failed to get body %v", err)
 	}
 
-	fmt.Printf("Received POST request body: %s\n", body)
+	// JSONをパース
+	var result map[string]interface{}
+	if err := json.Unmarshal(body, &result); err != nil {
+		return "", fmt.Errorf("failed to parse response: %v", err)
+	}
 
-	return "", nil
+	// tokenを抽出
+	token, ok := result["access_token"].(string)
+	if !ok {
+		return "", fmt.Errorf("access_token not found")
+	}
+
+	return token, nil
 }
