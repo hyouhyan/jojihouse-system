@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"jojihouse-system/api/authentication"
 	"log"
 	"net/http"
@@ -36,6 +37,15 @@ func (h *AuthHandler) DiscordAuth(c *gin.Context) {
 		return
 	}
 
-	log.Println(token)
-	c.JSON(http.StatusOK, gin.H{"message": "success"})
+	// UserIDの取得
+	discordUserID, err := h.discordAuthentication.GetUserID(token)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get discord user id"})
+		log.Print(err)
+		return
+	}
+
+	fmt.Println(discordUserID)
+
+	c.JSON(http.StatusOK, gin.H{"message": "success", "discord_user_id": discordUserID})
 }
