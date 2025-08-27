@@ -1,12 +1,13 @@
 package router
 
 import (
+	"jojihouse-system/api/authentication/middleware"
 	"jojihouse-system/api/handler"
 
 	"github.com/gin-gonic/gin"
 )
 
-func SetupUserRoutes(router *gin.Engine, userHandler *handler.UserHandler) {
+func SetupUserRoutes(router *gin.Engine, userHandler *handler.UserHandler, middleware *middleware.AuthMiddleware) {
 	userGroupMember := router.Group("/users")
 	// userGroupMember.Use()
 	{

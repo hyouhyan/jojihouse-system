@@ -2,6 +2,7 @@ package main
 
 import (
 	"jojihouse-system/api/authentication"
+	"jojihouse-system/api/authentication/middleware"
 	"jojihouse-system/api/handler"
 	"jojihouse-system/api/router"
 	"jojihouse-system/internal/database"
@@ -78,12 +79,15 @@ func main() {
 		MaxAge:           12 * time.Hour, // プリフライトリクエストの結果をキャッシュ
 	}))
 
-	router.SetupEntranceRoutes(r, entranceHandler)
-	router.SetupUserRoutes(r, userHandler)
-	router.SetupRoleRoutes(r, roleHandler)
-	router.SetupKaisukenRoutes(r, kaisukenHandler)
-	router.SetupPaymentRoutes(r, paymentHandler)
-	router.SetupAuthRoutes(r, authHandler)
+	// Middleware
+	authMiddleware := middleware.NewAuthMiddleware(userPortalService, tokenAuthentication)
+
+	router.SetupEntranceRoutes(r, entranceHandler, authMiddleware)
+	router.SetupUserRoutes(r, userHandler, authMiddleware)
+	router.SetupRoleRoutes(r, roleHandler, authMiddleware)
+	router.SetupKaisukenRoutes(r, kaisukenHandler, authMiddleware)
+	router.SetupPaymentRoutes(r, paymentHandler, authMiddleware)
+	router.SetupAuthRoutes(r, authHandler, authMiddleware)
 
 	// サーバー起動
 	r.Run("0.0.0.0:8080")
