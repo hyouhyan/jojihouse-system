@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"jojihouse-system/api/model/response"
+	"jojihouse-system/internal/service"
 	"log"
 	"net/http"
 	"net/url"
@@ -24,13 +26,13 @@ func Env_load() {
 }
 
 type DiscordAuthentication struct {
-	// userPortalService *service.UserPortalService
+	userPortalService *service.UserPortalService
 }
 
-// func NewDiscordAuthentication(userPortalService *service.UserPortalService) *DiscordAuthentication {
-func NewDiscordAuthentication() *DiscordAuthentication {
-	// return &DiscordAuthentication{userPortalService: userPortalService}
-	return &DiscordAuthentication{}
+func NewDiscordAuthentication(userPortalService *service.UserPortalService) *DiscordAuthentication {
+	// func NewDiscordAuthentication() *DiscordAuthentication {
+	return &DiscordAuthentication{userPortalService: userPortalService}
+	// return &DiscordAuthentication{}
 }
 
 func (a *DiscordAuthentication) GetToken(code string) (token string, err error) {
@@ -90,7 +92,7 @@ func (a *DiscordAuthentication) GetToken(code string) (token string, err error) 
 	return token, nil
 }
 
-func (a *DiscordAuthentication) GetUserID(token string) (userID int, err error) {
+func (a *DiscordAuthentication) GetDiscordUserID(token string) (userID int, err error) {
 	// Request組み立て
 	req, err := http.NewRequest(
 		"GET",
@@ -141,4 +143,20 @@ func (a *DiscordAuthentication) GetUserID(token string) (userID int, err error) 
 	}
 
 	return userID, nil
+}
+
+func (a *DiscordAuthentication) GetHouseSystemUser(token string) (user *response.User, err error) {
+	// Discord APIよりID取得
+	discordUserID, err := a.GetDiscordUserID(token)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get discord user id: %v", err)
+	}
+
+	// HouseSystemからUser情報取得
+	user, err = a.userPortalService.GetUserByDiscordID(discordUserID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user by discord id: %v", err)
+	}
+
+	return user, nil
 }

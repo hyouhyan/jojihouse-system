@@ -48,8 +48,8 @@ func main() {
 	userPortalService := service.NewUserPortalService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo, currentUsersRepo)
 
 	// Discord Authentication
-	// discordAuthentication := authentication.NewDiscordAuthentication(userPortalService)
-	discordAuthentication := authentication.NewDiscordAuthentication()
+	discordAuthentication := authentication.NewDiscordAuthentication(userPortalService)
+	// discordAuthentication := authentication.NewDiscordAuthentication()
 
 	// EntranceHandler
 	entranceHandler := handler.NewEntranceHandler(entranceService, userPortalService)
