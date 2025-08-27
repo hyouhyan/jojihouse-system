@@ -9,6 +9,6 @@ import (
 func SetupAuthRoutes(router *gin.Engine, handler *handler.AuthHandler) {
 	authGroup := router.Group("/auth")
 	{
-		authGroup.POST("discord", handler.DiscordAuth)
+		authGroup.GET("discord", handler.DiscordAuth)
 	}
 }
