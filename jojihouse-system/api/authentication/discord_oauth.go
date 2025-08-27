@@ -30,9 +30,7 @@ type DiscordAuthentication struct {
 }
 
 func NewDiscordAuthentication(userPortalService *service.UserPortalService) *DiscordAuthentication {
-	// func NewDiscordAuthentication() *DiscordAuthentication {
 	return &DiscordAuthentication{userPortalService: userPortalService}
-	// return &DiscordAuthentication{}
 }
 
 func (a *DiscordAuthentication) GetToken(code string) (token string, err error) {
