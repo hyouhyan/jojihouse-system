@@ -35,7 +35,7 @@ func (m AuthMiddleware) AuthSystemAdmin(c *gin.Context) {
 	}
 
 	// ロール情報の検証
-	isSysAdmin, err := m.userPortalService.IsSystemAdmin(userID)
+	isUserCorrect, err := m.userPortalService.IsSystemAdmin(userID)
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong user"})
 		log.Printf("failed to check user is system admin: %v", err)
@@ -43,7 +43,123 @@ func (m AuthMiddleware) AuthSystemAdmin(c *gin.Context) {
 		return
 	}
 
-	if isSysAdmin {
+	if isUserCorrect {
+		c.Next()
+	} else {
+		c.Abort()
+	}
+}
+
+func (m AuthMiddleware) AuthHouseAdmin(c *gin.Context) {
+	// Authorizationヘッダーからトークンを取得
+	tokenString := c.GetHeader("Authorization")
+
+	// Tokenの検証
+	userID, err := m.tokenAuthentication.VerifyJWTToken(tokenString)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+		log.Printf("invalid token: %v", err)
+		c.Abort()
+		return
+	}
+
+	// ロール情報の検証
+	isUserCorrect, err := m.userPortalService.IsHouseAdmin(userID)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong user"})
+		log.Printf("failed to check user is system admin: %v", err)
+		c.Abort()
+		return
+	}
+
+	if isUserCorrect {
+		c.Next()
+	} else {
+		c.Abort()
+	}
+}
+
+func (m AuthMiddleware) AuthMember(c *gin.Context) {
+	// Authorizationヘッダーからトークンを取得
+	tokenString := c.GetHeader("Authorization")
+
+	// Tokenの検証
+	userID, err := m.tokenAuthentication.VerifyJWTToken(tokenString)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+		log.Printf("invalid token: %v", err)
+		c.Abort()
+		return
+	}
+
+	// ロール情報の検証
+	isUserCorrect, err := m.userPortalService.IsMember(userID)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong user"})
+		log.Printf("failed to check user is system admin: %v", err)
+		c.Abort()
+		return
+	}
+
+	if isUserCorrect {
+		c.Next()
+	} else {
+		c.Abort()
+	}
+}
+
+func (m AuthMiddleware) AuthCurrentUser(c *gin.Context) {
+	// Authorizationヘッダーからトークンを取得
+	tokenString := c.GetHeader("Authorization")
+
+	// Tokenの検証
+	userID, err := m.tokenAuthentication.VerifyJWTToken(tokenString)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+		log.Printf("invalid token: %v", err)
+		c.Abort()
+		return
+	}
+
+	// ロール情報の検証
+	isUserCorrect, err := m.userPortalService.IsCurrentUser(userID)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong user"})
+		log.Printf("failed to check user is system admin: %v", err)
+		c.Abort()
+		return
+	}
+
+	if isUserCorrect {
+		c.Next()
+	} else {
+		c.Abort()
+	}
+}
+
+func (m AuthMiddleware) AuthStudent(c *gin.Context) {
+	// Authorizationヘッダーからトークンを取得
+	tokenString := c.GetHeader("Authorization")
+
+	// Tokenの検証
+	userID, err := m.tokenAuthentication.VerifyJWTToken(tokenString)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
+		log.Printf("invalid token: %v", err)
+		c.Abort()
+		return
+	}
+
+	// ロール情報の検証
+	isUserCorrect, err := m.userPortalService.IsStudent(userID)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "wrong user"})
+		log.Printf("failed to check user is system admin: %v", err)
+		c.Abort()
+		return
+	}
+
+	if isUserCorrect {
 		c.Next()
 	} else {
 		c.Abort()
