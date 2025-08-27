@@ -9,7 +9,7 @@ import (
 
 func SetupUserRoutes(router *gin.Engine, userHandler *handler.UserHandler, middleware *middleware.AuthMiddleware) {
 	userGroupMember := router.Group("/users")
-	// userGroupMember.Use()
+	userGroupMember.Use(middleware.AuthMember)
 	{
 		userGroupMember.GET("", userHandler.GetUsers)
 		userGroupMember.GET("/:user_id", userHandler.GetUserByID)
@@ -18,7 +18,7 @@ func SetupUserRoutes(router *gin.Engine, userHandler *handler.UserHandler, middl
 	}
 
 	userGroupHouseAdmin := router.Group("/users")
-	// userGroupHouseAdmin.Use()
+	userGroupHouseAdmin.Use(middleware.AuthHouseAdmin)
 	{
 		userGroupHouseAdmin.PATCH("/:user_id", userHandler.UpdateUser)
 
@@ -26,7 +26,7 @@ func SetupUserRoutes(router *gin.Engine, userHandler *handler.UserHandler, middl
 	}
 
 	userGroupSysAdmin := router.Group("/users")
-	// userGroupSysAdmin.Use()
+	userGroupSysAdmin.Use(middleware.AuthSystemAdmin)
 	{
 		userGroupSysAdmin.POST("", userHandler.CreateUser)
 

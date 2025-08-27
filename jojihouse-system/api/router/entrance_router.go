@@ -9,13 +9,13 @@ import (
 
 func SetupEntranceRoutes(router *gin.Engine, entranceHandler *handler.EntranceHandler, middleware *middleware.AuthMiddleware) {
 	entranceGroupMember := router.Group("/entrance")
-	// entranceGroupMember.Use()
+	entranceGroupMember.Use(middleware.AuthMember)
 	{
 		entranceGroupMember.GET("/current", entranceHandler.GetCurrentUsers)
 	}
 
 	entranceGroupHouseAdmin := router.Group("/entrance")
-	// entranceGroupHouseAdmin.Use()
+	entranceGroupHouseAdmin.Use(middleware.AuthHouseAdmin)
 	{
 		entranceGroupHouseAdmin.GET("/logs", entranceHandler.GetAccessLogs)
 		entranceGroupHouseAdmin.GET("/logs/:user_id", entranceHandler.GetAccessLogsByUserID)

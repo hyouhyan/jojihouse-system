@@ -9,7 +9,7 @@ import (
 
 func SetupKaisukenRoutes(router *gin.Engine, handler *handler.KaisukenHandler, middleware *middleware.AuthMiddleware) {
 	kaisukenGroupHouseAdmin := router.Group("/kaisuken")
-	// kaisukenGroupHouseAdmin.Use()
+	kaisukenGroupHouseAdmin.Use(middleware.AuthHouseAdmin)
 	{
 		kaisukenGroupHouseAdmin.POST("", handler.BuyKaisuken)
 	}

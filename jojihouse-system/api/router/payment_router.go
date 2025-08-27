@@ -9,7 +9,7 @@ import (
 
 func SetupPaymentRoutes(router *gin.Engine, handler *handler.PaymentHandler, middleware *middleware.AuthMiddleware) {
 	paymentGroupHouseAdmin := router.Group("/payment")
-	// paymentGroupHouseAdmin.Use()
+	paymentGroupHouseAdmin.Use(middleware.AuthHouseAdmin)
 	{
 		paymentGroupHouseAdmin.GET("", handler.GetAllPaymentLogs)
 		paymentGroupHouseAdmin.POST("", handler.CreatePaymentLog)

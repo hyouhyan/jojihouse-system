@@ -9,7 +9,7 @@ import (
 
 func SetupRoleRoutes(router *gin.Engine, roleHandler *handler.RoleHandler, middleware *middleware.AuthMiddleware) {
 	roleGroupMember := router.Group("/roles")
-	// roleGroupMember.Use()
+	roleGroupMember.Use(middleware.AuthMember)
 	{
 		roleGroupMember.GET("", roleHandler.GetAllRoles)
 	}
