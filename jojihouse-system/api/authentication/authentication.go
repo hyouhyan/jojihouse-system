@@ -3,6 +3,7 @@ package authentication
 import (
 	"fmt"
 	"jojihouse-system/internal/service"
+	"log"
 	"os"
 	"time"
 
@@ -31,6 +32,8 @@ func (a *TokenAuthentication) CreateJWTToken(userID int) (tokenStr string, err e
 	if err != nil {
 		return "", fmt.Errorf("failed to convert token to string: %v", err)
 	}
+
+	log.Print("[Token Authentication] Create JWT Token", tokenStr)
 
 	return tokenStr, nil
 }

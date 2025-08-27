@@ -48,6 +48,13 @@ func (h *AuthHandler) DiscordAuth(c *gin.Context) {
 	}
 
 	// トークンの発行
+	authToken, err := h.authentication.CreateJWTToken(*user.ID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create authentication token"})
+		log.Print(err)
+		return
+	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "success", "user": user})
+	c.Header("Authorization", authToken)
+	c.JSON(http.StatusOK, gin.H{"message": "success"})
 }
