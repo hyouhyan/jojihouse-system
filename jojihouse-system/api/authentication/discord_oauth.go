@@ -17,9 +17,9 @@ import (
 const DISCORD_API_BASEURL = "https://discordapp.com/api"
 
 func Env_load() {
-	err := godotenv.Load()
+	err := godotenv.Load("./api/authentication/.env")
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Fatalf("Error loading .env file: %v", err)
 	}
 }
 
