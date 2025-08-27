@@ -35,4 +35,5 @@ func (h *AuthHandler) DiscordAuth(c *gin.Context) {
 	}
 
 	log.Println(token)
+	c.JSON(http.StatusOK, gin.H{"message": "success"})
 }
