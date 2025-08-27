@@ -6,10 +6,11 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 )
 
-const DISCORD_API_URL = "https://discordapp.com/api/oauth2/token"
+const DISCORD_API_BASEURL = "https://discordapp.com/api"
 
 type DiscordAuthentication struct {
 	// userPortalService *service.UserPortalService
@@ -33,7 +34,7 @@ func (a *DiscordAuthentication) GetToken(code string) (token string, err error) 
 	// リクエストの作成
 	req, err := http.NewRequest(
 		"POST",
-		DISCORD_API_URL,
+		DISCORD_API_BASEURL+"/oauth2/token",
 		strings.NewReader(values.Encode()),
 	)
 	if err != nil {
@@ -74,4 +75,57 @@ func (a *DiscordAuthentication) GetToken(code string) (token string, err error) 
 	}
 
 	return token, nil
+}
+
+func (a *DiscordAuthentication) GetUserID(token string) (userID int, err error) {
+	// Request組み立て
+	req, err := http.NewRequest(
+		"GET",
+		DISCORD_API_BASEURL+"/users/@me",
+		nil,
+	)
+	if err != nil {
+		return 0, fmt.Errorf("リクエストの作成に失敗しました: %v", err)
+	}
+
+	// ヘッダー
+	req.Header.Set("Authorization", "Bearer "+token)
+
+	// Client作ってリクエスト投げる
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		return 0, err
+	}
+	defer res.Body.Close()
+
+	// ステータスコード確認
+	if res.StatusCode != 200 {
+		return 0, fmt.Errorf("status code %d", res.StatusCode)
+	}
+
+	// Bodyの取得
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get body %v", err)
+	}
+
+	// JSONをパース
+	var result map[string]interface{}
+	if err := json.Unmarshal(body, &result); err != nil {
+		return 0, fmt.Errorf("failed to parse response: %v", err)
+	}
+
+	// idを抽出
+	userIDStr, ok := result["id"].(string)
+	if !ok {
+		return 0, fmt.Errorf("id not found")
+	}
+
+	userID, err = strconv.Atoi(userIDStr)
+	if err != nil {
+		return 0, fmt.Errorf("failed to parse id: %v", err)
+	}
+
+	return userID, nil
 }

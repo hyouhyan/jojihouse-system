@@ -15,3 +15,14 @@ func TestGetToken_CodeからTokenを取得(t *testing.T) {
 
 	fmt.Println(token)
 }
+
+func TestGetUserID(t *testing.T) {
+	discordAuthentication := NewDiscordAuthentication()
+
+	id, err := discordAuthentication.GetUserID("")
+	if err != nil {
+		t.Error(err)
+	}
+
+	fmt.Println(id)
+}
