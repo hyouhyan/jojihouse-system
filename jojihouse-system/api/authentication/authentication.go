@@ -38,7 +38,7 @@ func (a *TokenAuthentication) CreateJWTToken(userID int) (tokenStr string, err e
 	return tokenStr, nil
 }
 
-func (a *TokenAuthentication) VerifyJWTToken(tokenStr string) (ok bool, err error) {
+func (a *TokenAuthentication) VerifyJWTToken(tokenStr string) (userID int, err error) {
 	Env_load()
 
 	// トークンの検証
@@ -46,10 +46,22 @@ func (a *TokenAuthentication) VerifyJWTToken(tokenStr string) (ok bool, err erro
 		return []byte(os.Getenv("JWT_SECRET")), nil
 	})
 	if err != nil {
-		return false, fmt.Errorf("failed to verify jwt token: %v", err)
+		return 0, fmt.Errorf("failed to verify jwt token: %v", err)
 	} else if !token.Valid {
-		return false, fmt.Errorf("invalid token")
+		return 0, fmt.Errorf("invalid token")
 	}
 
-	return true, nil
+	// Payloadの取得
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return 0, fmt.Errorf("failed to get claims")
+	}
+
+	// sub(userid)の抽出
+	userID, ok = claims["sub"].(int)
+	if !ok {
+		return 0, fmt.Errorf("failed to get User ID")
+	}
+
+	return userID, nil
 }
