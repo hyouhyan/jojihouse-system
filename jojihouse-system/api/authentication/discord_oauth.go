@@ -4,13 +4,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
+
+	"github.com/joho/godotenv"
 )
 
 const DISCORD_API_BASEURL = "https://discordapp.com/api"
+
+func Env_load() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+}
 
 type DiscordAuthentication struct {
 	// userPortalService *service.UserPortalService
@@ -23,12 +34,14 @@ func NewDiscordAuthentication() *DiscordAuthentication {
 }
 
 func (a *DiscordAuthentication) GetToken(code string) (token string, err error) {
+	Env_load()
+
 	// 色々定義
 	values := url.Values{}
-	values.Add("client_id", CLIENT_ID)
-	values.Add("client_secret", CLIENT_SECRET)
-	values.Add("grant_type", GRANT_TYPE)
-	values.Add("redirect_uri", REDIRECT_URL)
+	values.Add("client_id", os.Getenv("CLIENT_ID"))
+	values.Add("client_secret", os.Getenv("CLIENT_SECRET"))
+	values.Add("grant_type", os.Getenv("GRANT_TYPE"))
+	values.Add("redirect_uri", os.Getenv("REDIRECT_URL"))
 	values.Add("code", code)
 
 	// リクエストの作成
