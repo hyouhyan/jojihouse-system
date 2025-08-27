@@ -2,7 +2,6 @@ package handler
 
 import (
 	"jojihouse-system/api/authentication"
-	"jojihouse-system/internal/service"
 	"log"
 	"net/http"
 
@@ -10,16 +9,13 @@ import (
 )
 
 type AuthHandler struct {
-	userPortalService     *service.UserPortalService
 	discordAuthentication *authentication.DiscordAuthentication
 }
 
 func NewAuthHandler(
-	userPortalService *service.UserPortalService,
 	discordAuthentication *authentication.DiscordAuthentication,
 ) *AuthHandler {
 	return &AuthHandler{
-		userPortalService:     userPortalService,
 		discordAuthentication: discordAuthentication,
 	}
 }

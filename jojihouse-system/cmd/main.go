@@ -1,6 +1,7 @@
 package main
 
 import (
+	"jojihouse-system/api/authentication"
 	"jojihouse-system/api/handler"
 	"jojihouse-system/api/router"
 	"jojihouse-system/internal/database"
@@ -46,12 +47,17 @@ func main() {
 	// userPortalサービス
 	userPortalService := service.NewUserPortalService(userRepo, roleRepo, accessLogRepo, remainingEntriesLogRepo, currentUsersRepo)
 
+	// Discord Authentication
+	// discordAuthentication := authentication.NewDiscordAuthentication(userPortalService)
+	discordAuthentication := authentication.NewDiscordAuthentication()
+
 	// EntranceHandler
 	entranceHandler := handler.NewEntranceHandler(entranceService, userPortalService)
 	userHandler := handler.NewUserHandler(userPortalService, adminManagementService)
 	roleHandler := handler.NewRoleHandler(userPortalService)
 	kaisukenHandler := handler.NewKaisukenHandler(userPortalService, adminManagementService)
 	paymentHandler := handler.NewPaymentHandler(adminManagementService)
+	authHandler := handler.NewAuthHandler(discordAuthentication)
 
 	// Gin ルーターの設定
 	r := gin.Default()
@@ -76,6 +82,7 @@ func main() {
 	router.SetupRoleRoutes(r, roleHandler)
 	router.SetupKaisukenRoutes(r, kaisukenHandler)
 	router.SetupPaymentRoutes(r, paymentHandler)
+	router.SetupAuthRoutes(r, authHandler)
 
 	// サーバー起動
 	r.Run("0.0.0.0:8080")
