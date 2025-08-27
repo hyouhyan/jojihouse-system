@@ -25,6 +25,7 @@ func (h *AuthHandler) DiscordAuth(c *gin.Context) {
 	code := c.Query("code")
 	if code == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "code query is necessary"})
+		return
 	}
 
 	// Tokenの取得
@@ -32,6 +33,7 @@ func (h *AuthHandler) DiscordAuth(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get discord token"})
 		log.Print(err)
+		return
 	}
 
 	log.Println(token)
