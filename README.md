@@ -7,43 +7,43 @@
 ## API エンドポイント一覧
 
 ### ユーザー関連
-| メソッド | エンドポイント | 説明 | リクエスト | レスポンス |
-|----------|--------------|------|-----|-----|
-| `POST`   | `/users/`  | ユーザーを新規作成 | CreateUser |
-| `GET`    | `/users/`  | すべてのユーザーを取得 | |
-| `GET`    | `/users/:user_id` | 指定したユーザーの情報を取得 | |
-| `PATCH`  | `/users/:user_id` | 指定したユーザーの情報を部分更新 | UpdateUser |
-| `DELETE` | `/users/:user_id` | 指定したユーザーを削除 | |
-| `GET`    | `/users/:user_id/logs` | 該当ユーザに関連するログを取得 | |
+| メソッド | エンドポイント | 説明 | リクエスト | レスポンス | 権限 |
+|----------|--------------|------|-----|-----|-----|
+| `POST`   | `/users/`  | ユーザーを新規作成 | CreateUser | | SystemAdmin |
+| `GET`    | `/users/`  | すべてのユーザーを取得 | | | Member |
+| `GET`    | `/users/:user_id` | 指定したユーザーの情報を取得 | | | Member |
+| `PATCH`  | `/users/:user_id` | 指定したユーザーの情報を部分更新 | UpdateUser | | HouseAdmin |
+| `DELETE` | `/users/:user_id` | 指定したユーザーを削除 | | | SystemAdmin |
+| `GET`    | `/users/:user_id/logs` | 該当ユーザに関連するログを取得 | | | HouseAdmin |
 
 ### ロール管理
-| メソッド | エンドポイント | 説明 | リクエスト | レスポンス |
-|----------|--------------|------|-----|-----|
-| `GET`    | `/roles` | 全てのロールを取得 | |
-| `GET`    | `/users/:user_id/roles` | 指定したユーザーのロールを取得 | |
-| `POST`   | `/users/:user_id/roles` | 指定したユーザーにロールを追加 | AddRole |
-| `DELETE` | `/users/:user_id/roles/:role_id` | 指定したユーザーからロールを削除 | |
+| メソッド | エンドポイント | 説明 | リクエスト | レスポンス | 権限 |
+|----------|--------------|------|-----|-----|-----|
+| `GET`    | `/roles` | 全てのロールを取得 | | | Member |
+| `GET`    | `/users/:user_id/roles` | 指定したユーザーのロールを取得 | | | Member |
+| `POST`   | `/users/:user_id/roles` | 指定したユーザーにロールを追加 | AddRole | | SystemAdmin |
+| `DELETE` | `/users/:user_id/roles/:role_id` | 指定したユーザーからロールを削除 | | | SystemAdmin |
 
 ---
 
 ### 入退室管理
-| メソッド | エンドポイント | 説明 | リクエスト | レスポンス |
-|----------|--------------|------|-----|-----|
-| `POST`   | `/entrance/` | 入退室を記録 | Entrance |
-| `GET`    | `/entrance/current` | 在室ユーザ一覧を取得 | |
-| `GET`    | `/entrance/logs` | すべての入退室ログを取得 | |
-| `GET`    | `/entrance/logs/:user_id` | 指定したユーザーの入退室ログを取得 | |
+| メソッド | エンドポイント | 説明 | リクエスト | レスポンス | 権限 |
+|----------|--------------|------|-----|-----|-----|
+| `POST`   | `/entrance/` | 入退室を記録 | Entrance | | ??? |
+| `GET`    | `/entrance/current` | 在室ユーザ一覧を取得 | | | Member |
+| `GET`    | `/entrance/logs` | すべての入退室ログを取得 | | | HouseAdmin |
+| `GET`    | `/entrance/logs/:user_id` | 指定したユーザーの入退室ログを取得 | | | HouseAdmin |
 
 ---
 
 ### 支払い管理
 
-| メソッド | エンドポイント | 説明 | リクエスト | レスポンス |
-|----------|--------------|------|-----|-----|
-| `GET`   | `/payment/` | すべての支払いログを取得 | |
-| `POST`   | `/payment/` | 支払いを記録 | Payment |
-| `GET`   | `/payment/monthly?year=:year&month=:month` | 指定月の支払いログを取得 | |
-| `POST`   | `/kaisuken/` | 入場料支払いを記録 | BuyKaisuken |
+| メソッド | エンドポイント | 説明 | リクエスト | レスポンス | 権限 |
+|----------|--------------|------|-----|-----|-----|
+| `GET`   | `/payment/` | すべての支払いログを取得 | | | HouseAdmin |
+| `POST`   | `/payment/` | 支払いを記録 | Payment | | HouseAdmin |
+| `GET`   | `/payment/monthly?year=:year&month=:month` | 指定月の支払いログを取得 | | | HouseAdmin |
+| `POST`   | `/kaisuken/` | 入場料支払いを記録 | BuyKaisuken | | HouseAdmin |
 
 ---
 
