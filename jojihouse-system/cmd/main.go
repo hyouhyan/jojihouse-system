@@ -49,7 +49,8 @@ func main() {
 
 	// Discord Authentication
 	discordAuthentication := authentication.NewDiscordAuthentication(userPortalService)
-	// discordAuthentication := authentication.NewDiscordAuthentication()
+	// Authentication
+	tokenAuthentication := authentication.NewTokenAuthentication(userPortalService)
 
 	// EntranceHandler
 	entranceHandler := handler.NewEntranceHandler(entranceService, userPortalService)
@@ -57,7 +58,7 @@ func main() {
 	roleHandler := handler.NewRoleHandler(userPortalService)
 	kaisukenHandler := handler.NewKaisukenHandler(userPortalService, adminManagementService)
 	paymentHandler := handler.NewPaymentHandler(adminManagementService)
-	authHandler := handler.NewAuthHandler(discordAuthentication)
+	authHandler := handler.NewAuthHandler(discordAuthentication, tokenAuthentication)
 
 	// Gin ルーターの設定
 	r := gin.Default()

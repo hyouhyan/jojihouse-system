@@ -10,13 +10,16 @@ import (
 
 type AuthHandler struct {
 	discordAuthentication *authentication.DiscordAuthentication
+	authentication        *authentication.TokenAuthentication
 }
 
 func NewAuthHandler(
 	discordAuthentication *authentication.DiscordAuthentication,
+	authentication *authentication.TokenAuthentication,
 ) *AuthHandler {
 	return &AuthHandler{
 		discordAuthentication: discordAuthentication,
+		authentication:        authentication,
 	}
 }
 
@@ -43,6 +46,8 @@ func (h *AuthHandler) DiscordAuth(c *gin.Context) {
 		log.Print(err)
 		return
 	}
+
+	// トークンの発行
 
 	c.JSON(http.StatusOK, gin.H{"message": "success", "user": user})
 }

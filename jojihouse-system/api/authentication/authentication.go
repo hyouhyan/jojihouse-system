@@ -9,15 +9,15 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type Authentication struct {
+type TokenAuthentication struct {
 	userPortalService *service.UserPortalService
 }
 
-func NewAuthentication(userPortalService *service.UserPortalService) *Authentication {
-	return &Authentication{userPortalService: userPortalService}
+func NewTokenAuthentication(userPortalService *service.UserPortalService) *TokenAuthentication {
+	return &TokenAuthentication{userPortalService: userPortalService}
 }
 
-func (a *Authentication) CreateJWTToken(userID int) (tokenStr string, err error) {
+func (a *TokenAuthentication) CreateJWTToken(userID int) (tokenStr string, err error) {
 	Env_load()
 
 	// トークン発行
@@ -35,7 +35,7 @@ func (a *Authentication) CreateJWTToken(userID int) (tokenStr string, err error)
 	return tokenStr, nil
 }
 
-func (a *Authentication) VerifyJWTToken(tokenStr string) (ok bool, err error) {
+func (a *TokenAuthentication) VerifyJWTToken(tokenStr string) (ok bool, err error) {
 	Env_load()
 
 	// トークンの検証
