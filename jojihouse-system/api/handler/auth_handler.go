@@ -31,8 +31,8 @@ func (h *AuthHandler) DiscordAuth(c *gin.Context) {
 		return
 	}
 
-	// Tokenの取得
-	token, err := h.discordAuthentication.GetToken(code)
+	// DiscordTokenの取得
+	discToken, err := h.discordAuthentication.GetToken(code)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get discord token"})
 		log.Print(err)
@@ -40,7 +40,7 @@ func (h *AuthHandler) DiscordAuth(c *gin.Context) {
 	}
 
 	// UserIDの取得
-	user, err := h.discordAuthentication.GetHouseSystemUser(token)
+	user, err := h.discordAuthentication.GetHouseSystemUser(discToken)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get discord user id"})
 		log.Print(err)
@@ -56,5 +56,5 @@ func (h *AuthHandler) DiscordAuth(c *gin.Context) {
 	}
 
 	c.Header("Authorization", authToken)
-	c.JSON(http.StatusOK, gin.H{"message": "success"})
+	c.JSON(http.StatusOK, gin.H{"message": "success", "user": *user, "authorization": authToken})
 }

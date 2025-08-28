@@ -5,6 +5,7 @@ import (
 	"jojihouse-system/internal/service"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -23,7 +24,7 @@ func (a *TokenAuthentication) CreateJWTToken(userID int) (tokenStr string, err e
 
 	// トークン発行
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub": userID,
+		"sub": strconv.Itoa(userID),
 		"exp": time.Now().Add(time.Hour * 24).Unix(),
 	})
 
@@ -58,9 +59,15 @@ func (a *TokenAuthentication) VerifyJWTToken(tokenStr string) (userID int, err e
 	}
 
 	// sub(userid)の抽出
-	userID, ok = claims["sub"].(int)
+	sub, ok := claims["sub"].(string)
 	if !ok {
 		return 0, fmt.Errorf("failed to get User ID")
+	}
+
+	// intへ変換
+	userID, err = strconv.Atoi(sub)
+	if err != nil {
+		return 0, fmt.Errorf("invalid user ID: %w", err)
 	}
 
 	return userID, nil
