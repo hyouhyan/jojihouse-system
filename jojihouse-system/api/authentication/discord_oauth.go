@@ -130,12 +130,12 @@ func (a *DiscordAuthentication) GetDiscordUserID(token string) (userID string, e
 	}
 
 	// idを抽出
-	userIDStr, ok := result["id"].(string)
+	userID, ok := result["id"].(string)
 	if !ok {
 		return "", fmt.Errorf("id not found")
 	}
 
-	_, err = strconv.Atoi(userIDStr)
+	_, err = strconv.Atoi(userID)
 	if err != nil {
 		return "", fmt.Errorf("discord id is not number: %v", err)
 	}
