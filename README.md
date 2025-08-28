@@ -62,7 +62,7 @@
 | name | VARCHAR(255) | 名前 | NOT NULL |
 | description | TEXT | 概要（任意） |  |
 | barcode | VARCHAR(64) | カードに印刷するバーコード（EAN-8） | 8桁の数字 NOT NULL |
-| discord_id | INT | DiscordアカウントのID |  |
+| discord_id | VARCHAR(64) | DiscordアカウントのID |  |
 | remaining_entries | INT | 入場可能回数 | 入場ごとに減少 |
 | registered_at | TIMESTAMP WITH TIME ZONE | 登録日 |  |
 | total_entries | INT | 総入場回数 |  |
