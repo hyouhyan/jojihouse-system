@@ -90,7 +90,7 @@ func (a *DiscordAuthentication) GetToken(code string) (token string, err error) 
 	return token, nil
 }
 
-func (a *DiscordAuthentication) GetDiscordUserID(token string) (userID int, err error) {
+func (a *DiscordAuthentication) GetDiscordUserID(token string) (userID string, err error) {
 	// Request組み立て
 	req, err := http.NewRequest(
 		"GET",
@@ -98,7 +98,7 @@ func (a *DiscordAuthentication) GetDiscordUserID(token string) (userID int, err 
 		nil,
 	)
 	if err != nil {
-		return 0, fmt.Errorf("リクエストの作成に失敗しました: %v", err)
+		return "", fmt.Errorf("リクエストの作成に失敗しました: %v", err)
 	}
 
 	// ヘッダー
@@ -108,36 +108,36 @@ func (a *DiscordAuthentication) GetDiscordUserID(token string) (userID int, err 
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 	defer res.Body.Close()
 
 	// ステータスコード確認
 	if res.StatusCode != 200 {
-		return 0, fmt.Errorf("status code %d", res.StatusCode)
+		return "", fmt.Errorf("status code %d", res.StatusCode)
 	}
 
 	// Bodyの取得
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return 0, fmt.Errorf("failed to get body %v", err)
+		return "", fmt.Errorf("failed to get body %v", err)
 	}
 
 	// JSONをパース
 	var result map[string]interface{}
 	if err := json.Unmarshal(body, &result); err != nil {
-		return 0, fmt.Errorf("failed to parse response: %v", err)
+		return "", fmt.Errorf("failed to parse response: %v", err)
 	}
 
 	// idを抽出
 	userIDStr, ok := result["id"].(string)
 	if !ok {
-		return 0, fmt.Errorf("id not found")
+		return "", fmt.Errorf("id not found")
 	}
 
-	userID, err = strconv.Atoi(userIDStr)
+	_, err = strconv.Atoi(userIDStr)
 	if err != nil {
-		return 0, fmt.Errorf("failed to parse id: %v", err)
+		return "", fmt.Errorf("discord id is not number: %v", err)
 	}
 
 	return userID, nil

@@ -46,7 +46,7 @@ func (r *UserRepository) GetUserByID(id int) (*model.User, error) {
 	return user, nil
 }
 
-func (r *UserRepository) GetUserByDiscordID(discordID int) (*model.User, error) {
+func (r *UserRepository) GetUserByDiscordID(discordID string) (*model.User, error) {
 	user := &model.User{}
 	err := r.db.Get(user, "SELECT * FROM users WHERE discord_id = $1", discordID)
 

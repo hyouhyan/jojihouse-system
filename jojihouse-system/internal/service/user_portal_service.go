@@ -187,7 +187,7 @@ func (s *UserPortalService) GetUserByBarcode(barcode string) (*response.User, er
 	return s.cnvModelUserToResponseUser(user), nil
 }
 
-func (s *UserPortalService) GetUserByDiscordID(discordID int) (*response.User, error) {
+func (s *UserPortalService) GetUserByDiscordID(discordID string) (*response.User, error) {
 	user, err := s.userRepository.GetUserByDiscordID(discordID)
 	if err != nil {
 		return nil, err
