@@ -48,6 +48,7 @@ func (h *KaisukenHandler) BuyKaisuken(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not increase remaining entries"})
 		log.Print(err)
+		return
 	}
 
 	// 支払いログの作成
