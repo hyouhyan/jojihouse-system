@@ -4,7 +4,7 @@ CREATE TABLE users (
     name VARCHAR(255) NOT NULL,
     description TEXT,
     barcode VARCHAR(64) UNIQUE NOT NULL,
-    discord_id INT UNIQUE,
+    discord_id VARCHAR(64) UNIQUE,
     remaining_entries INT DEFAULT 0,
     registered_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     total_entries INT DEFAULT 0 CHECK (total_entries >= 0),
