@@ -16,9 +16,15 @@ clean:
 
 deploy:
 	git fetch
-	$(MAKE) down
-	git pull
-	$(MAKE) up
+	@if [ $$(git rev-parse HEAD) = $$(git rev-parse @{u}) ]; then \
+		echo "No updates. Skip deploy."; \
+	else \
+		echo "Updates found. Deploying..."; \
+		$(MAKE) down; \
+		git pull; \
+		$(MAKE) up; \
+	fi
+
 
 dump:
 	docker compose run --rm backup
