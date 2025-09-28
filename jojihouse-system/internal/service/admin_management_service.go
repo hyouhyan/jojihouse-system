@@ -370,12 +370,27 @@ func (s *AdminManagementService) DeletePaymentLog(logID string) error {
 		count := remainintEntriesLog.NewEntries - remainintEntriesLog.PreviousEntries
 
 		// 入場可能回数を減らす
-		before, after, err := s.userRepository.DecreaseRemainingEntries(remainintEntriesLog.UserID, count)
+		beforeCount, afterCount, err := s.userRepository.DecreaseRemainingEntries(remainintEntriesLog.UserID, count)
 		if err != nil {
 			return err
 		}
 
-		log.Printf("[AdminManagementService] Decreased remaining entries for userID %d: %d -> %d", remainintEntriesLog.UserID, before, after)
+		// ログ保存
+		logData := &model.RemainingEntriesLog{
+			UserID:          remainintEntriesLog.UserID,
+			PreviousEntries: beforeCount,
+			NewEntries:      afterCount,
+			Reason:          "回数券購入の取り消しによる",
+			UpdatedBy:       "システム",
+		}
+
+		// ログ作成
+		_, err = s.remainingEntriesLogRepository.CreateRemainingEntriesLog(logData)
+		if err != nil {
+			return err
+		}
+
+		log.Printf("[AdminManagementService] Decreased remaining entries for userID %d: %d -> %d", remainintEntriesLog.UserID, beforeCount, afterCount)
 	}
 
 	return nil
