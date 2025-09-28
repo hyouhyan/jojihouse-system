@@ -102,3 +102,20 @@ func (h *PaymentHandler) CreatePaymentLog(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"time": paymentLog.Time.Format(time.RFC3339), "amount": paymentLog.Amount, "payway": paymentLog.Payway, "description": paymentLog.Description})
 }
+
+func (h *PaymentHandler) GetPaymentLogByID(c *gin.Context) {
+	logID := c.Param("log_id")
+	if logID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Log ID is required"})
+		return
+	}
+
+	paymentLog, err := h.adminManagementService.GetPaymentLogByID(logID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get payment log"})
+		log.Print(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"payment_log": paymentLog})
+}

@@ -175,3 +175,20 @@ func (r *PaymentLogRepository) GetMonthlyPaymentLogs(year int, month int) (*mode
 		Logs:       logs,
 	}, nil
 }
+
+func (r *PaymentLogRepository) GetPaymentLogByID(id primitive.ObjectID) (*model.PaymentLog, error) {
+	ctx := context.Background()
+	var log model.PaymentLog
+	err := r.db.Collection("payment_log").FindOne(ctx, bson.D{{Key: "_id", Value: id}}).Decode(&log)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &log, nil
+}
+
+// func (r *PaymentLogRepository) LinkPaymentAndRemainingEntries(paymentID primitive.ObjectID, remainingEntryID primitive.ObjectID) error {
+// 	ctx := context.Background()
+// }

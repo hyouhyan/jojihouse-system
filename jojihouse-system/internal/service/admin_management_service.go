@@ -224,6 +224,43 @@ func (s *AdminManagementService) GetAllPaymentLogs(lastID string, limit int64) (
 	return responseLogs, nil
 }
 
+func (s *AdminManagementService) GetPaymentLogByID(logID string) (*response.PaymentLog, error) {
+	objectID, err := primitive.ObjectIDFromHex(logID)
+	if err != nil {
+		return nil, err
+	}
+
+	log, err := s.paymentLogRepository.GetPaymentLogByID(objectID)
+	if err != nil {
+		return nil, err
+	}
+	if log == nil {
+		return nil, fmt.Errorf("payment log not found")
+	}
+
+	// UserIDに対応するUserNameを取得
+	user, err := s.userRepository.GetUserByID(log.UserID)
+	if err != nil {
+		return nil, err
+	}
+	if user == nil {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	// レスポンスデータの作成
+	responseLog := &response.PaymentLog{
+		ID:          log.ID.Hex(),
+		UserID:      log.UserID,
+		UserName:    *user.Name, // UserNameをセット
+		Time:        log.Time,
+		Description: log.Description,
+		Amount:      log.Amount,
+		Payway:      log.Payway,
+	}
+
+	return responseLog, nil
+}
+
 func (s *AdminManagementService) GetMonthlyPaymentLogs(year int, month int) (response.MonthlyPaymentLog, error) {
 	monthlyLog, err := s.paymentLogRepository.GetMonthlyPaymentLogs(year, month)
 	if err != nil {
