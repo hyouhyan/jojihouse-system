@@ -189,6 +189,23 @@ func (r *PaymentLogRepository) GetPaymentLogByID(id primitive.ObjectID) (*model.
 	return &log, nil
 }
 
-// func (r *PaymentLogRepository) LinkPaymentAndRemainingEntries(paymentID primitive.ObjectID, remainingEntryID primitive.ObjectID) error {
-// 	ctx := context.Background()
-// }
+func (r *PaymentLogRepository) LinkPaymentAndRemainingEntries(paymentID primitive.ObjectID, remainingEntryID primitive.ObjectID) error {
+	ctx := context.Background()
+	_, err := r.db.Collection("payment_log").UpdateOne(
+		ctx,
+		bson.D{{Key: "_id", Value: paymentID}},
+		bson.D{{
+			Key: "$set",
+			Value: bson.D{{
+				Key:   "remaining_entries_log_id",
+				Value: remainingEntryID,
+			}},
+		}},
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

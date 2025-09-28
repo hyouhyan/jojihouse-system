@@ -315,7 +315,7 @@ func (s *AdminManagementService) BuyKaisuken(userID int, receiver string, amount
 		logDescription = logDescription + "(" + description + ")"
 	}
 
-	_, err := s.IncreaseRemainingEntries(userID, count, logDescription, receiver)
+	remainingEntriesLogID, err := s.IncreaseRemainingEntries(userID, count, logDescription, receiver)
 	if err != nil {
 		return nil, err
 	}
@@ -327,7 +327,12 @@ func (s *AdminManagementService) BuyKaisuken(userID int, receiver string, amount
 		Description: logDescription,
 		Payway:      payway,
 	}
-	_, err = s.CreatePaymentLog(paymentLog)
+	paymentLogID, err := s.CreatePaymentLog(paymentLog)
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.paymentLogRepository.LinkPaymentAndRemainingEntries(*paymentLogID, *remainingEntriesLogID)
 	if err != nil {
 		return nil, err
 	}
