@@ -16,7 +16,7 @@ type PaymentLog struct {
 	Description            string             `json:"description" bson:"description"`
 	Amount                 int                `json:"amount" bson:"amount"`
 	Payway                 string             `json:"payway" bson:"payway"`
-	RemainingEntiriesLogID int                `json:"remaining_entries_log_id" bson:"remaining_entries_log_id"`
+	RemainingEntiriesLogID primitive.ObjectID `json:"remaining_entries_log_id" bson:"remaining_entries_log_id"`
 }
 
 type MonthlyPaymentLog struct {
