@@ -212,3 +212,16 @@ func (r *PaymentLogRepository) LinkPaymentAndRemainingEntries(paymentID primitiv
 
 	return nil
 }
+
+func (r *PaymentLogRepository) DeletePaymentLog(id primitive.ObjectID) error {
+	ctx := context.Background()
+
+	res, err := r.db.Collection("payment_log").DeleteOne(ctx, bson.D{{Key: "_id", Value: id}})
+	if err != nil {
+		return err
+	}
+	if res.DeletedCount == 0 {
+		return model.ErrPaymentLogNotFound
+	}
+	return nil
+}

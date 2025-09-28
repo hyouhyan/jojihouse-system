@@ -339,3 +339,44 @@ func (s *AdminManagementService) BuyKaisuken(userID int, receiver string, amount
 
 	return paymentLog, nil
 }
+
+func (s *AdminManagementService) DeletePaymentLog(logID string) error {
+	objectID, err := primitive.ObjectIDFromHex(logID)
+	if err != nil {
+		return err
+	}
+
+	// PaymentLogからRemainingEntriesLogのIDを取得
+	paymentLog, err := s.paymentLogRepository.GetPaymentLogByID(objectID)
+	if err != nil {
+		return err
+	}
+	if paymentLog == nil {
+		return model.ErrPaymentLogNotFound
+	}
+
+	// PaymentLogの削除
+	err = s.paymentLogRepository.DeletePaymentLog(objectID)
+	if err != nil {
+		return err
+	}
+
+	// 関連RemainingEntriesログがあれば入場可能回数を戻す
+	if paymentLog.RemainingEntiriesLogID != nil {
+		remainintEntriesLog, err := s.remainingEntriesLogRepository.GetRemainingEntriesLogByID(*paymentLog.RemainingEntiriesLogID)
+		if err != nil {
+			return err
+		}
+		count := remainintEntriesLog.NewEntries - remainintEntriesLog.PreviousEntries
+
+		// 入場可能回数を減らす
+		before, after, err := s.userRepository.DecreaseRemainingEntries(remainintEntriesLog.UserID, count)
+		if err != nil {
+			return err
+		}
+
+		log.Printf("[AdminManagementService] Decreased remaining entries for userID %d: %d -> %d", remainintEntriesLog.UserID, before, after)
+	}
+
+	return nil
+}

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"jojihouse-system/api/model/request"
 	"jojihouse-system/internal/model"
 	"jojihouse-system/internal/service"
@@ -113,7 +114,7 @@ func (h *PaymentHandler) GetPaymentLogByID(c *gin.Context) {
 	paymentLog, err := h.adminManagementService.GetPaymentLogByID(logID)
 	if err != nil {
 		switch {
-		case err == model.ErrPaymentLogNotFound:
+		case errors.Is(err, model.ErrPaymentLogNotFound):
 			c.JSON(http.StatusNotFound, gin.H{"error": "Payment log not found"})
 		default:
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get payment log"})
@@ -123,4 +124,26 @@ func (h *PaymentHandler) GetPaymentLogByID(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"payment_log": paymentLog})
+}
+
+func (h *PaymentHandler) DeletePaymentLog(c *gin.Context) {
+	logID := c.Param("log_id")
+	if logID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Log ID is required"})
+		return
+	}
+
+	err := h.adminManagementService.DeletePaymentLog(logID)
+	if err != nil {
+		switch {
+		case errors.Is(err, model.ErrPaymentLogNotFound):
+			c.JSON(http.StatusNotFound, gin.H{"error": "Payment log not found"})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete payment log"})
+		}
+		log.Print(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Payment log deleted successfully"})
 }

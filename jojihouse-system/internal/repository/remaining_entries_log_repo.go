@@ -53,6 +53,18 @@ func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogs(lastID primitive
 	return r._findRemainingEntriesLogs(bson.D{}, lastID, limit)
 }
 
+func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogByID(id primitive.ObjectID) (*model.RemainingEntriesLog, error) {
+	logs, err := r._findRemainingEntriesLogs(bson.D{{Key: "_id", Value: id}}, primitive.NilObjectID, 1)
+	if err != nil {
+		return nil, err
+	}
+	if len(logs) == 0 {
+		return nil, nil
+	}
+
+	return &logs[0], nil
+}
+
 func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogsOnlyIncrease(lastID primitive.ObjectID, limit int64) ([]model.RemainingEntriesLog, error) {
 	// previous_entries より new_entries の方が大きいデータを取得
 	filter := bson.D{
