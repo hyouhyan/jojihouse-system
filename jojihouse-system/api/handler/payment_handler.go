@@ -112,7 +112,12 @@ func (h *PaymentHandler) GetPaymentLogByID(c *gin.Context) {
 
 	paymentLog, err := h.adminManagementService.GetPaymentLogByID(logID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get payment log"})
+		switch {
+		case err == model.ErrPaymentLogNotFound:
+			c.JSON(http.StatusNotFound, gin.H{"error": "Payment log not found"})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get payment log"})
+		}
 		log.Print(err)
 		return
 	}

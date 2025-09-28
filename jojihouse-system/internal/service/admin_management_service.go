@@ -235,7 +235,7 @@ func (s *AdminManagementService) GetPaymentLogByID(logID string) (*response.Paym
 		return nil, err
 	}
 	if log == nil {
-		return nil, fmt.Errorf("payment log not found")
+		return nil, model.ErrPaymentLogNotFound
 	}
 
 	// UserIDに対応するUserNameを取得
@@ -244,7 +244,7 @@ func (s *AdminManagementService) GetPaymentLogByID(logID string) (*response.Paym
 		return nil, err
 	}
 	if user == nil {
-		return nil, fmt.Errorf("user not found")
+		return nil, model.ErrUserNotFound
 	}
 
 	// レスポンスデータの作成

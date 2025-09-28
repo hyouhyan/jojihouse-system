@@ -206,6 +206,9 @@ func (r *PaymentLogRepository) LinkPaymentAndRemainingEntries(paymentID primitiv
 	if err != nil {
 		return err
 	}
+	if err == mongo.ErrNoDocuments {
+		return model.ErrPaymentLogNotFound
+	}
 
 	return nil
 }
