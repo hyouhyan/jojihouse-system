@@ -8,6 +8,7 @@ import (
 )
 
 var ErrInvalidPaymentLog = errors.New("invalid payment log")
+var ErrPaymentLogNotFound = errors.New("payment log not found")
 
 type PaymentLog struct {
 	ID                     primitive.ObjectID  `json:"id" bson:"_id,omitempty"`
