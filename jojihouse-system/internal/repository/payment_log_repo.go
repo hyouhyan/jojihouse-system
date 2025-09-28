@@ -20,15 +20,21 @@ func NewPaymentLogRepository(db *mongo.Database) *PaymentLogRepository {
 	return &PaymentLogRepository{db: db}
 }
 
-func (r *PaymentLogRepository) CreatePaymentLog(log *model.PaymentLog) error {
+func (r *PaymentLogRepository) CreatePaymentLog(log *model.PaymentLog) (*primitive.ObjectID, error) {
 	log.ID = primitive.NilObjectID
 	log.Time = time.Now()
 
-	_, err := r.db.Collection("payment_log").InsertOne(context.Background(), log)
+	insResult, err := r.db.Collection("payment_log").InsertOne(context.Background(), log)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+
+	id, ok := insResult.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return nil, fmt.Errorf("failed to convert inserted ID to ObjectID")
+	}
+
+	return &id, nil
 }
 
 func (r *PaymentLogRepository) GetAllPaymentLogs(lastID primitive.ObjectID, limit int64) ([]model.PaymentLog, error) {

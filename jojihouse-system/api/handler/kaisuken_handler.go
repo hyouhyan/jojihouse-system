@@ -57,7 +57,7 @@ func (h *KaisukenHandler) BuyKaisuken(c *gin.Context) {
 		Description: description,
 		Payway:      req.Payway,
 	}
-	err = h.adminManagementService.CreatePaymentLog(paymentLog)
+	_, err = h.adminManagementService.CreatePaymentLog(paymentLog)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not create payment log"})
 		log.Print(err)

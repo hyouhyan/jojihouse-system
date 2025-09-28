@@ -93,7 +93,7 @@ func (h *PaymentHandler) CreatePaymentLog(c *gin.Context) {
 		Payway:      req.Payway,
 	}
 
-	err := h.adminManagementService.CreatePaymentLog(paymentLog)
+	_, err := h.adminManagementService.CreatePaymentLog(paymentLog)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create payment log"})
 		log.Print(err)
