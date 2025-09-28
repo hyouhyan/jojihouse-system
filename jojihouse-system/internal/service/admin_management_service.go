@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"jojihouse-system/api/model/request"
 	"jojihouse-system/api/model/response"
 	"jojihouse-system/internal/model"
@@ -269,4 +270,30 @@ func (s *AdminManagementService) GetMonthlyPaymentLogs(year int, month int) (res
 		CashTotal:  monthlyLog.CashTotal,
 		Logs:       responseLogs,
 	}, nil
+}
+
+func (s *AdminManagementService) BuyKaisuken(userID int, receiver string, amount int, count int, payway string, description string) (*model.PaymentLog, error) {
+	logDescription := fmt.Sprintf("入場料記録 %d回分 %d円", count, amount)
+	if description != "" {
+		logDescription = logDescription + "(" + description + ")"
+	}
+
+	_, err := s.IncreaseRemainingEntries(userID, count, logDescription, receiver)
+	if err != nil {
+		return nil, err
+	}
+
+	// 支払いログの作成
+	paymentLog := &model.PaymentLog{
+		UserID:      userID,
+		Amount:      amount,
+		Description: logDescription,
+		Payway:      payway,
+	}
+	_, err = s.CreatePaymentLog(paymentLog)
+	if err != nil {
+		return nil, err
+	}
+
+	return paymentLog, nil
 }

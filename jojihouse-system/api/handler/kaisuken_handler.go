@@ -1,9 +1,7 @@
 package handler
 
 import (
-	"fmt"
 	"jojihouse-system/api/model/request"
-	"jojihouse-system/internal/model"
 	"jojihouse-system/internal/service"
 	"log"
 	"net/http"
@@ -43,23 +41,9 @@ func (h *KaisukenHandler) BuyKaisuken(c *gin.Context) {
 		return
 	}
 
-	description := fmt.Sprintf("回数券購入 %d回分 %d円", req.Count, req.Amount)
-	_, err := h.adminManagementService.IncreaseRemainingEntries(req.UserID, req.Count, description, req.Receiver)
+	paymentLog, err := h.adminManagementService.BuyKaisuken(req.UserID, req.Receiver, req.Amount, req.Count, req.Payway, req.Description)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not increase remaining entries"})
-		log.Print(err)
-	}
-
-	// 支払いログの作成
-	paymentLog := &model.PaymentLog{
-		UserID:      req.UserID,
-		Amount:      req.Amount,
-		Description: description,
-		Payway:      req.Payway,
-	}
-	_, err = h.adminManagementService.CreatePaymentLog(paymentLog)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not create payment log"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to record kaisuken purchase"})
 		log.Print(err)
 		return
 	}
