@@ -103,22 +103,22 @@ func (s *AdminManagementService) DeleteUser(userID int) error {
 }
 
 // 入場可能回数の追加
-func (s *AdminManagementService) IncreaseRemainingEntries(userID int, count int, reason string, updatedBy string) error {
+func (s *AdminManagementService) IncreaseRemainingEntries(userID int, count int, reason string, updatedBy string) (*primitive.ObjectID, error) {
 	// ユーザー情報を取得(存在するかの確認)
 	user, err := s.userRepository.GetUserByID(userID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// ユーザーが存在しない場合はエラーを返す
 	if user == nil {
-		return model.ErrUserNotFound
+		return nil, model.ErrUserNotFound
 	}
 
 	// 入場可能回数 追加
 	beforeCount, afterCount, err := s.userRepository.IncreaseRemainingEntries(*user.ID, count)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// ログに保存

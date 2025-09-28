@@ -44,7 +44,7 @@ func (h *KaisukenHandler) BuyKaisuken(c *gin.Context) {
 	}
 
 	description := fmt.Sprintf("回数券購入 %d回分 %d円", req.Count, req.Amount)
-	err := h.adminManagementService.IncreaseRemainingEntries(req.UserID, req.Count, description, req.Receiver)
+	_, err := h.adminManagementService.IncreaseRemainingEntries(req.UserID, req.Count, description, req.Receiver)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not increase remaining entries"})
 		log.Print(err)

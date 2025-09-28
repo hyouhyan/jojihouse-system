@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"jojihouse-system/internal/model"
@@ -20,15 +21,21 @@ func NewRemainingEntriesLogRepository(db *mongo.Database) *RemainingEntriesLogRe
 	return &RemainingEntriesLogRepository{db: db}
 }
 
-func (r *RemainingEntriesLogRepository) CreateRemainingEntriesLog(log *model.RemainingEntriesLog) error {
+func (r *RemainingEntriesLogRepository) CreateRemainingEntriesLog(log *model.RemainingEntriesLog) (*primitive.ObjectID, error) {
 	log.ID = primitive.NilObjectID
 	log.UpdatedAt = time.Now()
 
-	_, err := r.db.Collection("remaining_entries_log").InsertOne(context.Background(), log)
+	insResult, err := r.db.Collection("remaining_entries_log").InsertOne(context.Background(), log)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+
+	id, ok := insResult.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return nil, fmt.Errorf("failed to convert inserted ID to ObjectID")
+	}
+
+	return &id, nil
 }
 
 func (r *RemainingEntriesLogRepository) CreateFixedRemainingEntriesLog(log *model.RemainingEntriesLog) error {

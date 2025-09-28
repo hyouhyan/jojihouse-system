@@ -102,7 +102,7 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 		}
 
 		// ログ作成
-		err = s.remainingEntriesLogRepository.CreateRemainingEntriesLog(logData)
+		_, err = s.remainingEntriesLogRepository.CreateRemainingEntriesLog(logData)
 		if err != nil {
 			return response.Entrance{}, err
 		}
@@ -208,7 +208,7 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 		}
 
 		// ログ作成
-		err = s.remainingEntriesLogRepository.CreateRemainingEntriesLog(logData)
+		_, err = s.remainingEntriesLogRepository.CreateRemainingEntriesLog(logData)
 		if err != nil {
 			return response.Entrance{}, err
 		}
