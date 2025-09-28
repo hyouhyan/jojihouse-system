@@ -10,13 +10,13 @@ import (
 var ErrInvalidPaymentLog = errors.New("invalid payment log")
 
 type PaymentLog struct {
-	ID                     primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	UserID                 int                `json:"user_id" bson:"user_id"`
-	Time                   time.Time          `json:"time" bson:"time"`
-	Description            string             `json:"description" bson:"description"`
-	Amount                 int                `json:"amount" bson:"amount"`
-	Payway                 string             `json:"payway" bson:"payway"`
-	RemainingEntiriesLogID primitive.ObjectID `json:"remaining_entries_log_id" bson:"remaining_entries_log_id"`
+	ID                     primitive.ObjectID  `json:"id" bson:"_id,omitempty"`
+	UserID                 int                 `json:"user_id" bson:"user_id"`
+	Time                   time.Time           `json:"time" bson:"time"`
+	Description            string              `json:"description" bson:"description"`
+	Amount                 int                 `json:"amount" bson:"amount"`
+	Payway                 string              `json:"payway" bson:"payway"`
+	RemainingEntiriesLogID *primitive.ObjectID `json:"remaining_entries_log_id" bson:"remaining_entries_log_id"`
 }
 
 type MonthlyPaymentLog struct {
