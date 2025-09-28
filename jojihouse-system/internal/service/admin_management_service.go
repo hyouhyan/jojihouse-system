@@ -273,7 +273,7 @@ func (s *AdminManagementService) GetMonthlyPaymentLogs(year int, month int) (res
 }
 
 func (s *AdminManagementService) BuyKaisuken(userID int, receiver string, amount int, count int, payway string, description string) (*model.PaymentLog, error) {
-	logDescription := fmt.Sprintf("入場料記録 %d回分 %d円", count, amount)
+	logDescription := fmt.Sprintf("回数券購入 %d回分 %d円", count, amount)
 	if description != "" {
 		logDescription = logDescription + "(" + description + ")"
 	}
