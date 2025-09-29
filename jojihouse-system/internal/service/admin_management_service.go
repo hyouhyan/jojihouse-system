@@ -104,7 +104,7 @@ func (s *AdminManagementService) DeleteUser(userID int) error {
 }
 
 // 入場可能回数の追加
-func (s *AdminManagementService) IncreaseRemainingEntries(userID int, count int, reason string, updatedBy string) (*primitive.ObjectID, error) {
+func (s *AdminManagementService) increaseRemainingEntries(userID int, count int, reason string, updatedBy string) (*primitive.ObjectID, error) {
 	// ユーザー情報を取得(存在するかの確認)
 	user, err := s.userRepository.GetUserByID(userID)
 	if err != nil {
@@ -134,6 +134,40 @@ func (s *AdminManagementService) IncreaseRemainingEntries(userID int, count int,
 
 	log.Printf("[AdminManagementService] %s's remaining entries increased %d -> %d: %s", *user.Name, beforeCount, afterCount, reason)
 
+	return s.remainingEntriesLogRepository.CreateRemainingEntriesLog(logData)
+}
+
+func (s *AdminManagementService) decreaseRemainingEntries(userID int, count int, reason string, updatedBy string) (*primitive.ObjectID, error) {
+	// ユーザー情報を取得(存在するかの確認)
+	user, err := s.userRepository.GetUserByID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// ユーザーが存在しない場合はエラーを返す
+	if user == nil {
+		return nil, model.ErrUserNotFound
+	}
+
+	// 入場可能回数を減らす
+	beforeCount, afterCount, err := s.userRepository.DecreaseRemainingEntries(userID, count)
+	if err != nil {
+		return nil, err
+	}
+
+	// ログに保存
+	logData := &model.RemainingEntriesLog{
+		UserID:          *user.ID,
+		PreviousEntries: beforeCount,
+		NewEntries:      afterCount,
+		Reason:          reason,
+		UpdatedBy:       updatedBy,
+		UpdatedAt:       time.Now(),
+	}
+
+	log.Printf("[AdminManagementService] %s's remaining entries decreased %d -> %d: %s", *user.Name, beforeCount, afterCount, reason)
+
+	// ログ作成
 	return s.remainingEntriesLogRepository.CreateRemainingEntriesLog(logData)
 }
 
@@ -315,7 +349,7 @@ func (s *AdminManagementService) BuyKaisuken(userID int, receiver string, amount
 		logDescription = logDescription + "(" + description + ")"
 	}
 
-	remainingEntriesLogID, err := s.IncreaseRemainingEntries(userID, count, logDescription, receiver)
+	remainingEntriesLogID, err := s.increaseRemainingEntries(userID, count, logDescription, receiver)
 	if err != nil {
 		return nil, err
 	}
@@ -370,27 +404,10 @@ func (s *AdminManagementService) DeletePaymentLog(logID string) error {
 		count := remainintEntriesLog.NewEntries - remainintEntriesLog.PreviousEntries
 
 		// 入場可能回数を減らす
-		beforeCount, afterCount, err := s.userRepository.DecreaseRemainingEntries(remainintEntriesLog.UserID, count)
+		_, err = s.decreaseRemainingEntries(remainintEntriesLog.UserID, count, "回数券購入の取り消しによる", "システム")
 		if err != nil {
 			return err
 		}
-
-		// ログ保存
-		logData := &model.RemainingEntriesLog{
-			UserID:          remainintEntriesLog.UserID,
-			PreviousEntries: beforeCount,
-			NewEntries:      afterCount,
-			Reason:          "回数券購入の取り消しによる",
-			UpdatedBy:       "システム",
-		}
-
-		// ログ作成
-		_, err = s.remainingEntriesLogRepository.CreateRemainingEntriesLog(logData)
-		if err != nil {
-			return err
-		}
-
-		log.Printf("[AdminManagementService] Decreased remaining entries for userID %d: %d -> %d", remainintEntriesLog.UserID, beforeCount, afterCount)
 	}
 
 	return nil
