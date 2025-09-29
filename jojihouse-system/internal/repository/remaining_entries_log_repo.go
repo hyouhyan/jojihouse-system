@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"jojihouse-system/internal/model"
@@ -20,15 +21,21 @@ func NewRemainingEntriesLogRepository(db *mongo.Database) *RemainingEntriesLogRe
 	return &RemainingEntriesLogRepository{db: db}
 }
 
-func (r *RemainingEntriesLogRepository) CreateRemainingEntriesLog(log *model.RemainingEntriesLog) error {
+func (r *RemainingEntriesLogRepository) CreateRemainingEntriesLog(log *model.RemainingEntriesLog) (*primitive.ObjectID, error) {
 	log.ID = primitive.NilObjectID
 	log.UpdatedAt = time.Now()
 
-	_, err := r.db.Collection("remaining_entries_log").InsertOne(context.Background(), log)
+	insResult, err := r.db.Collection("remaining_entries_log").InsertOne(context.Background(), log)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+
+	id, ok := insResult.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return nil, fmt.Errorf("failed to convert inserted ID to ObjectID")
+	}
+
+	return &id, nil
 }
 
 func (r *RemainingEntriesLogRepository) CreateFixedRemainingEntriesLog(log *model.RemainingEntriesLog) error {
@@ -44,6 +51,18 @@ func (r *RemainingEntriesLogRepository) CreateFixedRemainingEntriesLog(log *mode
 func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogs(lastID primitive.ObjectID, limit int64) ([]model.RemainingEntriesLog, error) {
 	// フィルターなしで全ログを取得
 	return r._findRemainingEntriesLogs(bson.D{}, lastID, limit)
+}
+
+func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogByID(id primitive.ObjectID) (*model.RemainingEntriesLog, error) {
+	logs, err := r._findRemainingEntriesLogs(bson.D{{Key: "_id", Value: id}}, primitive.NilObjectID, 1)
+	if err != nil {
+		return nil, err
+	}
+	if len(logs) == 0 {
+		return nil, nil
+	}
+
+	return &logs[0], nil
 }
 
 func (r *RemainingEntriesLogRepository) GetRemainingEntriesLogsOnlyIncrease(lastID primitive.ObjectID, limit int64) ([]model.RemainingEntriesLog, error) {

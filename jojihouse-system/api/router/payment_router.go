@@ -11,6 +11,10 @@ func SetupPaymentRoutes(router *gin.Engine, handler *handler.PaymentHandler) {
 	{
 		group.GET("", handler.GetAllPaymentLogs)
 		group.POST("", handler.CreatePaymentLog)
+
+		group.GET("/:log_id", handler.GetPaymentLogByID)
+		group.DELETE("/:log_id", handler.DeletePaymentLog)
+
 		group.GET("/monthly", handler.GetMonthlyPaymentLogs)
 	}
 }

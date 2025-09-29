@@ -20,15 +20,21 @@ func NewPaymentLogRepository(db *mongo.Database) *PaymentLogRepository {
 	return &PaymentLogRepository{db: db}
 }
 
-func (r *PaymentLogRepository) CreatePaymentLog(log *model.PaymentLog) error {
+func (r *PaymentLogRepository) CreatePaymentLog(log *model.PaymentLog) (*primitive.ObjectID, error) {
 	log.ID = primitive.NilObjectID
 	log.Time = time.Now()
 
-	_, err := r.db.Collection("payment_log").InsertOne(context.Background(), log)
+	insResult, err := r.db.Collection("payment_log").InsertOne(context.Background(), log)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+
+	id, ok := insResult.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return nil, fmt.Errorf("failed to convert inserted ID to ObjectID")
+	}
+
+	return &id, nil
 }
 
 func (r *PaymentLogRepository) GetAllPaymentLogs(lastID primitive.ObjectID, limit int64) ([]model.PaymentLog, error) {
@@ -168,4 +174,54 @@ func (r *PaymentLogRepository) GetMonthlyPaymentLogs(year int, month int) (*mode
 		CashTotal:  totals.CashTotal,
 		Logs:       logs,
 	}, nil
+}
+
+func (r *PaymentLogRepository) GetPaymentLogByID(id primitive.ObjectID) (*model.PaymentLog, error) {
+	ctx := context.Background()
+	var log model.PaymentLog
+	err := r.db.Collection("payment_log").FindOne(ctx, bson.D{{Key: "_id", Value: id}}).Decode(&log)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &log, nil
+}
+
+func (r *PaymentLogRepository) LinkPaymentAndRemainingEntries(paymentID primitive.ObjectID, remainingEntryID primitive.ObjectID) error {
+	ctx := context.Background()
+	_, err := r.db.Collection("payment_log").UpdateOne(
+		ctx,
+		bson.D{{Key: "_id", Value: paymentID}},
+		bson.D{{
+			Key: "$set",
+			Value: bson.D{{
+				Key:   "remaining_entries_log_id",
+				Value: remainingEntryID,
+			}},
+		}},
+	)
+
+	if err != nil {
+		return err
+	}
+	if err == mongo.ErrNoDocuments {
+		return model.ErrPaymentLogNotFound
+	}
+
+	return nil
+}
+
+func (r *PaymentLogRepository) DeletePaymentLog(id primitive.ObjectID) error {
+	ctx := context.Background()
+
+	res, err := r.db.Collection("payment_log").DeleteOne(ctx, bson.D{{Key: "_id", Value: id}})
+	if err != nil {
+		return err
+	}
+	if res.DeletedCount == 0 {
+		return model.ErrPaymentLogNotFound
+	}
+	return nil
 }
