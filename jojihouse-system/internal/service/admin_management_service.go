@@ -410,5 +410,7 @@ func (s *AdminManagementService) DeletePaymentLog(logID string) error {
 		}
 	}
 
+	log.Print("[AdminManagementService] Payment log deleted.\n", *paymentLog)
+
 	return nil
 }
