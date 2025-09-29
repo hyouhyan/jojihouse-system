@@ -390,11 +390,21 @@ func (s *AdminManagementService) DeletePaymentLog(logID string) error {
 		return model.ErrPaymentLogNotFound
 	}
 
+	// セーフティチェック
+	if paymentLog.RemainingEntiriesLogID == nil {
+		// Descriptionに"回数券購入"が含まれているか
+		if strings.Contains(paymentLog.Description, "回数券購入") {
+			log.Printf("[AdminManagementService] Warning: Payment log %s seems to be for ticket purchase but has no linked RemainingEntriesLogID.", logID)
+			return model.ErrPaymentLogSeemsTicketPurchase
+		}
+	}
+
 	// PaymentLogの削除
 	err = s.paymentLogRepository.DeletePaymentLog(objectID)
 	if err != nil {
 		return err
 	}
+	log.Print("[AdminManagementService] Payment log deleted.\n", *paymentLog)
 
 	// 関連RemainingEntriesログがあれば入場可能回数を戻す
 	if paymentLog.RemainingEntiriesLogID != nil {
@@ -410,17 +420,6 @@ func (s *AdminManagementService) DeletePaymentLog(logID string) error {
 			return err
 		}
 	}
-
-	// セーフティチェック
-	if paymentLog.RemainingEntiriesLogID == nil {
-		// Descriptionに"回数券購入"が含まれているか
-		if strings.Contains(paymentLog.Description, "回数券購入") {
-			log.Printf("[AdminManagementService] Warning: Payment log %s seems to be for ticket purchase but has no linked RemainingEntriesLogID.", logID)
-			return model.ErrPaymentLogSeemsTicketPurchase
-		}
-	}
-
-	log.Print("[AdminManagementService] Payment log deleted.\n", *paymentLog)
 
 	return nil
 }
