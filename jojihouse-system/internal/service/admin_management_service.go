@@ -7,6 +7,7 @@ import (
 	"jojihouse-system/internal/model"
 	"jojihouse-system/internal/repository"
 	"log"
+	"strings"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -407,6 +408,15 @@ func (s *AdminManagementService) DeletePaymentLog(logID string) error {
 		_, err = s.decreaseRemainingEntries(remainintEntriesLog.UserID, count, "回数券購入の取り消しによる", "システム")
 		if err != nil {
 			return err
+		}
+	}
+
+	// セーフティチェック
+	if paymentLog.RemainingEntiriesLogID == nil {
+		// Descriptionに"回数券購入"が含まれているか
+		if strings.Contains(paymentLog.Description, "回数券購入") {
+			log.Printf("[AdminManagementService] Warning: Payment log %s seems to be for ticket purchase but has no linked RemainingEntriesLogID.", logID)
+			return model.ErrPaymentLogSeemsTicketPurchase
 		}
 	}
 
