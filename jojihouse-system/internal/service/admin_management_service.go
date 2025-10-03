@@ -423,3 +423,11 @@ func (s *AdminManagementService) DeletePaymentLog(logID string) error {
 
 	return nil
 }
+
+func (s *AdminManagementService) DecreaseRemainingEntries(userID int, count int, reason string, updatedBy string) (*primitive.ObjectID, error) {
+	return s.decreaseRemainingEntries(userID, count, reason, updatedBy)
+}
+
+func (s *AdminManagementService) IncreaseRemainingEntries(userID int, count int, reason string, updatedBy string) (*primitive.ObjectID, error) {
+	return s.increaseRemainingEntries(userID, count, reason, updatedBy)
+}
