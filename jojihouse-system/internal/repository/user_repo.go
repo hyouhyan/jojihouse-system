@@ -159,7 +159,7 @@ func (r *UserRepository) UpdateUser(user *model.User) error {
 			contact = :contact,
 			remaining_entries = :remaining_entries,
 			total_entries = :total_entries,
-			allergy = :allergy
+			allergy = :allergy,
 			number = :number
 		WHERE id = :id
 	`, user)
@@ -184,8 +184,8 @@ func (r *UserRepository) DecreaseRemainingEntries(id int, count int) (int, int, 
 
 	// remaining_entries を更新しつつ、更新前後の値を取得
 	err := r.db.QueryRow(`
-		UPDATE users 
-		SET remaining_entries = remaining_entries - $1 
+		UPDATE users
+		SET remaining_entries = remaining_entries - $1
 		WHERE id = $2
 		RETURNING remaining_entries + $1, remaining_entries
 	`, count, id).Scan(&before, &after)
