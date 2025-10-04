@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"jojihouse-system/api/model/request"
 	"jojihouse-system/internal/model"
 	"jojihouse-system/internal/service"
@@ -93,7 +94,7 @@ func (h *PaymentHandler) CreatePaymentLog(c *gin.Context) {
 		Payway:      req.Payway,
 	}
 
-	err := h.adminManagementService.CreatePaymentLog(paymentLog)
+	_, err := h.adminManagementService.CreatePaymentLog(paymentLog)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create payment log"})
 		log.Print(err)
@@ -101,4 +102,50 @@ func (h *PaymentHandler) CreatePaymentLog(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"time": paymentLog.Time.Format(time.RFC3339), "amount": paymentLog.Amount, "payway": paymentLog.Payway, "description": paymentLog.Description})
+}
+
+func (h *PaymentHandler) GetPaymentLogByID(c *gin.Context) {
+	logID := c.Param("log_id")
+	if logID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Log ID is required"})
+		return
+	}
+
+	paymentLog, err := h.adminManagementService.GetPaymentLogByID(logID)
+	if err != nil {
+		switch {
+		case errors.Is(err, model.ErrPaymentLogNotFound):
+			c.JSON(http.StatusNotFound, gin.H{"error": "Payment log not found"})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get payment log"})
+		}
+		log.Print(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"payment_log": paymentLog})
+}
+
+func (h *PaymentHandler) DeletePaymentLog(c *gin.Context) {
+	logID := c.Param("log_id")
+	if logID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Log ID is required"})
+		return
+	}
+
+	err := h.adminManagementService.DeletePaymentLog(logID)
+	if err != nil {
+		switch {
+		case errors.Is(err, model.ErrPaymentLogNotFound):
+			c.JSON(http.StatusNotFound, gin.H{"error": "Payment log not found"})
+		case errors.Is(err, model.ErrPaymentLogSeemsTicketPurchase):
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "該当ログの削除には、特殊な処理が必要です。管理者に連絡してください。"})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete payment log"})
+		}
+		log.Print(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Payment log deleted successfully"})
 }

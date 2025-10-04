@@ -302,3 +302,38 @@ func (h *UserHandler) GetUserLogs(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"logs": logs})
 }
+
+func (h *UserHandler) ChangeRemainingEntries(c *gin.Context) {
+	userID, err := strconv.Atoi(c.Param("user_id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		log.Print(err)
+		return
+	}
+
+	var req request.ChangeRemainingEntries
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		log.Print(err)
+		return
+	}
+
+	if req.Delta == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Delta must be non-zero"})
+		return
+	}
+
+	if req.Delta > 0 {
+		_, err = h.adminManagementService.IncreaseRemainingEntries(userID, req.Delta, req.Readon, req.UpdatedBy)
+	} else {
+		_, err = h.adminManagementService.DecreaseRemainingEntries(userID, -req.Delta, req.Readon, req.UpdatedBy)
+	}
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to change remaining entries"})
+		log.Print(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Success"})
+}

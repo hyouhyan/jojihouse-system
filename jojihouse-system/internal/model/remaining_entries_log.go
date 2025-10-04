@@ -1,10 +1,13 @@
 package model
 
 import (
+	"errors"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
+
+var ErrRemainingEntriesLogNotFound = errors.New("remaining entries log not found")
 
 type RemainingEntriesLog struct {
 	ID              primitive.ObjectID `json:"id" bson:"_id,omitempty"`
