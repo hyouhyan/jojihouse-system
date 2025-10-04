@@ -89,7 +89,7 @@ func (s *AdminManagementService) UpdateUser(userID int, user *request.UpdateUser
 		userModel.Number = user.Number
 	}
 
-	log.Println("[AdminManagementService] User updated: ", *user.Name)
+	log.Println("[AdminManagementService] User updated: ", *userModel.Name)
 
 	return s.userRepository.UpdateUser(userModel)
 }
