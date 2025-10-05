@@ -399,6 +399,12 @@ func (s *AdminManagementService) DeletePaymentLog(logID string) error {
 		}
 	}
 
+	// ログが14日以上前のものであれば削除不可
+	if time.Since(paymentLog.Time) > 14*24*time.Hour {
+		log.Print("[AdminManagementService] Warning: Payment log ", logID, " is too old to delete.", "\n", "today: ", time.Now(), " log time: ", paymentLog.Time)
+		return model.ErrPaymentLogTooOldToDelete
+	}
+
 	// PaymentLogの削除
 	err = s.paymentLogRepository.DeletePaymentLog(objectID)
 	if err != nil {
