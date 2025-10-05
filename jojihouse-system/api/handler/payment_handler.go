@@ -140,6 +140,8 @@ func (h *PaymentHandler) DeletePaymentLog(c *gin.Context) {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Payment log not found"})
 		case errors.Is(err, model.ErrPaymentLogSeemsTicketPurchase):
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "該当ログの削除には、特殊な処理が必要です。管理者に連絡してください。"})
+		case errors.Is(err, model.ErrPaymentLogTooOldToDelete):
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "14日以上前のログは削除できません。どうしても削除したい場合は、管理者に連絡してください。"})
 		default:
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete payment log"})
 		}
