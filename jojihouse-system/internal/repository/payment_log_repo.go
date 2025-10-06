@@ -48,6 +48,7 @@ func (r *PaymentLogRepository) GetAllPaymentLogs(lastID primitive.ObjectID, limi
 			{Key: "_id", Value: bson.D{
 				{Key: "$lt", Value: lastID},
 			}},
+			{Key: "is_deleted", Value: false},
 		}
 	}
 	cursor, err := r.db.Collection("payment_log").Find(context.Background(), filter, opts)
@@ -86,6 +87,7 @@ func (r *PaymentLogRepository) getMonthlyTotalAmount(year int, month int) (*Mont
 			{Key: "$gte", Value: startDate},
 			{Key: "$lt", Value: endDate},
 		}},
+		{Key: "is_deleted", Value: false},
 	}
 
 	pipeline := mongo.Pipeline{
@@ -137,6 +139,7 @@ func (r *PaymentLogRepository) GetMonthlyPaymentLogs(year int, month int) (*mode
 			{Key: "$gte", Value: startDate},
 			{Key: "$lt", Value: endDate},
 		}},
+		{Key: "is_deleted", Value: false},
 	}
 
 	totals, err := r.getMonthlyTotalAmount(year, month)
