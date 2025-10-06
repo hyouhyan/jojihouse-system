@@ -20,6 +20,9 @@ type PaymentLog struct {
 	Amount                 int                 `json:"amount" bson:"amount"`
 	Payway                 string              `json:"payway" bson:"payway"`
 	RemainingEntiriesLogID *primitive.ObjectID `json:"remaining_entries_log_id" bson:"remaining_entries_log_id"`
+	IsDeleted              bool                `bson:"is_deleted"`
+	DeletedBy              *int                `bson:"deleted_by,omitempty"`
+	DeletedAt              *time.Time          `bson:"deleted_at,omitempty"`
 }
 
 type MonthlyPaymentLog struct {
