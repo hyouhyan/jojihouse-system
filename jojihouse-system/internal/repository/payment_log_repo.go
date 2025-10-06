@@ -20,6 +20,15 @@ func NewPaymentLogRepository(db *mongo.Database) *PaymentLogRepository {
 	return &PaymentLogRepository{db: db}
 }
 
+func (r *PaymentLogRepository) activeDeletedFilter() bson.D {
+	return bson.D{
+		{Key: "$or", Value: bson.A{
+			bson.D{{Key: "is_deleted", Value: false}},
+			bson.D{{Key: "is_deleted", Value: nil}},
+		}},
+	}
+}
+
 func (r *PaymentLogRepository) CreatePaymentLog(log *model.PaymentLog) (*primitive.ObjectID, error) {
 	log.ID = primitive.NilObjectID
 	log.Time = time.Now()
@@ -39,17 +48,21 @@ func (r *PaymentLogRepository) CreatePaymentLog(log *model.PaymentLog) (*primiti
 
 func (r *PaymentLogRepository) GetAllPaymentLogs(lastID primitive.ObjectID, limit int64) ([]model.PaymentLog, error) {
 	var logs []model.PaymentLog
-	filter := bson.D{}
+
 	opts := options.Find()
 	opts.SetSort(bson.D{{Key: "time", Value: -1}})
 	opts.SetLimit(limit)
+
+	filter := r.activeDeletedFilter()
 	if !lastID.IsZero() {
 		filter = bson.D{
 			{Key: "_id", Value: bson.D{
 				{Key: "$lt", Value: lastID},
 			}},
 		}
+		filter = append(filter, r.activeDeletedFilter()...)
 	}
+
 	cursor, err := r.db.Collection("payment_log").Find(context.Background(), filter, opts)
 	if err != nil {
 		return nil, err
@@ -69,14 +82,14 @@ func (r *PaymentLogRepository) GetAllPaymentLogs(lastID primitive.ObjectID, limi
 }
 
 // MonthlyTotalAmount は月次の支払い合計額を表す構造体です
-type MonthlyTotalAmount struct {
+type monthlyTotalAmount struct {
 	Total      int
 	OliveTotal int
 	CashTotal  int
 }
 
 // getMonthlyTotalAmount は指定された年月の支払い合計額を取得します
-func (r *PaymentLogRepository) getMonthlyTotalAmount(year int, month int) (*MonthlyTotalAmount, error) {
+func (r *PaymentLogRepository) getMonthlyTotalAmount(year int, month int) (*monthlyTotalAmount, error) {
 	ctx := context.Background()
 	startDate := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.Local)
 	endDate := startDate.AddDate(0, 1, 0)
@@ -87,6 +100,7 @@ func (r *PaymentLogRepository) getMonthlyTotalAmount(year int, month int) (*Mont
 			{Key: "$lt", Value: endDate},
 		}},
 	}
+	filter = append(filter, r.activeDeletedFilter()...)
 
 	pipeline := mongo.Pipeline{
 		bson.D{{Key: "$match", Value: filter}},
@@ -113,7 +127,7 @@ func (r *PaymentLogRepository) getMonthlyTotalAmount(year int, month int) (*Mont
 		return nil, fmt.Errorf("合計値の集計結果デコードに失敗: %w", err)
 	}
 
-	totals := &MonthlyTotalAmount{}
+	totals := &monthlyTotalAmount{}
 	for _, aggResult := range aggResults {
 		totals.Total += aggResult.Total
 		switch aggResult.ID {
@@ -138,6 +152,7 @@ func (r *PaymentLogRepository) GetMonthlyPaymentLogs(year int, month int) (*mode
 			{Key: "$lt", Value: endDate},
 		}},
 	}
+	filter = append(filter, r.activeDeletedFilter()...)
 
 	totals, err := r.getMonthlyTotalAmount(year, month)
 	if err != nil {
@@ -216,12 +231,83 @@ func (r *PaymentLogRepository) LinkPaymentAndRemainingEntries(paymentID primitiv
 func (r *PaymentLogRepository) DeletePaymentLog(id primitive.ObjectID) error {
 	ctx := context.Background()
 
-	res, err := r.db.Collection("payment_log").DeleteOne(ctx, bson.D{{Key: "_id", Value: id}})
+	now := time.Now()
+	res, err := r.db.Collection("payment_log").UpdateOne(
+		ctx,
+		append(
+			bson.D{
+				{Key: "_id", Value: id},
+			},
+			r.activeDeletedFilter()...,
+		),
+		bson.D{{
+			Key: "$set",
+			Value: bson.D{
+				{Key: "is_deleted", Value: true},
+				{Key: "deleted_at", Value: now},
+				{Key: "deleted_by", Value: nil}, // TODO: 実際のユーザーIDをセットする
+			},
+		}},
+	)
 	if err != nil {
 		return err
 	}
-	if res.DeletedCount == 0 {
-		return model.ErrPaymentLogNotFound
+
+	if res.MatchedCount == 0 {
+		// 条件に一致するドキュメントがない場合、削除できない理由を特定
+		existingLog, err := r.GetPaymentLogByID(id)
+		if err != nil {
+			return err
+		}
+		if existingLog == nil {
+			return model.ErrPaymentLogNotFound
+		}
+		if existingLog.IsDeleted {
+			return model.ErrPaymentLogAlreadyDeleted
+		}
+
+		return model.ErrPaymentLogFaledToDelete
 	}
+
+	return nil
+}
+
+func (r *PaymentLogRepository) ReactivatePaymentLog(id primitive.ObjectID) error {
+	ctx := context.Background()
+
+	res, err := r.db.Collection("payment_log").UpdateOne(
+		ctx,
+		bson.D{
+			{Key: "_id", Value: id},
+			{Key: "is_deleted", Value: true},
+		},
+		bson.D{{
+			Key: "$set",
+			Value: bson.D{
+				{Key: "is_deleted", Value: false},
+				{Key: "deleted_at", Value: nil},
+				{Key: "deleted_by", Value: nil},
+			},
+		}},
+	)
+	if err != nil {
+		return err
+	}
+
+	if res.MatchedCount == 0 {
+		existingLog, err := r.GetPaymentLogByID(id)
+		if err != nil {
+			return err
+		}
+		if existingLog == nil {
+			return model.ErrPaymentLogNotFound
+		}
+		if !existingLog.IsDeleted {
+			return model.ErrPaymentLogIsnotDeleted
+		}
+
+		return model.ErrPaymentLogFaledToDelete
+	}
+
 	return nil
 }

@@ -291,6 +291,9 @@ func (s *AdminManagementService) GetPaymentLogByID(logID string) (*response.Paym
 		Description: log.Description,
 		Amount:      log.Amount,
 		Payway:      log.Payway,
+		IsDeleted:   log.IsDeleted,
+		DeletedBy:   log.DeletedBy,
+		DeletedAt:   log.DeletedAt,
 	}
 
 	return responseLog, nil
