@@ -39,18 +39,29 @@ func (r *PaymentLogRepository) CreatePaymentLog(log *model.PaymentLog) (*primiti
 
 func (r *PaymentLogRepository) GetAllPaymentLogs(lastID primitive.ObjectID, limit int64) ([]model.PaymentLog, error) {
 	var logs []model.PaymentLog
-	filter := bson.D{}
+
 	opts := options.Find()
 	opts.SetSort(bson.D{{Key: "time", Value: -1}})
 	opts.SetLimit(limit)
+
+	filter := bson.D{
+		{Key: "$or", Value: bson.A{
+			bson.D{{Key: "is_deleted", Value: false}},
+			bson.D{{Key: "is_deleted", Value: nil}},
+		}},
+	}
 	if !lastID.IsZero() {
 		filter = bson.D{
 			{Key: "_id", Value: bson.D{
 				{Key: "$lt", Value: lastID},
 			}},
-			{Key: "is_deleted", Value: false},
+			{Key: "$or", Value: bson.A{
+				bson.D{{Key: "is_deleted", Value: false}},
+				bson.D{{Key: "is_deleted", Value: nil}},
+			}},
 		}
 	}
+
 	cursor, err := r.db.Collection("payment_log").Find(context.Background(), filter, opts)
 	if err != nil {
 		return nil, err
@@ -87,7 +98,10 @@ func (r *PaymentLogRepository) getMonthlyTotalAmount(year int, month int) (*Mont
 			{Key: "$gte", Value: startDate},
 			{Key: "$lt", Value: endDate},
 		}},
-		{Key: "is_deleted", Value: false},
+		{Key: "$or", Value: bson.A{
+			bson.D{{Key: "is_deleted", Value: false}},
+			bson.D{{Key: "is_deleted", Value: nil}},
+		}},
 	}
 
 	pipeline := mongo.Pipeline{
@@ -139,7 +153,10 @@ func (r *PaymentLogRepository) GetMonthlyPaymentLogs(year int, month int) (*mode
 			{Key: "$gte", Value: startDate},
 			{Key: "$lt", Value: endDate},
 		}},
-		{Key: "is_deleted", Value: false},
+		{Key: "$or", Value: bson.A{
+			bson.D{{Key: "is_deleted", Value: false}},
+			bson.D{{Key: "is_deleted", Value: nil}},
+		}},
 	}
 
 	totals, err := r.getMonthlyTotalAmount(year, month)
