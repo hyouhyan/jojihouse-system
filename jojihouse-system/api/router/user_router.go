@@ -1,27 +1,40 @@
 package router
 
 import (
+	"jojihouse-system/api/authentication/middleware"
 	"jojihouse-system/api/handler"
 
 	"github.com/gin-gonic/gin"
 )
 
-func SetupUserRoutes(router *gin.Engine, userHandler *handler.UserHandler) {
-	userGroup := router.Group("/users")
+func SetupUserRoutes(router *gin.Engine, userHandler *handler.UserHandler, middleware *middleware.AuthMiddleware) {
+	userGroupMember := router.Group("/users")
+	userGroupMember.Use(middleware.AuthMember)
 	{
-		userGroup.POST("", userHandler.CreateUser)
-		userGroup.GET("", userHandler.GetUsers)
+		userGroupMember.GET("", userHandler.GetUsers)
+		userGroupMember.GET("/:user_id", userHandler.GetUserByID)
 
-		userGroup.GET("/:user_id", userHandler.GetUserByID)
-		userGroup.PATCH("/:user_id", userHandler.UpdateUser)
-		userGroup.DELETE("/:user_id", userHandler.DeleteUser)
+		userGroupMember.GET("/:user_id/roles", userHandler.GetRolesByUserID)
+	}
 
-		userGroup.GET("/:user_id/roles", userHandler.GetRolesByUserID)
-		userGroup.POST("/:user_id/roles", userHandler.AddRoleToUser)
-		userGroup.DELETE("/:user_id/roles/:role_id", userHandler.RemoveRoleFromUser)
+	userGroupHouseAdmin := router.Group("/users")
+	userGroupHouseAdmin.Use(middleware.AuthHouseAdmin)
+	{
+		userGroupHouseAdmin.PATCH("/:user_id", userHandler.UpdateUser)
 
-		userGroup.POST("/:user_id/remainingentries", userHandler.ChangeRemainingEntries)
+		userGroupHouseAdmin.GET("/:user_id/logs", userHandler.GetUserLogs)
+	}
 
-		userGroup.GET("/:user_id/logs", userHandler.GetUserLogs)
+	userGroupSysAdmin := router.Group("/users")
+	userGroupSysAdmin.Use(middleware.AuthSystemAdmin)
+	{
+		userGroupSysAdmin.POST("", userHandler.CreateUser)
+
+		userGroupSysAdmin.DELETE("/:user_id", userHandler.DeleteUser)
+
+		userGroupSysAdmin.POST("/:user_id/roles", userHandler.AddRoleToUser)
+		userGroupSysAdmin.DELETE("/:user_id/roles/:role_id", userHandler.RemoveRoleFromUser)
+
+		userGroupSysAdmin.POST("/:user_id/remainingentries", userHandler.ChangeRemainingEntries)
 	}
 }

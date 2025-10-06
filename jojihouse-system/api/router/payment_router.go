@@ -1,20 +1,22 @@
 package router
 
 import (
+	"jojihouse-system/api/authentication/middleware"
 	"jojihouse-system/api/handler"
 
 	"github.com/gin-gonic/gin"
 )
 
-func SetupPaymentRoutes(router *gin.Engine, handler *handler.PaymentHandler) {
-	group := router.Group("/payment")
+func SetupPaymentRoutes(router *gin.Engine, handler *handler.PaymentHandler, middleware *middleware.AuthMiddleware) {
+	paymentGroupHouseAdmin := router.Group("/payment")
+	paymentGroupHouseAdmin.Use(middleware.AuthHouseAdmin)
 	{
-		group.GET("", handler.GetAllPaymentLogs)
-		group.POST("", handler.CreatePaymentLog)
+		paymentGroupHouseAdmin.GET("", handler.GetAllPaymentLogs)
+		paymentGroupHouseAdmin.POST("", handler.CreatePaymentLog)
 
-		group.GET("/:log_id", handler.GetPaymentLogByID)
-		group.DELETE("/:log_id", handler.DeletePaymentLog)
+		paymentGroupHouseAdmin.GET("/:log_id", handler.GetPaymentLogByID)
+		paymentGroupHouseAdmin.DELETE("/:log_id", handler.DeletePaymentLog)
 
-		group.GET("/monthly", handler.GetMonthlyPaymentLogs)
+		paymentGroupHouseAdmin.GET("/monthly", handler.GetMonthlyPaymentLogs)
 	}
 }
