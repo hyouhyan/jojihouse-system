@@ -271,3 +271,43 @@ func (r *PaymentLogRepository) DeletePaymentLog(id primitive.ObjectID) error {
 
 	return nil
 }
+
+func (r *PaymentLogRepository) ReactivatePaymentLog(id primitive.ObjectID) error {
+	ctx := context.Background()
+
+	res, err := r.db.Collection("payment_log").UpdateOne(
+		ctx,
+		bson.D{
+			{Key: "_id", Value: id},
+			{Key: "is_deleted", Value: true},
+		},
+		bson.D{{
+			Key: "$set",
+			Value: bson.D{
+				{Key: "is_deleted", Value: false},
+				{Key: "deleted_at", Value: nil},
+				{Key: "deleted_by", Value: nil},
+			},
+		}},
+	)
+	if err != nil {
+		return err
+	}
+
+	if res.MatchedCount == 0 {
+		existingLog, err := r.GetPaymentLogByID(id)
+		if err != nil {
+			return err
+		}
+		if existingLog == nil {
+			return model.ErrPaymentLogNotFound
+		}
+		if !existingLog.IsDeleted {
+			return model.ErrPaymentLogIsnotDeleted
+		}
+
+		return model.ErrPaymentLogFaledToDelete
+	}
+
+	return nil
+}

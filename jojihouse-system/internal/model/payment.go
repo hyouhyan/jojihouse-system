@@ -13,6 +13,7 @@ var ErrPaymentLogNotFound = errors.New("payment log not found")
 var ErrPaymentLogSeemsTicketPurchase = errors.New("payment log seems to be for ticket purchase but has no linked RemainingEntriesLogID")
 var ErrPaymentLogTooOldToDelete = errors.New("payment log is too old to delete, over 14 days")
 var ErrPaymentLogAlreadyDeleted = errors.New("payment log is already deleted")
+var ErrPaymentLogIsnotDeleted = errors.New("payment log is not deleted")
 var ErrPaymentLogFaledToDelete = errors.New("failed to delete payment log")
 
 type PaymentLog struct {
