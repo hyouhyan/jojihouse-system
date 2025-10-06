@@ -82,14 +82,14 @@ func (r *PaymentLogRepository) GetAllPaymentLogs(lastID primitive.ObjectID, limi
 }
 
 // MonthlyTotalAmount は月次の支払い合計額を表す構造体です
-type MonthlyTotalAmount struct {
+type monthlyTotalAmount struct {
 	Total      int
 	OliveTotal int
 	CashTotal  int
 }
 
 // getMonthlyTotalAmount は指定された年月の支払い合計額を取得します
-func (r *PaymentLogRepository) getMonthlyTotalAmount(year int, month int) (*MonthlyTotalAmount, error) {
+func (r *PaymentLogRepository) getMonthlyTotalAmount(year int, month int) (*monthlyTotalAmount, error) {
 	ctx := context.Background()
 	startDate := time.Date(year, time.Month(month), 1, 0, 0, 0, 0, time.Local)
 	endDate := startDate.AddDate(0, 1, 0)
@@ -127,7 +127,7 @@ func (r *PaymentLogRepository) getMonthlyTotalAmount(year int, month int) (*Mont
 		return nil, fmt.Errorf("合計値の集計結果デコードに失敗: %w", err)
 	}
 
-	totals := &MonthlyTotalAmount{}
+	totals := &monthlyTotalAmount{}
 	for _, aggResult := range aggResults {
 		totals.Total += aggResult.Total
 		switch aggResult.ID {
