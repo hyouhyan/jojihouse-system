@@ -234,10 +234,12 @@ func (r *PaymentLogRepository) DeletePaymentLog(id primitive.ObjectID) error {
 	now := time.Now()
 	res, err := r.db.Collection("payment_log").UpdateOne(
 		ctx,
-		bson.D{
-			{Key: "_id", Value: id},
-			{Key: "is_deleted", Value: false}, // 既に削除されていないことを確認
-		},
+		append(
+			bson.D{
+				{Key: "_id", Value: id},
+			},
+			r.activeDeletedFilter()...,
+		),
 		bson.D{{
 			Key: "$set",
 			Value: bson.D{
