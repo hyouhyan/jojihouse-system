@@ -216,12 +216,41 @@ func (r *PaymentLogRepository) LinkPaymentAndRemainingEntries(paymentID primitiv
 func (r *PaymentLogRepository) DeletePaymentLog(id primitive.ObjectID) error {
 	ctx := context.Background()
 
-	res, err := r.db.Collection("payment_log").DeleteOne(ctx, bson.D{{Key: "_id", Value: id}})
+	now := time.Now()
+	res, err := r.db.Collection("payment_log").UpdateOne(
+		ctx,
+		bson.D{
+			{Key: "_id", Value: id},
+			{Key: "is_deleted", Value: false}, // 既に削除されていないことを確認
+		},
+		bson.D{{
+			Key: "$set",
+			Value: bson.D{
+				{Key: "is_deleted", Value: true},
+				{Key: "deleted_at", Value: now},
+				{Key: "deleted_by", Value: nil}, // TODO: 実際のユーザーIDをセットする
+			},
+		}},
+	)
 	if err != nil {
 		return err
 	}
-	if res.DeletedCount == 0 {
-		return model.ErrPaymentLogNotFound
+
+	if res.MatchedCount == 0 {
+		// 条件に一致するドキュメントがない場合、削除できない理由を特定
+		existingLog, err := r.GetPaymentLogByID(id)
+		if err != nil {
+			return err
+		}
+		if existingLog == nil {
+			return model.ErrPaymentLogNotFound
+		}
+		if existingLog.IsDeleted {
+			return model.ErrPaymentLogAlreadyDeleted
+		}
+
+		return model.ErrPaymentLogFaledToDelete
 	}
+
 	return nil
 }
