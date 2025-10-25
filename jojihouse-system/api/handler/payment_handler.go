@@ -48,6 +48,29 @@ func (h *PaymentHandler) GetAllPaymentLogs(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"payment_logs": paymentLogs})
 }
 
+func (h *PaymentHandler) GetAllDeletedPaymentLogs(c *gin.Context) {
+	lastID := c.Query("last_id") // クエリパラメータから lastID を取得
+	limitStr := c.Query("limit") // クエリパラメータから limit を取得
+
+	// デフォルトの取得件数を設定（limit が指定されていなければ 10）
+	limit := int64(10)
+	if limitStr != "" {
+		parsedLimit, err := strconv.Atoi(limitStr)
+		if err == nil && parsedLimit > 0 {
+			limit = int64(parsedLimit)
+		}
+	}
+
+	paymentLogs, err := h.adminManagementService.GetAllDeletedPaymentLogs(lastID, limit)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get payment log"})
+		log.Print(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"payment_logs": paymentLogs})
+}
+
 func (h *PaymentHandler) GetMonthlyPaymentLogs(c *gin.Context) {
 	year := c.Query("year")
 	month := c.Query("month")
