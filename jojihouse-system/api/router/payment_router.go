@@ -16,5 +16,7 @@ func SetupPaymentRoutes(router *gin.Engine, handler *handler.PaymentHandler) {
 		group.DELETE("/:log_id", handler.DeletePaymentLog)
 
 		group.GET("/monthly", handler.GetMonthlyPaymentLogs)
+
+		group.GET("/deleted", handler.GetAllDeletedPaymentLogs)
 	}
 }

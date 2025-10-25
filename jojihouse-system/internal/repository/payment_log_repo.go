@@ -311,3 +311,39 @@ func (r *PaymentLogRepository) ReactivatePaymentLog(id primitive.ObjectID) error
 
 	return nil
 }
+
+// 消された支払いログのみ全て取得
+func (r *PaymentLogRepository) GetAllDeletedPaymentLogs(lastID primitive.ObjectID, limit int64) ([]model.PaymentLog, error) {
+	var logs []model.PaymentLog
+
+	opts := options.Find()
+	opts.SetSort(bson.D{{Key: "time", Value: -1}})
+	opts.SetLimit(limit)
+
+	filter := bson.D{{Key: "is_deleted", Value: true}}
+	if !lastID.IsZero() {
+		adFilter := bson.D{
+			{Key: "_id", Value: bson.D{
+				{Key: "$lt", Value: lastID},
+			}},
+		}
+		filter = append(filter, adFilter...)
+	}
+
+	cursor, err := r.db.Collection("payment_log").Find(context.Background(), filter, opts)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(context.Background())
+	for cursor.Next(context.Background()) {
+		var log model.PaymentLog
+		if err := cursor.Decode(&log); err != nil {
+			return nil, err
+		}
+		logs = append(logs, log)
+	}
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+	return logs, nil
+}
