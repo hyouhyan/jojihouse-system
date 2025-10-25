@@ -258,6 +258,62 @@ func (s *AdminManagementService) GetAllPaymentLogs(lastID string, limit int64) (
 
 	return responseLogs, nil
 }
+func (s *AdminManagementService) GetAllDeletedPaymentLogs(lastID string, limit int64) ([]response.PaymentLog, error) {
+	var objectID primitive.ObjectID
+	var err error
+
+	// lastIDを変換
+	if lastID == "" {
+		objectID = primitive.NilObjectID
+	} else {
+		objectID, err = primitive.ObjectIDFromHex(lastID)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	logs, err := s.paymentLogRepository.GetAllDeletedPaymentLogs(objectID, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	// UserIDの一覧を作成
+	userIDs := make([]int, len(logs))
+	for i, log := range logs {
+		userIDs[i] = log.UserID
+	}
+
+	// PostgreSQL から UserID に対応する UserName を取得
+	users, err := s.userRepository.GetUsersByIDs(userIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	// UserID -> UserName のマッピング
+	userMap := make(map[int]string)
+	for _, user := range users {
+		userMap[*user.ID] = *user.Name
+	}
+
+	// レスポンスデータの作成
+	var responseLogs []response.PaymentLog
+	for _, log := range logs {
+		responseLogs = append(responseLogs, response.PaymentLog{
+			ID:          log.ID.Hex(),
+			UserID:      log.UserID,
+			UserName:    userMap[log.UserID], // UserIDからUserNameを取得
+			Time:        log.Time,
+			Description: log.Description,
+			Amount:      log.Amount,
+			Payway:      log.Payway,
+			IsDeleted:   log.IsDeleted,
+			DeletedBy:   log.DeletedBy,
+			DeletedAt:   log.DeletedAt,
+		})
+	}
+
+	return responseLogs, nil
+}
 
 func (s *AdminManagementService) GetPaymentLogByID(logID string) (*response.PaymentLog, error) {
 	objectID, err := primitive.ObjectIDFromHex(logID)
@@ -291,6 +347,9 @@ func (s *AdminManagementService) GetPaymentLogByID(logID string) (*response.Paym
 		Description: log.Description,
 		Amount:      log.Amount,
 		Payway:      log.Payway,
+		IsDeleted:   log.IsDeleted,
+		DeletedBy:   log.DeletedBy,
+		DeletedAt:   log.DeletedAt,
 	}
 
 	return responseLog, nil
@@ -397,6 +456,12 @@ func (s *AdminManagementService) DeletePaymentLog(logID string) error {
 			log.Printf("[AdminManagementService] Warning: Payment log %s seems to be for ticket purchase but has no linked RemainingEntriesLogID.", logID)
 			return model.ErrPaymentLogSeemsTicketPurchase
 		}
+	}
+
+	// ログが14日以上前のものであれば削除不可
+	if time.Since(paymentLog.Time) > 14*24*time.Hour {
+		log.Print("[AdminManagementService] Warning: Payment log ", logID, " is too old to delete.", "\n", "today: ", time.Now(), " log time: ", paymentLog.Time)
+		return model.ErrPaymentLogTooOldToDelete
 	}
 
 	// PaymentLogの削除
