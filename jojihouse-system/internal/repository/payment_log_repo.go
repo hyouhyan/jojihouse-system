@@ -320,7 +320,7 @@ func (r *PaymentLogRepository) GetAllDeletedPaymentLogs(lastID primitive.ObjectI
 	opts.SetSort(bson.D{{Key: "time", Value: -1}})
 	opts.SetLimit(limit)
 
-	filter := bson.D{{Key: "is_deleted", Value: false}}
+	filter := bson.D{{Key: "is_deleted", Value: true}}
 	if !lastID.IsZero() {
 		adFilter := bson.D{
 			{Key: "_id", Value: bson.D{
