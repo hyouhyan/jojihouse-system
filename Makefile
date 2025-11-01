@@ -1,3 +1,8 @@
+DOCKER=docker
+COMPOSE=$(DOCKER) compose
+
+IMAGE=$(DOCKER) image
+
 .PHONY: reup
 reup:
 	$(MAKE) down
@@ -5,16 +10,16 @@ reup:
 
 .PHONY:  up
 up:
-	docker compose up -d --build
+	$(COMPOSE) up -d --build
 	$(MAKE) clean
 
 .PHONY:  down
 down:
-	docker compose down
+	$(COMPOSE) down
 
 .PHONY:  clean
 clean:
-	docker image prune -f
+	$(IMAGE) prune -f
 
 .PHONY:  deploy
 deploy:
@@ -31,7 +36,7 @@ deploy:
 
 .PHONY:  dump
 dump:
-	docker compose run --rm backup
+	$(COMPOSE) run --rm backup
 
 .PHONY:  dev
 dev:
@@ -41,7 +46,7 @@ dev:
 
 .PHONY:  dev/up
 dev/up:
-	docker compose -f dev-compose.yml up -d --build
+	$(COMPOSE) -f dev-compose.yml up -d --build
 
 .PHONY:  dev/down
 dev/reup:
@@ -50,4 +55,4 @@ dev/reup:
 
 .PHONY:  dev/reup
 dev/down:
-	docker compose -f dev-compose.yml down
+	$(COMPOSE) -f dev-compose.yml down
