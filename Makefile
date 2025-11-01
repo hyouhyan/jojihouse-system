@@ -1,19 +1,27 @@
-.PHONY: reup up down clean dump deploy dev dev/up dev/down dev/reup
+DOCKER=docker
+COMPOSE=$(DOCKER) compose
 
+IMAGE=$(DOCKER) image
+
+.PHONY: reup
 reup:
 	$(MAKE) down
 	$(MAKE) up
 
+.PHONY:  up
 up:
-	docker compose up -d --build
+	$(COMPOSE) up -d --build
 	$(MAKE) clean
 
+.PHONY:  down
 down:
-	docker compose down
+	$(COMPOSE) down
 
+.PHONY:  clean
 clean:
-	docker image prune -f
+	$(IMAGE) prune -f
 
+.PHONY:  deploy
 deploy:
 	git fetch
 	@if [ $$(git rev-parse HEAD) = $$(git rev-parse @{u}) ]; then \
@@ -26,20 +34,25 @@ deploy:
 	fi
 
 
+.PHONY:  dump
 dump:
-	docker compose run --rm backup
+	$(COMPOSE) run --rm backup
 
+.PHONY:  dev
 dev:
 	$(MAKE) dev/reup
 	@echo "Dev mode is \033[32mactive\033[m."
 	@echo "Try this -> \033[4m\033[34mhttp://localhost:1024/\033[m\033[m"
 
+.PHONY:  dev/up
 dev/up:
-	docker compose -f dev-compose.yml up -d --build
+	$(COMPOSE) -f dev-compose.yml up -d --build
 
+.PHONY:  dev/down
 dev/reup:
 	$(MAKE) dev/down
 	$(MAKE) dev/up
 
+.PHONY:  dev/reup
 dev/down:
-	docker compose -f dev-compose.yml down
+	$(COMPOSE) -f dev-compose.yml down
