@@ -130,7 +130,10 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 func (h *EntranceHandler) GetCurrentUsers(c *gin.Context) {
 	currentUsers, err := h.userPortalService.GetCurrentUsers()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get current users"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"title":  "Failed to get current users",
+			"detail": "現在ハウス内にいるユーザーの取得に失敗しました。",
+		})
 		log.Print(err)
 		return
 	}
