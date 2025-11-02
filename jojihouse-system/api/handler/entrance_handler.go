@@ -34,7 +34,10 @@ func NewEntranceHandler(entranceService *service.EntranceService, userPortalServ
 func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 	var req request.Entrance
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid request",
+			"detail": "リクエストの形式が間違っています。",
+		})
 		log.Print(err)
 		return
 	}
@@ -49,9 +52,15 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 		if err != nil {
 			switch {
 			case errors.Is(err, model.ErrUserNotFound):
-				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+				c.JSON(http.StatusNotFound, gin.H{
+					"title":  "User not found",
+					"detail": "バーコードに対応するユーザが見つかりませんでした。",
+				})
 			default:
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check current user"})
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"title":  "Failed to check current user",
+					"detail": "ユーザが在室しているかを確認できませんでした。通常は起こり得ないエラーなので、管理者に連絡してください。",
+				})
 			}
 			log.Print(err)
 			return
@@ -69,9 +78,15 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 		if err != nil {
 			switch {
 			case errors.Is(err, model.ErrUserNotFound):
-				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+				c.JSON(http.StatusNotFound, gin.H{
+					"title":  "User not found",
+					"detail": "バーコードに対応するユーザが見つかりませんでした。",
+				})
 			default:
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to record entry"})
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"title":  "Failed to record entry",
+					"detail": "入室の記録に失敗しました。",
+				})
 			}
 			log.Print(err)
 			return
@@ -81,15 +96,24 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 		if err != nil {
 			switch {
 			case errors.Is(err, model.ErrUserNotFound):
-				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+				c.JSON(http.StatusNotFound, gin.H{
+					"title":  "User not found",
+					"detail": "バーコードに対応するユーザが見つかりませんでした。",
+				})
 			default:
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to record exit"})
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"title":  "Failed to record exit",
+					"detail": "退室の記録に失敗しました。",
+				})
 			}
 			log.Print(err)
 			return
 		}
 	default:
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid type. Must be 'entry', 'exit', or 'auto'"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid type",
+			"detail": "typeは「entry」「exit」「auto」のいずれかで指定してください。",
+		})
 		log.Print("Invalid type. " + req.Type)
 		return
 	}
