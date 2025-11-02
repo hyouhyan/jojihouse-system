@@ -182,10 +182,18 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 
 	err = h.adminManagementService.UpdateUser(userID, &req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"title":  "Failed to update user",
-			"detail": "ユーザ情報の更新に失敗しました。",
-		})
+		switch {
+		case errors.Is(err, model.ErrUserNotFound):
+			c.JSON(http.StatusNotFound, gin.H{
+				"title":  "User not found",
+				"detail": "指定されたユーザが見つかりませんでした。",
+			})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"title":  "Failed to update user",
+				"detail": "ユーザ情報の更新に失敗しました。",
+			})
+		}
 		log.Print(err)
 		return
 	}
@@ -213,10 +221,18 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 
 	err = h.adminManagementService.DeleteUser(userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"title":  "Failed to delete user",
-			"detail": "ユーザの削除に失敗しました。",
-		})
+		switch {
+		case errors.Is(err, model.ErrUserNotFound):
+			c.JSON(http.StatusNotFound, gin.H{
+				"title":  "User not found",
+				"detail": "指定されたユーザが見つかりませんでした。",
+			})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"title":  "Failed to delete user",
+				"detail": "ユーザの削除に失敗しました。",
+			})
+		}
 		log.Print(err)
 		return
 	}
@@ -244,10 +260,18 @@ func (h *UserHandler) GetRolesByUserID(c *gin.Context) {
 
 	res, err := h.userPortalService.GetRolesByUserID(userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"title":  "Failed to get user roles",
-			"detail": "ユーザのロール情報の取得に失敗しました。",
-		})
+		switch {
+		case errors.Is(err, model.ErrUserNotFound):
+			c.JSON(http.StatusNotFound, gin.H{
+				"title":  "User not found",
+				"detail": "指定されたユーザが見つかりませんでした。",
+			})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"title":  "Failed to get user roles",
+				"detail": "ユーザのロール情報の取得に失敗しました。",
+			})
+		}
 		log.Print(err)
 		return
 	}
@@ -286,10 +310,18 @@ func (h *UserHandler) AddRoleToUser(c *gin.Context) {
 	}
 
 	if err := h.adminManagementService.AddRoleToUser(userID, req.RoleID); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"title":  "Failed to add role to user",
-			"detail": "ユーザへのロール追加に失敗しました。",
-		})
+		switch {
+		case errors.Is(err, model.ErrUserNotFound):
+			c.JSON(http.StatusNotFound, gin.H{
+				"title":  "User not found",
+				"detail": "指定されたユーザが見つかりませんでした。",
+			})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"title":  "Failed to add role to user",
+				"detail": "ユーザへのロール追加に失敗しました。",
+			})
+		}
 		log.Print(err)
 		return
 	}
@@ -327,10 +359,18 @@ func (h *UserHandler) RemoveRoleFromUser(c *gin.Context) {
 	}
 
 	if err := h.adminManagementService.RemoveRoleFromUser(userID, roleID); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"title":  "Failed to remove role",
-			"detail": "ユーザのロール削除に失敗しました。",
-		})
+		switch {
+		case errors.Is(err, model.ErrUserNotFound):
+			c.JSON(http.StatusNotFound, gin.H{
+				"title":  "User not found",
+				"detail": "指定されたユーザが見つかりませんでした。",
+			})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"title":  "Failed to remove role",
+				"detail": "ユーザのロール削除に失敗しました。",
+			})
+		}
 		log.Print(err)
 		return
 	}
@@ -411,10 +451,18 @@ func (h *UserHandler) ChangeRemainingEntries(c *gin.Context) {
 	}
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"title":  "Failed to change remaining entries",
-			"detail": "入場可能回数の変更に失敗しました。",
-		})
+		switch {
+		case errors.Is(err, model.ErrUserNotFound):
+			c.JSON(http.StatusNotFound, gin.H{
+				"title":  "User not found",
+				"detail": "指定されたユーザが見つかりませんでした。",
+			})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"title":  "Failed to change remaining entries",
+				"detail": "入場可能回数の変更に失敗しました。",
+			})
+		}
 		log.Print(err)
 		return
 	}
