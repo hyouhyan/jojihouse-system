@@ -36,14 +36,20 @@ func NewKaisukenHandler(
 func (h *KaisukenHandler) BuyKaisuken(c *gin.Context) {
 	var req request.BuyKaisuken
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid request",
+			"detail": "リクエストの形式が間違っています。",
+		})
 		log.Print(err)
 		return
 	}
 
 	paymentLog, err := h.adminManagementService.BuyKaisuken(req.UserID, req.Receiver, req.Amount, req.Count, req.Payway, req.Description)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to record kaisuken purchase"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"title":  "Failed to record kaisuken purchase",
+			"detail": "回数券購入の記録に失敗しました。",
+		})
 		log.Print(err)
 		return
 	}

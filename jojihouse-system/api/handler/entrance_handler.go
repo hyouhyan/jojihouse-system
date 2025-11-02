@@ -34,7 +34,10 @@ func NewEntranceHandler(entranceService *service.EntranceService, userPortalServ
 func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 	var req request.Entrance
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid request",
+			"detail": "リクエストの形式が間違っています。",
+		})
 		log.Print(err)
 		return
 	}
@@ -49,9 +52,15 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 		if err != nil {
 			switch {
 			case errors.Is(err, model.ErrUserNotFound):
-				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+				c.JSON(http.StatusNotFound, gin.H{
+					"title":  "User not found",
+					"detail": "バーコードに対応するユーザが見つかりませんでした。",
+				})
 			default:
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check current user"})
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"title":  "Failed to check current user",
+					"detail": "ユーザが在室しているかを確認できませんでした。通常は起こり得ないエラーなので、管理者に連絡してください。",
+				})
 			}
 			log.Print(err)
 			return
@@ -69,9 +78,15 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 		if err != nil {
 			switch {
 			case errors.Is(err, model.ErrUserNotFound):
-				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+				c.JSON(http.StatusNotFound, gin.H{
+					"title":  "User not found",
+					"detail": "バーコードに対応するユーザが見つかりませんでした。",
+				})
 			default:
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to record entry"})
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"title":  "Failed to record entry",
+					"detail": "入室の記録に失敗しました。",
+				})
 			}
 			log.Print(err)
 			return
@@ -81,15 +96,24 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 		if err != nil {
 			switch {
 			case errors.Is(err, model.ErrUserNotFound):
-				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+				c.JSON(http.StatusNotFound, gin.H{
+					"title":  "User not found",
+					"detail": "バーコードに対応するユーザが見つかりませんでした。",
+				})
 			default:
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to record exit"})
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"title":  "Failed to record exit",
+					"detail": "退室の記録に失敗しました。",
+				})
 			}
 			log.Print(err)
 			return
 		}
 	default:
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid type. Must be 'entry', 'exit', or 'auto'"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid type",
+			"detail": "typeは「entry」「exit」「auto」のいずれかで指定してください。",
+		})
 		log.Print("Invalid type. " + req.Type)
 		return
 	}
@@ -106,7 +130,10 @@ func (h *EntranceHandler) RecordEntrance(c *gin.Context) {
 func (h *EntranceHandler) GetCurrentUsers(c *gin.Context) {
 	currentUsers, err := h.userPortalService.GetCurrentUsers()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get current users"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"title":  "Failed to get current users",
+			"detail": "現在ハウス内にいるユーザーの取得に失敗しました。",
+		})
 		log.Print(err)
 		return
 	}
@@ -145,7 +172,10 @@ func (h *EntranceHandler) GetAccessLogs(c *gin.Context) {
 	if dateStr != "" {
 		date, err = time.Parse("2006-01-02", dateStr)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format. Use YYYY-MM-DD"})
+			c.JSON(http.StatusBadRequest, gin.H{
+				"title":  "Invalid date format",
+				"detail": "dateはYYYY-MM-DD形式で指定してください。",
+			})
 			log.Print(err)
 			return
 		}
@@ -159,7 +189,10 @@ func (h *EntranceHandler) GetAccessLogs(c *gin.Context) {
 
 	accessLogs, err := h.userPortalService.GetAccessLogsByAnyFilter(lastID, options)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get access log"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"title":  "Failed to get access log",
+			"detail": "入退室ログの取得に失敗しました。",
+		})
 		log.Print(err)
 		return
 	}
@@ -179,7 +212,10 @@ func (h *EntranceHandler) GetAccessLogs(c *gin.Context) {
 func (h *EntranceHandler) GetAccessLogsByUserID(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"title":  "Invalid user ID",
+			"detail": "ユーザIDが誤っています。ユーザIDは整数で指定してください。",
+		})
 		log.Print(err)
 		return
 	}
@@ -203,7 +239,10 @@ func (h *EntranceHandler) GetAccessLogsByUserID(c *gin.Context) {
 
 	accessLogs, err := h.userPortalService.GetAccessLogsByAnyFilter(lastID, options)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get access log"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"title":  "Failed to get access log",
+			"detail": "入退室ログの取得に失敗しました。",
+		})
 		log.Print(err)
 		return
 	}

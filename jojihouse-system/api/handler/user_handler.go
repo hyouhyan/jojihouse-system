@@ -32,14 +32,20 @@ func (h *UserHandler) CreateUser(c *gin.Context) {
 	var req request.CreateUser
 	// リクエストの解読
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid request",
+			"detail": "リクエストの形式が間違っています。",
+		})
 		log.Print(err)
 		return
 	}
 
 	res, err := h.adminManagementService.CreateUser(&req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"title":  "Failed to create user",
+			"detail": "ユーザの作成に失敗しました。",
+		})
 		log.Print(err)
 		return
 	}
@@ -58,7 +64,10 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 	// URLパラメータから user_id を取得
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid user ID",
+			"detail": "ユーザIDが誤っています。ユーザIDは整数で指定してください。",
+		})
 		log.Print(err)
 		return
 	}
@@ -68,9 +77,15 @@ func (h *UserHandler) GetUserByID(c *gin.Context) {
 	if err != nil {
 		switch {
 		case errors.Is(err, model.ErrUserNotFound):
-			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			c.JSON(http.StatusNotFound, gin.H{
+				"title":  "User not found",
+				"detail": "指定されたユーザが見つかりませんでした。",
+			})
 		default:
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"title":  "Failed to get user",
+				"detail": "ユーザ情報の取得に失敗しました。",
+			})
 		}
 		log.Print(err)
 		return
@@ -96,9 +111,15 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 		if err != nil {
 			switch {
 			case errors.Is(err, model.ErrUserNotFound):
-				c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+				c.JSON(http.StatusNotFound, gin.H{
+					"title":  "User not found",
+					"detail": "バーコードに対応するユーザが見つかりませんでした。",
+				})
 			default:
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"title":  "Failed to get user",
+					"detail": "ユーザ情報の取得に失敗しました。",
+				})
 			}
 			log.Print(err)
 			return
@@ -113,9 +134,15 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 	if err != nil {
 		switch {
 		case errors.Is(err, model.ErrUserNotFound):
-			c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+			c.JSON(http.StatusNotFound, gin.H{
+				"title":  "User not found",
+				"detail": "ユーザが見つかりませんでした。",
+			})
 		default:
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get user"})
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"title":  "Failed to get user",
+				"detail": "ユーザ情報の取得に失敗しました。",
+			})
 		}
 		log.Print(err)
 	}
@@ -135,21 +162,38 @@ func (h *UserHandler) GetUsers(c *gin.Context) {
 func (h *UserHandler) UpdateUser(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid user ID",
+			"detail": "ユーザIDが誤っています。ユーザIDは整数で指定してください。",
+		})
 		log.Print(err)
 		return
 	}
 
 	var req request.UpdateUser
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid request",
+			"detail": "リクエストの形式が間違っています。",
+		})
 		log.Print(err)
 		return
 	}
 
 	err = h.adminManagementService.UpdateUser(userID, &req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+		switch {
+		case errors.Is(err, model.ErrUserNotFound):
+			c.JSON(http.StatusNotFound, gin.H{
+				"title":  "User not found",
+				"detail": "指定されたユーザが見つかりませんでした。",
+			})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"title":  "Failed to update user",
+				"detail": "ユーザ情報の更新に失敗しました。",
+			})
+		}
 		log.Print(err)
 		return
 	}
@@ -167,14 +211,28 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 func (h *UserHandler) DeleteUser(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid user ID",
+			"detail": "ユーザIDが誤っています。ユーザIDは整数で指定してください。",
+		})
 		log.Print(err)
 		return
 	}
 
 	err = h.adminManagementService.DeleteUser(userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not delete user"})
+		switch {
+		case errors.Is(err, model.ErrUserNotFound):
+			c.JSON(http.StatusNotFound, gin.H{
+				"title":  "User not found",
+				"detail": "指定されたユーザが見つかりませんでした。",
+			})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"title":  "Failed to delete user",
+				"detail": "ユーザの削除に失敗しました。",
+			})
+		}
 		log.Print(err)
 		return
 	}
@@ -192,14 +250,28 @@ func (h *UserHandler) DeleteUser(c *gin.Context) {
 func (h *UserHandler) GetRolesByUserID(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid user ID",
+			"detail": "ユーザIDが誤っています。ユーザIDは整数で指定してください。",
+		})
 		log.Print(err)
 		return
 	}
 
 	res, err := h.userPortalService.GetRolesByUserID(userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not get roles"})
+		switch {
+		case errors.Is(err, model.ErrUserNotFound):
+			c.JSON(http.StatusNotFound, gin.H{
+				"title":  "User not found",
+				"detail": "指定されたユーザが見つかりませんでした。",
+			})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"title":  "Failed to get user roles",
+				"detail": "ユーザのロール情報の取得に失敗しました。",
+			})
+		}
 		log.Print(err)
 		return
 	}
@@ -219,20 +291,37 @@ func (h *UserHandler) GetRolesByUserID(c *gin.Context) {
 func (h *UserHandler) AddRoleToUser(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid user ID",
+			"detail": "ユーザIDが誤っています。ユーザIDは整数で指定してください。",
+		})
 		log.Print(err)
 		return
 	}
 
 	var req request.AddRole
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid request",
+			"detail": "リクエストの形式が間違っています。",
+		})
 		log.Print(err)
 		return
 	}
 
 	if err := h.adminManagementService.AddRoleToUser(userID, req.RoleID); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not add role"})
+		switch {
+		case errors.Is(err, model.ErrUserNotFound):
+			c.JSON(http.StatusNotFound, gin.H{
+				"title":  "User not found",
+				"detail": "指定されたユーザが見つかりませんでした。",
+			})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"title":  "Failed to add role to user",
+				"detail": "ユーザへのロール追加に失敗しました。",
+			})
+		}
 		log.Print(err)
 		return
 	}
@@ -251,20 +340,37 @@ func (h *UserHandler) AddRoleToUser(c *gin.Context) {
 func (h *UserHandler) RemoveRoleFromUser(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid user ID",
+			"detail": "ユーザIDが誤っています。ユーザIDは整数で指定してください。",
+		})
 		log.Print(err)
 		return
 	}
 
 	roleID, err := strconv.Atoi(c.Param("role_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid role ID"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid role ID",
+			"detail": "ロールIDが誤っています。ロールIDは整数で指定してください。",
+		})
 		log.Print(err)
 		return
 	}
 
 	if err := h.adminManagementService.RemoveRoleFromUser(userID, roleID); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not remove role"})
+		switch {
+		case errors.Is(err, model.ErrUserNotFound):
+			c.JSON(http.StatusNotFound, gin.H{
+				"title":  "User not found",
+				"detail": "指定されたユーザが見つかりませんでした。",
+			})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"title":  "Failed to remove role",
+				"detail": "ユーザのロール削除に失敗しました。",
+			})
+		}
 		log.Print(err)
 		return
 	}
@@ -282,7 +388,10 @@ func (h *UserHandler) RemoveRoleFromUser(c *gin.Context) {
 func (h *UserHandler) GetUserLogs(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid user ID",
+			"detail": "ユーザIDが誤っています。ユーザIDは整数で指定してください。",
+		})
 		log.Print(err)
 		return
 	}
@@ -291,7 +400,10 @@ func (h *UserHandler) GetUserLogs(c *gin.Context) {
 
 	remLogs, err := h.userPortalService.GetRemainingEntriesLogsByUserID(userID, lastID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not get remaining entries logs"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"title":  "Failed to get remaining entries logs",
+			"detail": "入場可能回数の変更ログの取得に失敗しました。",
+		})
 		log.Print(err)
 		return
 	}
@@ -306,20 +418,29 @@ func (h *UserHandler) GetUserLogs(c *gin.Context) {
 func (h *UserHandler) ChangeRemainingEntries(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user ID"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid user ID",
+			"detail": "ユーザIDが誤っています。ユーザIDは整数で指定してください。",
+		})
 		log.Print(err)
 		return
 	}
 
 	var req request.ChangeRemainingEntries
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid request",
+			"detail": "リクエストの形式が間違っています。",
+		})
 		log.Print(err)
 		return
 	}
 
 	if req.Delta == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Delta must be non-zero"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Delta must be non-zero",
+			"detail": "deltaは0以外の整数を指定してください。",
+		})
 		return
 	}
 
@@ -330,7 +451,18 @@ func (h *UserHandler) ChangeRemainingEntries(c *gin.Context) {
 	}
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to change remaining entries"})
+		switch {
+		case errors.Is(err, model.ErrUserNotFound):
+			c.JSON(http.StatusNotFound, gin.H{
+				"title":  "User not found",
+				"detail": "指定されたユーザが見つかりませんでした。",
+			})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"title":  "Failed to change remaining entries",
+				"detail": "入場可能回数の変更に失敗しました。",
+			})
+		}
 		log.Print(err)
 		return
 	}
