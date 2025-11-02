@@ -203,7 +203,7 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 			UserID:          *user.ID,
 			PreviousEntries: beforeCount,
 			NewEntries:      afterCount,
-			Reason:          "日付を跨いだハウス利用のため",
+			Reason:          "日付を跨いだハウス利用のため(経過日数: " + fmt.Sprint(daysPassed) + ")",
 			UpdatedBy:       "システム",
 		}
 
