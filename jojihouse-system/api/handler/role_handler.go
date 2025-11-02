@@ -25,7 +25,10 @@ func NewRoleHandler(service *service.UserPortalService) *RoleHandler {
 func (h *RoleHandler) GetAllRoles(c *gin.Context) {
 	res, err := h.service.GetAllRoles()
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Could not get roles"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Failed to get roles",
+			"detail": "ロール一覧の取得に失敗しました。",
+		})
 		log.Print(err)
 		return
 	}
