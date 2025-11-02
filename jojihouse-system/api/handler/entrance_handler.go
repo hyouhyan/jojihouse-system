@@ -172,7 +172,10 @@ func (h *EntranceHandler) GetAccessLogs(c *gin.Context) {
 	if dateStr != "" {
 		date, err = time.Parse("2006-01-02", dateStr)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid date format. Use YYYY-MM-DD"})
+			c.JSON(http.StatusBadRequest, gin.H{
+				"title":  "Invalid date format",
+				"detail": "dateはYYYY-MM-DD形式で指定してください。",
+			})
 			log.Print(err)
 			return
 		}
@@ -186,7 +189,10 @@ func (h *EntranceHandler) GetAccessLogs(c *gin.Context) {
 
 	accessLogs, err := h.userPortalService.GetAccessLogsByAnyFilter(lastID, options)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get access log"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"title":  "Failed to get access log",
+			"detail": "入退室ログの取得に失敗しました。",
+		})
 		log.Print(err)
 		return
 	}
@@ -206,7 +212,10 @@ func (h *EntranceHandler) GetAccessLogs(c *gin.Context) {
 func (h *EntranceHandler) GetAccessLogsByUserID(c *gin.Context) {
 	userID, err := strconv.Atoi(c.Param("user_id"))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid user ID"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"title":  "Invalid user ID",
+			"detail": "ユーザIDが誤っています。ユーザIDは整数で指定してください。",
+		})
 		log.Print(err)
 		return
 	}
@@ -230,7 +239,10 @@ func (h *EntranceHandler) GetAccessLogsByUserID(c *gin.Context) {
 
 	accessLogs, err := h.userPortalService.GetAccessLogsByAnyFilter(lastID, options)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get access log"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"title":  "Failed to get access log",
+			"detail": "入退室ログの取得に失敗しました。",
+		})
 		log.Print(err)
 		return
 	}
