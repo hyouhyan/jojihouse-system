@@ -40,7 +40,10 @@ func (h *PaymentHandler) GetAllPaymentLogs(c *gin.Context) {
 
 	paymentLogs, err := h.adminManagementService.GetAllPaymentLogs(lastID, limit)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get payment log"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"title":  "Failed to get payment log",
+			"detail": "支払いログの取得に失敗しました。",
+		})
 		log.Print(err)
 		return
 	}
@@ -63,7 +66,10 @@ func (h *PaymentHandler) GetAllDeletedPaymentLogs(c *gin.Context) {
 
 	paymentLogs, err := h.adminManagementService.GetAllDeletedPaymentLogs(lastID, limit)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get payment log"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"title":  "Failed to get deleted payment log",
+			"detail": "削除済み支払いログの取得に失敗しました。",
+		})
 		log.Print(err)
 		return
 	}
@@ -76,24 +82,36 @@ func (h *PaymentHandler) GetMonthlyPaymentLogs(c *gin.Context) {
 	month := c.Query("month")
 
 	if year == "" || month == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Year and month are required"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid parameters",
+			"detail": "yearとmonthが必要です。",
+		})
 		return
 	}
 
 	yearInt, err := strconv.Atoi(year)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid year format"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid year format",
+			"detail": "yearが誤っています。yearは整数で指定してください。",
+		})
 		return
 	}
 	monthInt, err := strconv.Atoi(month)
 	if err != nil || monthInt < 1 || monthInt > 12 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid month format"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid month format",
+			"detail": "monthが誤っています。monthは整数で、1~12の範囲で指定してください。",
+		})
 		return
 	}
 
 	paymentLogs, err := h.adminManagementService.GetMonthlyPaymentLogs(yearInt, monthInt)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get monthly payment logs"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"title":  "Failed to get monthly payment logs",
+			"detail": "月間支払いログの取得に失敗しました。",
+		})
 		log.Print(err)
 		return
 	}
@@ -105,7 +123,10 @@ func (h *PaymentHandler) CreatePaymentLog(c *gin.Context) {
 	var req request.Payment
 
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Invalid request",
+			"detail": "リクエストの形式が間違っています。",
+		})
 		log.Print(err)
 		return
 	}
@@ -119,7 +140,10 @@ func (h *PaymentHandler) CreatePaymentLog(c *gin.Context) {
 
 	_, err := h.adminManagementService.CreatePaymentLog(paymentLog)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create payment log"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"title":  "Failed to create payment log",
+			"detail": "支払いの記録に失敗しました。",
+		})
 		log.Print(err)
 		return
 	}
@@ -130,7 +154,10 @@ func (h *PaymentHandler) CreatePaymentLog(c *gin.Context) {
 func (h *PaymentHandler) GetPaymentLogByID(c *gin.Context) {
 	logID := c.Param("log_id")
 	if logID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Log ID is required"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Log ID is required",
+			"detail": "log_idパラメータが必要です。",
+		})
 		return
 	}
 
@@ -138,9 +165,15 @@ func (h *PaymentHandler) GetPaymentLogByID(c *gin.Context) {
 	if err != nil {
 		switch {
 		case errors.Is(err, model.ErrPaymentLogNotFound):
-			c.JSON(http.StatusNotFound, gin.H{"error": "Payment log not found"})
+			c.JSON(http.StatusNotFound, gin.H{
+				"title":  "Payment log not found",
+				"detail": "指定された支払いログが見つかりませんでした。",
+			})
 		default:
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get payment log"})
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"title":  "Failed to get payment log",
+				"detail": "支払いログの取得に失敗しました。",
+			})
 		}
 		log.Print(err)
 		return
@@ -152,7 +185,10 @@ func (h *PaymentHandler) GetPaymentLogByID(c *gin.Context) {
 func (h *PaymentHandler) DeletePaymentLog(c *gin.Context) {
 	logID := c.Param("log_id")
 	if logID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Log ID is required"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"title":  "Log ID is required",
+			"detail": "log_idパラメータが必要です。",
+		})
 		return
 	}
 
@@ -160,13 +196,25 @@ func (h *PaymentHandler) DeletePaymentLog(c *gin.Context) {
 	if err != nil {
 		switch {
 		case errors.Is(err, model.ErrPaymentLogNotFound):
-			c.JSON(http.StatusNotFound, gin.H{"error": "Payment log not found"})
+			c.JSON(http.StatusNotFound, gin.H{
+				"title":  "Payment log not found",
+				"detail": "指定された支払いログが見つかりませんでした。",
+			})
 		case errors.Is(err, model.ErrPaymentLogSeemsTicketPurchase):
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "該当ログの削除には、特殊な処理が必要です。管理者に連絡してください。"})
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"title":  "Cannot delete Special log",
+				"detail": "該当ログの削除には、特殊な処理が必要です。管理者に連絡してください。",
+			})
 		case errors.Is(err, model.ErrPaymentLogTooOldToDelete):
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "14日以上前のログは削除できません。どうしても削除したい場合は、管理者に連絡してください。"})
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"title":  "Payment log is too old to delete",
+				"detail": "14日以上前のログは削除できません。どうしても削除したい場合は、管理者に連絡してください。",
+			})
 		default:
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete payment log"})
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"title":  "Failed to delete payment log",
+				"detail": "支払いログの削除に失敗しました。",
+			})
 		}
 		log.Print(err)
 		return
