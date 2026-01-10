@@ -19,7 +19,7 @@ type WebhookPayload struct {
 
 type Embed struct {
 	Title       string `json:"title"`
-	Description string `json"description"`
+	Description string `json:"description"`
 	Footer      Footer `json:"footer"`
 	Color       int    `json:"color"`
 }
