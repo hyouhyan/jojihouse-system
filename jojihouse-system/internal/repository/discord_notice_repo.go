@@ -86,7 +86,7 @@ func (r *DiscordNoticeRepository) noticeAccess(userName string, accessType strin
 		Embeds: []Embed{
 			{
 				Title:       fmt.Sprintf("%sが%sしました", userName, accessType),
-				Description: fmt.Sprintf("残り入場可能回数: %d", remainingEntries),
+				Description: fmt.Sprintf("入場可能回数: %d", remainingEntries),
 				Footer: Footer{
 					Text: footerText,
 				},
