@@ -18,9 +18,10 @@ type WebhookPayload struct {
 }
 
 type Embed struct {
-	Title  string `json:"title"`
-	Footer Footer `json:"footer"`
-	Color  int    `json:"color"`
+	Title       string `json:"title"`
+	Description string `json"description"`
+	Footer      Footer `json:"footer"`
+	Color       int    `json:"color"`
 }
 
 type Footer struct {
@@ -84,7 +85,8 @@ func (r *DiscordNoticeRepository) noticeAccess(userName string, accessType strin
 		AvatarURL: WEBHOOK_AVATAR_URL,
 		Embeds: []Embed{
 			{
-				Title: fmt.Sprintf("%sが%sしました", userName, accessType),
+				Title:       fmt.Sprintf("%sが%sしました", userName, accessType),
+				Description: fmt.Sprintf("残り入場可能回数: %d", remainingEntries),
 				Footer: Footer{
 					Text: footerText,
 				},
