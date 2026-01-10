@@ -36,8 +36,8 @@ func NewDiscordNoticeRepository() *DiscordNoticeRepository {
 	return &DiscordNoticeRepository{}
 }
 
-func (r *DiscordNoticeRepository) NoticeEntry(userName string) {
-	err := r.noticeAccess(userName, "入室")
+func (r *DiscordNoticeRepository) NoticeEntry(userName string, remainingEntries int) {
+	err := r.noticeAccess(userName, "入室", remainingEntries)
 	if err != nil {
 		log.Printf("[Webhook] Error sending entry notice: %v\n", err)
 	} else {
@@ -45,8 +45,8 @@ func (r *DiscordNoticeRepository) NoticeEntry(userName string) {
 	}
 }
 
-func (r *DiscordNoticeRepository) NoticeExit(userName string) {
-	err := r.noticeAccess(userName, "退室")
+func (r *DiscordNoticeRepository) NoticeExit(userName string, remainingEntries int) {
+	err := r.noticeAccess(userName, "退室", remainingEntries)
 	if err != nil {
 		log.Printf("[Webhook] Error sending entry notice: %v\n", err)
 	} else {
@@ -54,7 +54,7 @@ func (r *DiscordNoticeRepository) NoticeExit(userName string) {
 	}
 }
 
-func (r *DiscordNoticeRepository) noticeAccess(userName string, accessType string) error {
+func (r *DiscordNoticeRepository) noticeAccess(userName string, accessType string, remainingEntries int) error {
 	WEBHOOK_URL := os.Getenv("WEBHOOK_URL")
 	WEBHOOK_USERNAME := os.Getenv("WEBHOOK_USERNAME")
 	WEBHOOK_AVATAR_URL := os.Getenv("WEBHOOK_AVATAR_URL")
