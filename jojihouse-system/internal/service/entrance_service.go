@@ -124,8 +124,16 @@ func (s *EntranceService) EnterUser(barcode string) (response.Entrance, error) {
 	// Logに出力
 	log.Printf("[EntranceService] %s entered. Barcode: %s, Remaining entries: %d, Total entries: %d", *user.Name, *user.Barcode, *user.Remaining_entries, *user.Total_entries)
 
+	// 通知用の入場可能回数
+	var remainingStr string
+	if isHouseAdmin {
+		remainingStr = "∞"
+	} else {
+		remainingStr = fmt.Sprintf("%d", *user.Remaining_entries)
+	}
+
 	// Discordに通知
-	go s.discordNoticeRepository.NoticeEntry(*user.Name, *user.Remaining_entries)
+	go s.discordNoticeRepository.NoticeEntry(*user.Name, remainingStr)
 
 	// Response作成
 	response := response.Entrance{
@@ -222,8 +230,16 @@ func (s *EntranceService) ExitUser(barcode string) (response.Entrance, error) {
 	// Logに出力
 	log.Printf("[EntranceService] %s exited. Barcode: %s, Remaining entries: %d, Total entries: %d", *user.Name, *user.Barcode, *user.Remaining_entries, *user.Total_entries)
 
+	// 通知用の入場可能回数
+	var remainingStr string
+	if isHouseAdmin {
+		remainingStr = "∞"
+	} else {
+		remainingStr = fmt.Sprintf("%d", *user.Remaining_entries)
+	}
+
 	// Discordに通知
-	go s.discordNoticeRepository.NoticeExit(*user.Name, *user.Remaining_entries)
+	go s.discordNoticeRepository.NoticeExit(*user.Name, remainingStr)
 
 	// Response作成
 	response := response.Entrance{

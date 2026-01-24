@@ -37,7 +37,7 @@ func NewDiscordNoticeRepository() *DiscordNoticeRepository {
 	return &DiscordNoticeRepository{}
 }
 
-func (r *DiscordNoticeRepository) NoticeEntry(userName string, remainingEntries int) {
+func (r *DiscordNoticeRepository) NoticeEntry(userName string, remainingEntries string) {
 	err := r.noticeAccess(userName, "入室", remainingEntries)
 	if err != nil {
 		log.Printf("[Webhook] Error sending entry notice: %v\n", err)
@@ -46,7 +46,7 @@ func (r *DiscordNoticeRepository) NoticeEntry(userName string, remainingEntries 
 	}
 }
 
-func (r *DiscordNoticeRepository) NoticeExit(userName string, remainingEntries int) {
+func (r *DiscordNoticeRepository) NoticeExit(userName string, remainingEntries string) {
 	err := r.noticeAccess(userName, "退室", remainingEntries)
 	if err != nil {
 		log.Printf("[Webhook] Error sending entry notice: %v\n", err)
@@ -55,7 +55,7 @@ func (r *DiscordNoticeRepository) NoticeExit(userName string, remainingEntries i
 	}
 }
 
-func (r *DiscordNoticeRepository) noticeAccess(userName string, accessType string, remainingEntries int) error {
+func (r *DiscordNoticeRepository) noticeAccess(userName string, accessType string, remainingEntries string) error {
 	WEBHOOK_URL := os.Getenv("WEBHOOK_URL")
 	WEBHOOK_USERNAME := os.Getenv("WEBHOOK_USERNAME")
 	WEBHOOK_AVATAR_URL := os.Getenv("WEBHOOK_AVATAR_URL")
@@ -86,7 +86,7 @@ func (r *DiscordNoticeRepository) noticeAccess(userName string, accessType strin
 		Embeds: []Embed{
 			{
 				Title:       fmt.Sprintf("%sが%sしました", userName, accessType),
-				Description: fmt.Sprintf("残り入場回数: %d", remainingEntries),
+				Description: fmt.Sprintf("残り %s回 入場可能", remainingEntries),
 				Footer: Footer{
 					Text: footerText,
 				},
