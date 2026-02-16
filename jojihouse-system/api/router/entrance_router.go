@@ -1,17 +1,29 @@
 package router
 
 import (
+	"jojihouse-system/api/authentication/middleware"
 	"jojihouse-system/api/handler"
 
 	"github.com/gin-gonic/gin"
 )
 
-func SetupEntranceRoutes(router *gin.Engine, entranceHandler *handler.EntranceHandler) {
-	entranceGroup := router.Group("/entrance")
+func SetupEntranceRoutes(router *gin.Engine, entranceHandler *handler.EntranceHandler, middleware *middleware.AuthMiddleware) {
+	entranceGroupMember := router.Group("/entrance")
+	entranceGroupMember.Use(middleware.AuthMember)
 	{
-		entranceGroup.POST("", entranceHandler.RecordEntrance)
-		entranceGroup.GET("/current", entranceHandler.GetCurrentUsers)
-		entranceGroup.GET("/logs", entranceHandler.GetAccessLogs)
-		entranceGroup.GET("/logs/:user_id", entranceHandler.GetAccessLogsByUserID)
+		entranceGroupMember.GET("/current", entranceHandler.GetCurrentUsers)
+	}
+
+	entranceGroupHouseAdmin := router.Group("/entrance")
+	entranceGroupHouseAdmin.Use(middleware.AuthHouseAdmin)
+	{
+		entranceGroupHouseAdmin.GET("/logs", entranceHandler.GetAccessLogs)
+		entranceGroupHouseAdmin.GET("/logs/:user_id", entranceHandler.GetAccessLogsByUserID)
+	}
+
+	entranceGroupEntrance := router.Group("/entrance")
+	// entranceGroupEntrance.Use()
+	{
+		entranceGroupEntrance.POST("", entranceHandler.RecordEntrance)
 	}
 }

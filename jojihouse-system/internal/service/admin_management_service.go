@@ -31,7 +31,7 @@ func (s *AdminManagementService) CreateUser(req *request.CreateUser) (*response.
 		Name:              req.Name,
 		Description:       req.Description,
 		Barcode:           req.Barcode,
-		Contact:           req.Contact,
+		DiscordID:         req.DiscordID,
 		Remaining_entries: req.Remaining_entries,
 		Allergy:           req.Allergy,
 		Number:            req.Number,
@@ -48,7 +48,7 @@ func (s *AdminManagementService) CreateUser(req *request.CreateUser) (*response.
 		Name:              user.Name,
 		Description:       user.Description,
 		Barcode:           user.Barcode,
-		Contact:           user.Contact,
+		DiscordID:         user.DiscordID,
 		Remaining_entries: user.Remaining_entries,
 		Registered_at:     user.Registered_at,
 		Total_entries:     user.Total_entries,
@@ -76,8 +76,8 @@ func (s *AdminManagementService) UpdateUser(userID int, user *request.UpdateUser
 	if user.Barcode != nil {
 		userModel.Barcode = user.Barcode
 	}
-	if user.Contact != nil {
-		userModel.Contact = user.Contact
+	if user.DiscordID != nil {
+		userModel.DiscordID = user.DiscordID
 	}
 	if user.Remaining_entries != nil {
 		userModel.Remaining_entries = user.Remaining_entries

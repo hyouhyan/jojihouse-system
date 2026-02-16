@@ -187,6 +187,15 @@ func (s *UserPortalService) GetUserByBarcode(barcode string) (*response.User, er
 	return s.cnvModelUserToResponseUser(user), nil
 }
 
+func (s *UserPortalService) GetUserByDiscordID(discordID string) (*response.User, error) {
+	user, err := s.userRepository.GetUserByDiscordID(discordID)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.cnvModelUserToResponseUser(user), nil
+}
+
 func (s *UserPortalService) GetAllRoles() ([]response.Role, error) {
 	roles, err := s.roleRepository.GetAllRoles()
 	if err != nil {
@@ -267,7 +276,7 @@ func (s *UserPortalService) cnvModelUserToResponseUser(user *model.User) *respon
 		Name:              user.Name,
 		Description:       user.Description,
 		Barcode:           user.Barcode,
-		Contact:           user.Contact,
+		DiscordID:         user.DiscordID,
 		Remaining_entries: user.Remaining_entries,
 		Registered_at:     user.Registered_at,
 		Total_entries:     user.Total_entries,

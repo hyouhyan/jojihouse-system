@@ -46,6 +46,20 @@ func (r *UserRepository) GetUserByID(id int) (*model.User, error) {
 	return user, nil
 }
 
+func (r *UserRepository) GetUserByDiscordID(discordID string) (*model.User, error) {
+	user := &model.User{}
+	err := r.db.Get(user, "SELECT * FROM users WHERE discord_id = $1", discordID)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, model.ErrUserNotFound
+		}
+		return nil, fmt.Errorf("failed to get users: %w", err)
+	}
+
+	return user, nil
+}
+
 func (r *UserRepository) GetUserByBarcode(barcode string) (*model.User, error) {
 	user := &model.User{}
 	err := r.db.Get(user, "SELECT * FROM users WHERE barcode = $1", barcode)
@@ -95,10 +109,10 @@ func (r *UserRepository) CreateUser(user *model.User) (*model.User, error) {
 		values = append(values, ":barcode")
 		args["barcode"] = *user.Barcode
 	}
-	if user.Contact != nil {
-		columns = append(columns, "contact")
-		values = append(values, ":contact")
-		args["contact"] = *user.Contact
+	if user.DiscordID != nil {
+		columns = append(columns, "discord_id")
+		values = append(values, ":discord_id")
+		args["discord_id"] = *user.DiscordID
 	}
 	if user.Remaining_entries != nil {
 		columns = append(columns, "remaining_entries")
@@ -156,7 +170,7 @@ func (r *UserRepository) UpdateUser(user *model.User) error {
 			name = :name,
 			description = :description,
 			barcode = :barcode,
-			contact = :contact,
+			discord_id = :discord_id,
 			remaining_entries = :remaining_entries,
 			total_entries = :total_entries,
 			allergy = :allergy,
