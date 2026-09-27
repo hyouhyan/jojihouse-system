@@ -261,8 +261,8 @@ func (s *EntranceService) isSameDate(a, b time.Time) bool {
 		b = b.In(a.Location())
 	}
 
-	aDate := s.cnvTo00Time(a)
-	bDate := s.cnvTo00Time(b)
+	aDate := s.cnvToBusinessDate(a)
+	bDate := s.cnvToBusinessDate(b)
 
 	return aDate.Equal(bDate)
 }
@@ -275,15 +275,23 @@ func (s *EntranceService) cnvTo00Time(t time.Time) time.Time {
 		0, 0, 0, 0, t.Location())
 }
 
+// 日付変更の境界時刻(この時刻より前は前日扱い)
+const dayBoundaryOffset = 1 * time.Hour
+
+// tが属する日付の00:00:00を返す(境界時刻より前なら前日扱い)
+func (s *EntranceService) cnvToBusinessDate(t time.Time) time.Time {
+	return s.cnvTo00Time(t.Add(-dayBoundaryOffset))
+}
+
 func (s *EntranceService) getPassedDays(targetDate, currentDate time.Time) int {
 	// aとbのtimezoneを揃える
 	if targetDate.Location() != currentDate.Location() {
 		currentDate = currentDate.In(targetDate.Location())
 	}
 
-	// 00:00:00どうしで比較
-	targetDate = s.cnvTo00Time(targetDate)
-	currentDate = s.cnvTo00Time(currentDate)
+	// 日付変更の境界時刻を考慮した00:00:00どうしで比較
+	targetDate = s.cnvToBusinessDate(targetDate)
+	currentDate = s.cnvToBusinessDate(currentDate)
 
 	// 日数の差を計算
 	daysPassed := int(currentDate.Sub(targetDate).Hours() / 24)
