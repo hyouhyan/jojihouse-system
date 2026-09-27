@@ -289,9 +289,9 @@ func (s *EntranceService) getPassedDays(targetDate, currentDate time.Time) int {
 		currentDate = currentDate.In(targetDate.Location())
 	}
 
-	// 00:00:00どうしで比較
-	targetDate = s.cnvTo00Time(targetDate)
-	currentDate = s.cnvTo00Time(currentDate)
+	// 日付変更の境界時刻を考慮した00:00:00どうしで比較
+	targetDate = s.cnvToBusinessDate(targetDate)
+	currentDate = s.cnvToBusinessDate(currentDate)
 
 	// 日数の差を計算
 	daysPassed := int(currentDate.Sub(targetDate).Hours() / 24)
