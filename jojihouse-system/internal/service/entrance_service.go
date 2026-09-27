@@ -261,8 +261,8 @@ func (s *EntranceService) isSameDate(a, b time.Time) bool {
 		b = b.In(a.Location())
 	}
 
-	aDate := s.cnvTo00Time(a)
-	bDate := s.cnvTo00Time(b)
+	aDate := s.cnvToBusinessDate(a)
+	bDate := s.cnvToBusinessDate(b)
 
 	return aDate.Equal(bDate)
 }
